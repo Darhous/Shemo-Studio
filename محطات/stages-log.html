@@ -112,5 +112,70 @@
 
 </div>
 
+<div class="stage" id="stage-1">
+<h2>المحطة 1 — Baseline WordPress Config</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تعديل فعلي على إعدادات الموقع (لا إضافات، لا ثيم مخصص بعد)
+</p>
+
+<h3>السياق</h3>
+<p>استكمالًا لجرد المحطة 0، نُفّذت كل البنود المعلَّمة "⏳" في جدولها باستخدام <code>wp-cli 2.12.0</code> (متاح جاهز جوه LocalWP) متصل مباشرة بقاعدة بيانات الموقع — من غير لمس لوحة التحكم يدويًا. أداة التنفيذ: <code>wp-cli</code> عبر PHP 8.3.29، بـ <code>--path</code> يشاور على <code>...\Shemo-Studio-Clean-Start\app\public</code>.</p>
+
+<h3>1. إعدادات عامة (Settings → General / Reading / Discussion)</h3>
+<table>
+<tr><th>الإعداد</th><th>كان قبل</th><th>بقى دلوقتي</th><th>طريقة التنفيذ</th></tr>
+<tr><td>Site Title</td><td>"Shemo Studio"</td><td>بدون تغيير</td><td>✅ لا إجراء</td></tr>
+<tr><td>Tagline</td><td>فاضي</td><td><strong>"From Sketch to Screen"</strong></td><td><code>wp option update blogdescription</code></td></tr>
+<tr><td>Timezone</td><td>فاضي</td><td><strong>Africa/Cairo</strong></td><td><code>wp option update timezone_string</code></td></tr>
+<tr><td>Permalinks</td><td><code>/%postname%/</code></td><td>بدون تغيير</td><td>✅ لا إجراء</td></tr>
+<tr><td>Discourage search engines</td><td>غير مفعّل</td><td><strong>مفعّل (blog_public=0)</strong></td><td><code>wp option update blog_public 0</code></td></tr>
+<tr><td>Default comment status</td><td>open</td><td><strong>closed</strong></td><td><code>wp option update default_comment_status closed</code></td></tr>
+<tr><td>Default ping status</td><td>open</td><td><strong>closed</strong></td><td><code>wp option update default_ping_status closed</code></td></tr>
+</table>
+<p class="meta">تم التحقق بعد كل تعديل بقراءة القيمة رجوع من قاعدة البيانات فعليًا.</p>
+
+<h3>2. wp-config.php — أعلام تطوير</h3>
+<p>أُضيفت 3 سطور بعد تعريف <code>WP_DEBUG</code> الحالي (فضل <code>false</code>)، قبل سطر <code>WP_ENVIRONMENT_TYPE</code>:</p>
+<pre style="background:var(--surface2); padding:1rem; border-radius:6px; overflow-x:auto; direction:ltr; text-align:left;"><code>define( 'WP_DEBUG_LOG', true );
+define( 'WP_DEBUG_DISPLAY', false );
+define( 'SCRIPT_DEBUG', true );</code></pre>
+<p>الهدف: أي خطأ/تنبيه PHP يتسجل في <code>wp-content/debug.log</code> بدل ما يظهر على الشاشة لأي زائر. الملف ده موجود جوه فولدر موقع LocalWP مش جوه الريبو، فمفيش خطورة رفعه على GitHub.</p>
+
+<h3>3. حذف المحتوى الافتراضي</h3>
+<table>
+<tr><th>العنصر</th><th>الإجراء</th><th>السبب</th></tr>
+<tr><td>Post #1 "Hello world!"</td><td>🗑️ اتحذف نهائيًا</td><td>محتوى تجريبي افتراضي</td></tr>
+<tr><td>Comment #1</td><td>🗑️ اتحذف نهائيًا</td><td>مرتبط بالبوست المحذوف</td></tr>
+<tr><td>Page #2 "Sample Page"</td><td>🗑️ اتحذفت نهائيًا</td><td>محتوى تجريبي افتراضي</td></tr>
+<tr><td>Page #3 "Privacy Policy" (draft)</td><td>✅ اتسابت من غير تعديل</td><td>قرار تنفيذي: draft مش منشورة ومش بتأثر دلوقتي. الأفضل تتسيب كهيكل جاهز (slug + ID محجوز) وتتملى لاحقًا. <strong>محتاجة تأكيد من المستخدم في محطة لاحقة.</strong></td></tr>
+</table>
+
+<h3>4. التحقق النهائي (Verification)</h3>
+<ul>
+<li>✅ <code>wp core is-installed</code> نجح — الاتصال بقاعدة البيانات سليم بعد كل التعديلات</li>
+<li>✅ طلب HTTP لـ <code>http://shemostudio.local/</code> رجّع <strong>200 OK</strong> من غير أي PHP fatal error</li>
+<li>✅ الـ <code>&lt;title&gt;</code> بقى "Shemo Studio – From Sketch to Screen"</li>
+<li>✅ ظهر <code>&lt;meta name="robots" content="noindex, nofollow" /&gt;</code> فعليًا في الصفحة المعروضة</li>
+<li>✅ مفيش بوست/صفحة متبقّية غير Page #3 (Privacy Policy draft)</li>
+<li>ملاحظة: لسه مفيش <code>debug.log</code> — طبيعي، معناه مفيش أي notice/warning حصل لحد دلوقتي</li>
+</ul>
+
+<h3>5. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>مفيش أي ثيم اتغيّر (<code>twentytwentyfive</code> لسه مفعّل) — <code>shemo-child</code> ينتظر المحطة 3</li>
+<li>مفيش أي إضافة (plugin) اتثبّتت — تنتظر بوابة المحطة 2</li>
+<li>إيميل الأدمن (<code>dev-email@wpengine.local</code>) لسه placeholder، متلموسش</li>
+</ul>
+
+<div class="gate">
+<strong>6. بوابة المراجعة:</strong> المحطة 1 خلصت بالكامل وتم التحقق الفعلي منها (مش بس قراءة قيم، كمان فحص استجابة الموقع الحقيقية).
+القرار الوحيد المفتوح: مصير صفحة Privacy Policy draft (البند 3).
+في انتظار موافقة المستخدم للانتقال إلى <strong>المحطة 2</strong>.
+</div>
+
+</div>
+
 </body>
 </html>

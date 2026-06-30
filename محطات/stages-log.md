@@ -81,3 +81,70 @@
 
 ### 4. بوابة المراجعة
 المحطة 0 خلصت بالكامل كقراءة فقط، من غير أي تعديل على أي إعداد أو محتوى. **في انتظار موافقة المستخدم للانتقال إلى المحطة 1 (Baseline WordPress Config).**
+
+---
+
+## المحطة 1 — Baseline WordPress Config
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** تعديل فعلي على إعدادات الموقع (لا إضافات، لا ثيم مخصص بعد)
+
+### السياق
+استكمالًا للجرد اللي خرجت بيه المحطة 0، المحطة دي نفّذت كل البنود اللي كانت معلّمة "⏳ يحتاج ضبط/حذف" في جدول المحطة 0، باستخدام WP-CLI 2.12.0 (متاح جاهز جوه بيئة LocalWP) متصل مباشرة بقاعدة بيانات الموقع — من غير أي تعديل يدوي عبر لوحة التحكم.
+
+**أداة التنفيذ:** `wp-cli` عبر PHP 8.3.29 المرفق مع LocalWP، بـ `--path` يشاور على `C:\Users\ahmed\Local Sites\Shemo-Studio-Clean-Start\app\public`.
+
+### 1. إعدادات عامة (Settings → General / Reading / Discussion)
+
+| الإعداد | كان قبل | بقى دلوقتي | طريقة التنفيذ |
+|---|---|---|---|
+| Site Title | "Shemo Studio" | "Shemo Studio" (بدون تغيير) | — لا إجراء، كان مظبوط بالفعل |
+| Tagline | فاضي | **"From Sketch to Screen"** | `wp option update blogdescription` |
+| Timezone | فاضي (gmt_offset=0) | **Africa/Cairo** | `wp option update timezone_string` |
+| Permalinks | `/%postname%/` | `/%postname%/` (بدون تغيير) | — لا إجراء، كان مظبوط بالفعل |
+| Discourage search engines | غير مفعّل (`blog_public=1`) | **مفعّل** (`blog_public=0`) | `wp option update blog_public 0` |
+| Default comment status | open | **closed** | `wp option update default_comment_status closed` |
+| Default ping status | open | **closed** | `wp option update default_ping_status closed` |
+
+تم التحقق بعد كل تعديل بقراءة القيمة رجوع من قاعدة البيانات (مش بس الأمر اللي اترسل) — كل القيم اتأكدت فعليًا.
+
+### 2. wp-config.php — أعلام تطوير
+
+أُضيفت 3 سطور جديدة بعد تعريف `WP_DEBUG` الحالي (اللي فضل زي ما هو `false`)، قبل سطر `WP_ENVIRONMENT_TYPE`:
+
+```php
+define( 'WP_DEBUG_LOG', true );
+define( 'WP_DEBUG_DISPLAY', false );
+define( 'SCRIPT_DEBUG', true );
+```
+
+الهدف: أي خطأ/تنبيه PHP يتسجل في ملف لوج (`wp-content/debug.log`) بدل ما يظهر على الشاشة لأي زائر — مناسب لبيئة تطوير محلية بس برضه آمن لو حد فتح الموقع بالخطأ. السطر `WP_DEBUG` نفسه فضل `false` زي ما كان (مفيش داعي يتفعّل دلوقتي، هيتفعّل وقت الحاجة فعلاً للتطوير).
+
+هذا الملف (`wp-config.php`) موجود جوه فولدر موقع LocalWP مش جوه الريبو، فمفيش أي خطورة إنه يترفع على GitHub.
+
+### 3. حذف المحتوى الافتراضي
+
+| العنصر | الإجراء | السبب |
+|---|---|---|
+| Post #1 "Hello world!" | 🗑️ اتحذف نهائيًا (`wp post delete --force`) | محتوى تجريبي افتراضي، مفيش داعي له |
+| Comment #1 (تعليق على Hello World) | 🗑️ اتحذف نهائيًا | كان مرتبط بالبوست المحذوف |
+| Page #2 "Sample Page" | 🗑️ اتحذفت نهائيًا (`wp post delete --force`) | محتوى تجريبي افتراضي |
+| Page #3 "Privacy Policy" (draft) | ✅ **اتسابت من غير تعديل** | قرار تنفيذي: الصفحة دي draft مش منشورة، ومش بتأثر على وضع الموقع دلوقتي. الأفضل إنها تتسيب كهيكل جاهز (slug `privacy-policy` + الـ ID محجوز) وتتملى بمحتوى حقيقي لاحقًا بدل ما تتحذف وتتعمل من الأول. **محتاجة تأكيد/مراجعة من المستخدم في محطة لاحقة** (مرتبطة بالمحتوى القانوني في الخطة) — لو القرار يتغير، سهل تتحذف وقتها. |
+
+### 4. التحقق النهائي (Verification)
+
+- ✅ `wp core is-installed` → نجح (الاتصال بقاعدة البيانات سليم بعد كل التعديلات)
+- ✅ طلب HTTP لـ `http://shemostudio.local/` رجّع **200 OK** من غير أي PHP fatal error
+- ✅ الـ `<title>` بقى `Shemo Studio – From Sketch to Screen` (التاجلاين بان فعليًا في الصفحة)
+- ✅ ظهر `<meta name="robots" content="noindex, nofollow" />` في الـ `<head>` — تأكيد إن "Discourage search engines" شغّال فعليًا على مستوى الصفحة المعروضة، مش بس في قاعدة البيانات
+- ✅ مفيش أي بوست/صفحة متبقّية غير Page #3 (Privacy Policy draft) — لا Hello World ولا Sample Page ولا تعليقات
+- ملاحظة: لسه مفيش `wp-content/debug.log` — طبيعي، معناه مفيش أي PHP notice/warning حصل لحد دلوقتي (الملف هيتعمل تلقائي أول ما يحصل حاجة تتسجل)
+
+### 5. حدود المحطة (ما لم يتم لمسه عمدًا)
+- مفيش أي ثيم اتغيّر (`twentytwentyfive` لسه مفعّل) — `shemo-child` ينتظر المحطة 3
+- مفيش أي إضافة (plugin) اتثبّتت — تنتظر بوابة المحطة 2
+- إيميل الأدمن (`dev-email@wpengine.local`) لسه placeholder، متلموسش — لازم يتحدّث قبل أي مرحلة بتعتمد على نماذج/إشعارات
+
+### 6. بوابة المراجعة
+المحطة 1 خلصت بالكامل: كل بنود "Baseline WordPress Config" المعلّقة من المحطة 0 اتنفذت وتم التحقق منها فعليًا (مش بس قراءة قيم الإعداد، كمان فحص استجابة الموقع الحقيقية). القرار الوحيد المفتوح هو **مصير صفحة Privacy Policy draft** (راجع جدول البند 3). **في انتظار موافقة المستخدم للانتقال إلى المحطة 2.**
