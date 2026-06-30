@@ -270,3 +270,70 @@ define( 'SCRIPT_DEBUG', true );
 
 ### 8. بوابة المراجعة
 المحطة 3 خلصت: اتسجّل تراجع المستخدم الصريح عن قرار Bricks Builder المدفوع واتعتمد بديل مجاني (GeneratePress + GenerateBlocks) بدل منه في `APPROVED-DECISIONS.md` قبل أي تنفيذ، ثيم `shemo-child` اتبنى فعليًا جوه الريبو وبقى الثيم النشط على الموقع عبر directory junction (Git هو مصدر الحقيقة للكود مش فولدر LocalWP)، و`.gitignore` اتضاف لأول مرة يطبّق قاعدة "child theme + shemo-core بس متتبّعين". اتحقق كل حاجة بفحص HTTP حي للموقع مش بس قراءة قيم. **القرار المفتوح:** ACF Pro (قرار 5) لازم يتعرض من جديد على المستخدم في بداية محطة نمذجة المحتوى. **في انتظار موافقة المستخدم للانتقال إلى المحطة 4.**
+
+---
+
+## المحطة 4 — نمذجة المحتوى (Content Modeling)
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** تعديل فعلي على موقع LocalWP — تثبيت إضافة + بناء إضافة داخلية + تعديل قرار معتمد
+
+### السياق
+بداية المحطة: اتسأل المستخدم صراحةً عن قرار رقم 5 (ACF Pro، مدفوع) قبل أي تنفيذ — نفس أسلوب Bricks بالمحطة 3. المستخدم فوّض القرار ("خد انت القرار الأفضل"). تقرر الانتقال لـ**Meta Box (مجاني)** بدل ACF Pro، لأنه بيوفر مجانًا بالضبط الحقول اللي كانت سبب الحاجة لنسخة Pro من ACF تحديدًا (Repeater/Clone، Group، Gallery، Relationship). `APPROVED-DECISIONS.md` اتعدّل بالتفصيل (قرار 5 الأصلي `⛔ Superseded`، قرار 5 مُعدَّل `✅ Approved`) قبل أي تنفيذ تقني.
+
+### 1. مراجعة وتعديل قرار رقم 5 (قبل أي تنفيذ)
+نفس الإجراء بالظبط اللي اتعمل مع Bricks بالمحطة 3: القرار رقم 5 الأصلي (ACF Pro) اتسأل عنه المستخدم صراحةً قبل أي خطوة تقنية. المستخدم رد بتفويض القرار للتنفيذ الأفضل. السبب الفني لاختيار **Meta Box** تحديدًا (مش ACF المجاني العادي): النسخة المجانية من ACF بتفتقد Repeater/Flexible Content/Relationship fields (محجوزين لنسخة Pro فقط) — وهما بالظبط نوع الحقول المطلوبة في §19 (deliverables، credits، results، related projects). Meta Box المجاني بيوفرهم بالكامل عبر خاصية `clone => true` على أي حقل + حقل `post` للعلاقات — يعني قدرة أعلى فعليًا من ACF المجاني، مجانًا بالكامل. القرار اتسجّل في `APPROVED-DECISIONS.md` (قرار 5 الأصلي `⛔ Superseded`، قرار 5 مُعدَّل `✅ Approved`) قبل أي تنفيذ تقني — بنفس قاعدة "لا قرار بدون توثيق قبل التنفيذ".
+
+### 2. تثبيت Meta Box (الإضافة المجانية)
+- `wp plugin install meta-box --activate` من `downloads.wordpress.org` مباشرة (v5.12.1) — إضافة third-party عادية، **مش متتبّعة بـGit** (نفس مبدأ GeneratePress/GenerateBlocks بالمحطة 3).
+
+### 3. بناء إضافة `shemo-core` (المتتبّعة بـGit بالكامل)
+اتبنت جوه الريبو نفسه (`Shemo-Studio-Clean-Start/plugins/shemo-core/`) — `.gitignore` كان جاهز بالفعل من المحطة 3 يستثني `plugins/*` إلا `plugins/shemo-core/`. هيكل الإضافة:
+
+| الملف | المسؤولية |
+|---|---|
+| `shemo-core.php` | bootstrap الإضافة + تنبيه إداري لو Meta Box مش مفعّلة |
+| `includes/post-types.php` | تسجيل CPT `project` (slug `/work/`, archive `/work/`, REST-enabled) |
+| `includes/taxonomies.php` | تسجيل 8 تصنيفات على `project` |
+| `includes/fields.php` | تسجيل كل حقول §19 عبر فلتر `rwmb_meta_boxes` التابع لـMeta Box |
+
+**CPT `project`:** `public`، `show_in_rest => true` (يفتح الباب لاستخدام REST/headless لاحقًا لو احتجنا)، أرشيف ورابط دائم على `/work/`، يدعم title/editor/excerpt/thumbnail/revisions.
+
+**8 تصنيفات (Taxonomies):** Service، Project Type، Industry، Platform، Tool (غير هرمي عمدًا — حر زي الوسوم، لأن أدوات زي "Premiere Pro"/"Figma" متعددة وحرة مش شجرة ثابتة)، Content Format، Client Type، Visual Style. **"Featured" مش تصنيف عمدًا** — اتسجّل كحقل boolean منفصل (`shemo_featured`) بالظبط زي ما حدده `MASTER-PLAN.md` §19 ("Featured = field flag, not a taxonomy").
+
+**5 مجموعات حقول (Meta Box field groups)، 22 حقل إجمالًا، كلهم بالكود مش بواجهة إدارة GUI** (تفاديًا لنفس نقطة الرفض الموثقة بالخطة: "CPT-UI + Code Snippets — rejected, bloat"):
+
+1. **Project Details** (10 حقول): client label (select: Named/Confidential/Unnamed/Personal)، client name، short summary، project date، project goal، challenge (WYSIWYG)، creative direction (WYSIWYG)، deliverables (نص متكرر عبر `clone`)، external link، featured (checkbox).
+2. **Sketch to Screen** (6 حقول): sketch/before/after — كل واحدة منهم اتقسّمت لحقل صورة + حقل فيديو اختياري منفصلين (مفيش نوع حقل واحد "صورة أو فيديو" في Meta Box المجاني، فده الحل العملي البديل، بنفس البيانات).
+3. **Media** (2 حقول): main video (Vimeo، نوع oEmbed) + gallery (صور متعددة).
+4. **Results & Credibility** (3 حقول): results (مجموعة metric+value متكررة)، testimonial (quote + اسم + دور + صورة)، credits (مجموعة role+name متكررة).
+5. **Related Projects** (1 حقل): علاقة Many-to-Many مع نفس CPT `project` عبر حقل `post` (`select_advanced`، متعدد).
+
+### 4. ربط الإضافة بموقع LocalWP
+نفس أسلوب junction بالظبط من المحطة 3: **directory junction** (`New-Item -ItemType Junction`) من:
+`C:\Users\ahmed\Local Sites\Shemo-Studio-Clean-Start\app\public\wp-content\plugins\shemo-core`
+لـ:
+`C:\Users\ahmed\Desktop\New folder (9)\Shemo-Studio-Clean-Start\plugins\shemo-core`
+الريبو فضل مصدر الحقيقة الوحيد للكود، وWordPress بيشوف أي تعديل لاحق فورًا.
+
+### 5. التفعيل والتحقق (end-to-end، مش بس قراءة كود)
+- `wp plugin activate shemo-core` → نجح بدون أي PHP fatal error.
+- `wp post-type list` أكّد ظهور `project` (Projects).
+- `wp taxonomy list` أكّد ظهور كل الـ8 تصنيفات مربوطة بـ`project`.
+- `wp rewrite flush` نجح (رابط `/work/` شغّال).
+- **فحص حقيقي لمحرك الحقول:** عبر `wp eval-file` اتأكد إن Meta Box محمّل (`RWMB_Loader` موجودة) وإن فلتر `rwmb_meta_boxes` بيرجّع فعليًا **5 مجموعات بـ22 حقل إجمالًا** بدون أي خطأ PHP.
+- **فحص بيانات حقيقي:** اتعمل بوستين تجريبيين من نوع `project`، اتسجّلت عليهم قيم حقول فعلية (client label/name، short summary، featured) وتصنيفات فعلية (service، industry)، واتقرت رجوع من قاعدة البيانات بنجاح — يعني تخزين الحقول والتصنيفات شغّال end-to-end مش بس التسجيل بالكود.
+- **فحص HTTP حي:** أرشيف `/work/` رجّع **200 OK** وعرض فعليًا عناوين البوستات التجريبية (تأكيد إن routing/archive شغّال على الموقع الحقيقي مش بس في قاعدة البيانات). الصفحة الرئيسية كمان فحصت ورجّعت **200 OK** مع تأكيد بقاء كل إعدادات المحطات 1 و3 شغّالة (تاجلاين، robots noindex، شيمو تشايلد فوق جينيريت برس) — مفيش أي regression.
+- **تنظيف:** البوستين التجريبيين والتصنيفات التجريبية اتمسحوا بالكامل بعد التحقق، الموقع رجع لحالة فاضية من بيانات تجريبية.
+
+### 6. حدود المحطة (ما لم يتم لمسه عمدًا)
+- **مفيش أي محتوى حقيقي اتدخل** — كل اللي حصل تجربة تقنية اتمسحت بعدها. صفحات/بوستات Projects الحقيقية لسه منتظرة محتوى case-study فعلي (مرتبط ببند "Case-study data ×6–10" في `MASTER-PLAN.md`، مؤجّل لمرحلة لاحقة).
+- **مفيش تصميم بصري للحقول أو للأرشيف** — أرشيف `/work/` شغّال بقالب GeneratePress الافتراضي تمامًا، مفيش single template مخصص لـ`project` ولا تصميم لصفحة الحقول في لوحة التحكم — ينتظر محطة تصميم لاحقة (Bricks اتلغى، فالتصميم هيكون عبر GenerateBlocks/Site Editor).
+- **REST API exposure للحقول المخصصة لسه مش مفعّلة** — الـCPT نفسه `show_in_rest => true` لكن حقول Meta Box متسجلتش بـ`register_post_meta`/`show_in_rest` بعد؛ مش مطلوبة الآن (مفيش استخدام headless حاليًا)، بس سهل تتفعّل لاحقًا لو احتجناها.
+- **باقي الإضافات الأساسية لسه منتظرة** (Safe SVG، Fluent Forms، SureCart، Rank Math، Wordfence، ShortPixel، Duplicator) — ولا واحدة فيهم اتثبّتت في المحطة دي، برضه منتظرين محطة تثبيت إضافات منفصلة.
+- إيميل الأدمن placeholder لسه متلموسش (من محطة 1، لسه مفتوح).
+- إضافات لم تُعرض بعد على المستخدم (Cloudflare Turnstile، Complianz، GA4/GTM، CRM) — لسه برّه نطاق كل المحطات لحد الآن.
+
+### 7. بوابة المراجعة
+المحطة 4 خلصت: قرار رقم 5 (ACF Pro) اتراجَع عنه بنفس الأسلوب اللي اتعمل بيه Bricks بالمحطة 3 (سؤال صريح قبل أي تنفيذ، توثيق في `APPROVED-DECISIONS.md` قبل أي كود)، واتحل محله **Meta Box (مجاني)** كمحرك حقول بقدرة أعلى فعليًا من ACF المجاني (Repeater/Group/Gallery/Relationship كلهم مجانًا). إضافة `shemo-core` اتبنت بالكامل بالكود جوه الريبو (CPT + 8 تصنيفات + 22 حقل عبر 5 مجموعات)، اتربطت بالموقع عبر directory junction، واتفعّلت بنجاح. كل حاجة اتحقق منها end-to-end: تسجيل بالكود، تخزين بيانات حقيقي في قاعدة البيانات، وعرض حي عبر HTTP — مش بس قراءة كود ثابت. مفيش regression على أي إعداد من المحطات السابقة. **في انتظار موافقة المستخدم للانتقال إلى المحطة 5.**

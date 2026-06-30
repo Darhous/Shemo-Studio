@@ -302,5 +302,75 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 
 </div>
 
+<div class="stage" id="stage-4">
+<h2>المحطة 4 — نمذجة المحتوى (Content Modeling)</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تعديل فعلي على موقع LocalWP — تثبيت إضافة + بناء إضافة داخلية + تعديل قرار معتمد
+</p>
+
+<h3>السياق</h3>
+<p>بداية المحطة: اتسأل المستخدم صراحةً عن قرار رقم 5 (ACF Pro، مدفوع) قبل أي تنفيذ — نفس أسلوب Bricks بالمحطة 3. المستخدم فوّض القرار ("خد انت القرار الأفضل"). تقرر الانتقال لـ<strong>Meta Box (مجاني)</strong> بدل ACF Pro، لأنه بيوفر مجانًا بالضبط الحقول اللي كانت سبب الحاجة لنسخة Pro من ACF تحديدًا (Repeater/Clone، Group، Gallery، Relationship). <code>APPROVED-DECISIONS.md</code> اتعدّل بالتفصيل (قرار 5 الأصلي <code>⛔ Superseded</code>، قرار 5 مُعدَّل <code>✅ Approved</code>) قبل أي تنفيذ تقني.</p>
+
+<h3>1. مراجعة وتعديل قرار رقم 5 (قبل أي تنفيذ)</h3>
+<p>نفس الإجراء بالظبط اللي اتعمل مع Bricks بالمحطة 3: القرار رقم 5 الأصلي (ACF Pro) اتسأل عنه المستخدم صراحةً قبل أي خطوة تقنية. المستخدم رد بتفويض القرار للتنفيذ الأفضل. السبب الفني لاختيار Meta Box تحديدًا (مش ACF المجاني العادي): النسخة المجانية من ACF بتفتقد Repeater/Flexible Content/Relationship fields (محجوزين لنسخة Pro فقط) — وهما بالظبط نوع الحقول المطلوبة في §19 (deliverables، credits، results، related projects). Meta Box المجاني بيوفرهم بالكامل عبر خاصية <code>clone =&gt; true</code> على أي حقل + حقل <code>post</code> للعلاقات — يعني قدرة أعلى فعليًا من ACF المجاني، مجانًا بالكامل.</p>
+
+<h3>2. تثبيت Meta Box (الإضافة المجانية)</h3>
+<p><code>wp plugin install meta-box --activate</code> من <code>downloads.wordpress.org</code> مباشرة (v5.12.1) — إضافة third-party عادية، <strong>مش متتبّعة بـGit</strong> (نفس مبدأ GeneratePress/GenerateBlocks بالمحطة 3).</p>
+
+<h3>3. بناء إضافة shemo-core (المتتبّعة بـGit بالكامل)</h3>
+<p>اتبنت جوه الريبو نفسه (<code>plugins/shemo-core/</code>) — <code>.gitignore</code> كان جاهز بالفعل من المحطة 3 يستثني <code>plugins/*</code> إلا <code>plugins/shemo-core/</code>.</p>
+
+<table>
+<tr><th>الملف</th><th>المسؤولية</th></tr>
+<tr><td><code>shemo-core.php</code></td><td>bootstrap الإضافة + تنبيه إداري لو Meta Box مش مفعّلة</td></tr>
+<tr><td><code>includes/post-types.php</code></td><td>تسجيل CPT <code>project</code> (slug <code>/work/</code>, archive <code>/work/</code>, REST-enabled)</td></tr>
+<tr><td><code>includes/taxonomies.php</code></td><td>تسجيل 8 تصنيفات على <code>project</code></td></tr>
+<tr><td><code>includes/fields.php</code></td><td>تسجيل كل حقول §19 عبر فلتر <code>rwmb_meta_boxes</code></td></tr>
+</table>
+
+<p><strong>8 تصنيفات:</strong> Service، Project Type، Industry، Platform، Tool (غير هرمي عمدًا — حر زي الوسوم)، Content Format، Client Type، Visual Style. <strong>"Featured" مش تصنيف عمدًا</strong> — حقل boolean منفصل (<code>shemo_featured</code>) بالظبط زي ما حدده <code>MASTER-PLAN.md</code> §19.</p>
+
+<p><strong>5 مجموعات حقول، 22 حقل إجمالًا، كلهم بالكود مش بواجهة GUI</strong> (تفاديًا لنقطة الرفض الموثقة بالخطة: "CPT-UI + Code Snippets — rejected, bloat"):</p>
+<ul>
+<li><strong>Project Details</strong> (10 حقول): client label، client name، short summary، project date، project goal، challenge (WYSIWYG)، creative direction (WYSIWYG)، deliverables (متكرر)، external link، featured.</li>
+<li><strong>Sketch to Screen</strong> (6 حقول): sketch/before/after — كل واحدة صورة + فيديو اختياري منفصلين.</li>
+<li><strong>Media</strong> (2 حقول): main video (Vimeo) + gallery.</li>
+<li><strong>Results &amp; Credibility</strong> (3 حقول): results (متكرر) + testimonial + credits (متكرر).</li>
+<li><strong>Related Projects</strong> (1 حقل): علاقة Many-to-Many مع <code>project</code> نفسه.</li>
+</ul>
+
+<h3>4. ربط الإضافة بموقع LocalWP</h3>
+<p>نفس أسلوب junction من المحطة 3: <strong>directory junction</strong> من فولدر الموقع لفولدر الريبو — الريبو فضل مصدر الحقيقة الوحيد للكود.</p>
+
+<h3>5. التفعيل والتحقق (end-to-end)</h3>
+<ul>
+<li><code>wp plugin activate shemo-core</code> → نجح بدون أي PHP fatal error</li>
+<li><code>wp post-type list</code> أكّد ظهور <code>project</code></li>
+<li><code>wp taxonomy list</code> أكّد ظهور كل الـ8 تصنيفات</li>
+<li><code>wp rewrite flush</code> نجح</li>
+<li>فحص حقيقي عبر <code>wp eval-file</code>: Meta Box محمّل، وفلتر <code>rwmb_meta_boxes</code> بيرجّع فعليًا <strong>5 مجموعات بـ22 حقل</strong> بدون أي خطأ PHP</li>
+<li>فحص بيانات حقيقي: بوستين تجريبيين اتسجّلت عليهم قيم حقول وتصنيفات فعلية واتقرت من قاعدة البيانات بنجاح</li>
+<li>فحص HTTP حي: أرشيف <code>/work/</code> رجّع <strong>200 OK</strong> وعرض عناوين البوستات التجريبية؛ الصفحة الرئيسية رجّعت <strong>200 OK</strong> برضه مع تأكيد بقاء إعدادات المحطات 1 و3 شغّالة — مفيش regression</li>
+<li>تنظيف: البوستين التجريبيين والتصنيفات اتمسحوا بالكامل بعد التحقق</li>
+</ul>
+
+<h3>6. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>مفيش أي محتوى حقيقي اتدخل — التجربة التقنية اتمسحت بعدها، case-study data الحقيقي لسه مؤجّل</li>
+<li>مفيش تصميم بصري للأرشيف أو لصفحة الحقول — أرشيف <code>/work/</code> شغّال بقالب GeneratePress الافتراضي تمامًا</li>
+<li>REST API exposure للحقول المخصصة لسه مش مفعّلة (سهل تتفعّل لاحقًا لو احتجناها)</li>
+<li>باقي الإضافات الأساسية لسه منتظرة (Safe SVG، Fluent Forms، SureCart، Rank Math، Wordfence، ShortPixel، Duplicator)</li>
+<li>إيميل الأدمن placeholder لسه متلموسش</li>
+</ul>
+
+<div class="gate">
+<strong>7. بوابة المراجعة:</strong> المحطة 4 خلصت: قرار رقم 5 (ACF Pro) اتراجَع عنه بنفس أسلوب Bricks بالمحطة 3 (سؤال صريح قبل أي تنفيذ، توثيق قبل أي كود)، واتحل محله <strong>Meta Box (مجاني)</strong> بقدرة أعلى فعليًا من ACF المجاني. إضافة <code>shemo-core</code> اتبنت بالكامل بالكود (CPT + 8 تصنيفات + 22 حقل)، اتربطت بالموقع عبر directory junction، واتفعّلت بنجاح. كل حاجة اتحقق منها end-to-end. مفيش regression على أي إعداد من المحطات السابقة.
+في انتظار موافقة المستخدم للانتقال إلى <strong>المحطة 5</strong>.
+</div>
+
+</div>
+
 </body>
 </html>
