@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>سجل محطات مشروع Shemo Studio</title>
+<style>
+  :root {
+    --bg: #0E0F12; --surface: #1C1E22; --surface2: #23262B;
+    --text: #F5F2EC; --muted: #A7A39B; --accent: #FF5A2C;
+    --ok: #3FB984; --warn: #E9A23B; --border: #33363c;
+  }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Tahoma, sans-serif; line-height: 1.7; margin: 0; padding: 2rem; max-width: 980px; margin-inline: auto; }
+  h1 { font-size: 1.8rem; border-bottom: 2px solid var(--accent); padding-bottom: .5rem; }
+  h2 { color: var(--accent); margin-top: 3rem; font-size: 1.4rem; }
+  h3 { color: var(--text); margin-top: 1.6rem; font-size: 1.1rem; }
+  .meta { color: var(--muted); font-size: .95rem; }
+  .badge { display: inline-block; padding: .15rem .6rem; border-radius: 999px; font-size: .85rem; font-weight: 600; }
+  .badge.done { background: rgba(63,185,132,.15); color: var(--ok); border: 1px solid var(--ok); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--surface); }
+  th, td { border: 1px solid var(--border); padding: .5rem .7rem; text-align: right; font-size: .95rem; }
+  th { background: var(--surface2); color: var(--accent); }
+  .gate { background: var(--surface2); border-inline-start: 4px solid var(--accent); padding: 1rem 1.2rem; margin-top: 1.5rem; }
+  .stage { border-top: 1px solid var(--border); padding-top: 1rem; }
+  code { background: var(--surface2); padding: .1rem .4rem; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>سجل محطات مشروع Shemo Studio</h1>
+<p class="meta">هذا الملف هو السجل التراكمي لكل محطة تُنفَّذ في المشروع. كل محطة لها جلسة/محادثة منفصلة. لا تُحذف محطات سابقة — يُضاف الجديد فقط في آخر الملف.</p>
+
+<div class="stage" id="stage-0">
+<h2>المحطة 0 — الأمان والتدقيق (Safety &amp; Audit)</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: قراءة فقط (Read-Only) — لا تعديل على أي إعداد
+</p>
+
+<h3>السياق</h3>
+<p>الموقع القديم في LocalWP كان قد اتمسح بمعرفة المستخدم قبل بداية هذه المحطة (راجع <code>APPROVED-DECISIONS.md</code> — لا قرارات معتمدة غير رقم 1 "Hybrid studio + visible founder"). بدلاً من تدقيق بيئة قديمة، تم إنشاء <strong>موقع LocalWP جديد فاضي</strong> بالإعدادات الموصى بها في الخطة الأصلية:</p>
+
+<table>
+<tr><th>الإعداد</th><th>القيمة</th></tr>
+<tr><td>اسم الموقع</td><td>Shemo-Studio-Clean-Start</td></tr>
+<tr><td>الدومين المحلي</td><td>http://shemostudio.local (و HTTPS يعمل)</td></tr>
+<tr><td>WordPress</td><td>7.0</td></tr>
+<tr><td>PHP</td><td>8.3.29</td></tr>
+<tr><td>Web server</td><td>Nginx 1.26.1</td></tr>
+<tr><td>Database</td><td>MySQL 8.4.0</td></tr>
+<tr><td>مسار الموقع محليًا</td><td><code>C:\Users\ahmed\Local Sites\Shemo-Studio-Clean-Start</code></td></tr>
+</table>
+
+<h3>1. النسخ الاحتياطي</h3>
+<ul>
+<li>✅ نسخة قاعدة البيانات: <code>_backups/db_2026-07-01_phase0.sql</code> (≈897 KB)</li>
+<li>✅ نسخة كاملة للملفات (<code>app/</code> + <code>conf/</code>): <code>_backups/files_2026-07-01_phase0.zip</code> (≈30 MB)</li>
+<li>المكان: داخل فولدر الموقع نفسه في LocalWP — <strong>مش في الريبو العام عمدًا</strong>.</li>
+</ul>
+
+<h3>2. الجرد الكامل (Read-Only Inventory)</h3>
+
+<p><strong>الثيمات:</strong> مفعّل <code>twentytwentyfive</code> · موجود وغير مفعّل: <code>twentytwentyfour</code>، <code>twentytwentythree</code> · لا يوجد ثيم مخصص بعد.</p>
+<p><strong>الإضافات:</strong> لا توجد أي إضافة مثبّتة إطلاقًا.</p>
+
+<p><strong>المستخدمين:</strong></p>
+<table>
+<tr><th>ID</th><th>Username</th><th>Email</th><th>الدور</th><th>تاريخ الإنشاء</th></tr>
+<tr><td>1</td><td>darhous</td><td>dev-email@wpengine.local</td><td>Administrator</td><td>2026-06-30 22:25:59</td></tr>
+</table>
+<p class="meta">⚠️ الإيميل placeholder تلقائي من LocalWP — يحتاج تحديث قبل أي مرحلة لاحقة تعتمد على الإيميل.</p>
+
+<p><strong>المحتوى الافتراضي الموجود:</strong></p>
+<table>
+<tr><th>ID</th><th>العنوان</th><th>النوع</th><th>الحالة</th></tr>
+<tr><td>1</td><td>Hello world!</td><td>post</td><td>publish</td></tr>
+<tr><td>2</td><td>Sample Page</td><td>page</td><td>publish</td></tr>
+<tr><td>3</td><td>Privacy Policy</td><td>page</td><td>draft</td></tr>
+</table>
+<p>تعليق افتراضي واحد موجود. فولدر الرفع فاضي.</p>
+
+<p><strong>الإعدادات الحالية مقابل المطلوب بالمحطة 1:</strong></p>
+<table>
+<tr><th>الإعداد</th><th>الحالة الآن</th><th>الإجراء المطلوب لاحقًا</th></tr>
+<tr><td>Site Title</td><td>"Shemo Studio"</td><td>✅ لا إجراء</td></tr>
+<tr><td>Tagline</td><td>فاضي</td><td>⏳ "From Sketch to Screen"</td></tr>
+<tr><td>Timezone</td><td>فاضي (gmt_offset=0)</td><td>⏳ Africa/Cairo</td></tr>
+<tr><td>Permalinks</td><td><code>/%postname%/</code></td><td>✅ لا إجراء</td></tr>
+<tr><td>Discourage search engines</td><td>غير مفعّل (الموقع مفهرس)</td><td>⏳ تفعيل</td></tr>
+<tr><td>Comments / Pingbacks</td><td>مفتوحين</td><td>⏳ قفل</td></tr>
+<tr><td>wp-config: WP_DEBUG</td><td>false (معرّف)</td><td>—</td></tr>
+<tr><td>wp-config: WP_DEBUG_LOG</td><td>غير معرّف</td><td>⏳ إضافة وتفعيل</td></tr>
+<tr><td>wp-config: WP_DEBUG_DISPLAY</td><td>غير معرّف</td><td>⏳ إضافة وتعطيل</td></tr>
+<tr><td>wp-config: SCRIPT_DEBUG</td><td>غير معرّف</td><td>⏳ إضافة وتفعيل</td></tr>
+</table>
+
+<h3>3. خلاصة الجرد</h3>
+<ul>
+<li><strong>مظبوط بالفعل:</strong> Site Title، بنية الـ Permalinks.</li>
+<li><strong>يحتاج ضبط بالمحطة 1:</strong> Tagline، Timezone، Discourage search engines، حالة التعليقات، أعلام wp-config.</li>
+<li><strong>يحتاج حذف بالمحطة 1:</strong> Hello World post + تعليقه، Sample Page (ومراجعة Privacy Policy draft).</li>
+<li><strong>لسه مفيش حاجة منه:</strong> <code>shemo-child</code> (محطة 3)، <code>shemo-core</code> (محطة 4)، أي إضافة أساسية (تنتظر بوابة المحطة 2).</li>
+</ul>
+
+<h3>ملاحظة أمان</h3>
+<p>بيانات دخول الأدمن اتفحصت لغرض التحقق من الاتصال فقط، ومتسجلتش في أي ملف أو ذاكرة دائمة.</p>
+
+<div class="gate">
+<strong>4. بوابة المراجعة:</strong> المحطة 0 خلصت بالكامل كقراءة فقط، من غير أي تعديل على أي إعداد أو محتوى.
+في انتظار موافقة المستخدم للانتقال إلى <strong>المحطة 1 (Baseline WordPress Config)</strong>.
+</div>
+
+</div>
+
+</body>
+</html>
