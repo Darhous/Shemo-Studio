@@ -1,0 +1,25 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+
+# Secrets / environment-specific config — never committed
+.env
+wp-config.php
+wp-config-local.php
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+
+# Only the custom child theme + shemo-core plugin are versioned here.
+# Any third-party theme/plugin that ends up copied into these folders must stay untracked.
+themes/*
+!themes/shemo-child/
+plugins/*
+!plugins/shemo-core/
+
+# WordPress core and uploads never live in this repo
+/wp/
+/wp-content/uploads/

@@ -154,7 +154,7 @@ define( 'SCRIPT_DEBUG', true );
 ## المحطة 2 — بوابة قفل القرارات (Decisions Lock-in Gate)
 
 **التاريخ:** 2026-07-01
-**الحالة:** 🔄 قيد التنفيذ
+**الحالة:** ✅ مكتملة
 **النوع:** قرارات فقط — لا تعديل تقني على الموقع، لا تثبيت إضافات
 
 ### السياق
@@ -199,3 +199,74 @@ define( 'SCRIPT_DEBUG', true );
 
 ### 5. بوابة المراجعة
 المحطة 2 خلصت: 11 قرار معماري/تقني لووردبريس اتقفلوا بموافقة صريحة قرار-بقرار، ومبدأ "تفضيل المجاني" اتسجّل كملاحظة دائمة. الفجوات المتبقية (تفاصيل النماذج/البيع، اللغة، الهوية البصرية، إضافات التحليلات/الكوكيز/مكافحة السبام) موثّقة صراحة كمؤجّلة وليست منسية. **في انتظار موافقة المستخدم للانتقال إلى المحطة 3 (تركيب shemo-child theme).**
+
+---
+
+## المحطة 3 — تركيب ثيم shemo-child الفرعي
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** تعديل فعلي على موقع LocalWP — تثبيت ثيم/إضافة + تنفيذ Git tracking لأول مرة
+
+### السياق
+المحطة دي مخصصة لتنفيذ القرار رقم 4 المعتمد (ثيم فرعي مخصص `shemo-child`)، اعتمادًا على القرار رقم 3 (page builder). قبل أي خطوة تقنية، اتسأل المستخدم صراحةً: هل ترخيص Bricks Builder متاح بالفعل ولا لسه محتاج شراء؟ — بما إن Bricks **مالوش نسخة مجانية إطلاقًا** (ترخيص one-time من $79). ردّ المستخدم إنه **مش هيشتري حاجة، عاوز كل حاجة مجانية**.
+
+### 1. مراجعة وتعديل القرارات المعتمدة (قبل أي تنفيذ)
+ده تعارض مباشر مع القرار رقم 3 المُقفَل فعليًا في المحطة 2. اتسأل المستخدم تحديدًا: يرجع عن Bricks لبديل مجاني، يوقف المحطة، ولا يشتري لاحقًا بس يستنى؟ اختار المستخدم صراحةً: **الرجوع عن Bricks → GeneratePress (مجاني)**، وهو البديل (Runner-up) الموثّق أصلاً في `MASTER-PLAN.md` §8.
+
+`APPROVED-DECISIONS.md` اتعدّل قبل أي تنفيذ تقني:
+- **القرار 3 الأصلي (Bricks):** بقى `⛔ Superseded`، مع توثيق سبب وتاريخ التراجع، بدون حذف السجل التاريخي.
+- **قرار 3 (مُعدَّل) جديد:** ✅ **GeneratePress (مجاني) + GenerateBlocks (مجاني)** — معتمد.
+- **القرار 4 (الثيم):** اتعدّل ليصبح `shemo-child` فوق **GeneratePress** بدل Bricks (استراتيجية الثيم الفرعي نفسها فضلت زي ما هي).
+- **ملاحظة "تفضيل المجاني" العامة:** اتحدّثت لتوثّق إن القرار 3 (Bricks) اتراجَع عنه فعليًا بناءً على طلب صريح، وإن **القرار 5 (ACF Pro، لسه مدفوع ولم يُراجَع)** لازم يتعرض على المستخدم صراحةً في بداية محطة `shemo-core`/نمذجة المحتوى قبل أي شراء — مش مفروض يتفترض استمراره تلقائيًا.
+
+### 2. إعداد بيئة التنفيذ (wp-cli)
+الموقع القديم لـwp-cli (من محطة 1) معروف إنه يحتاج PowerShell + متغيرات بيئة محددة، لكن المسارات نفسها متسجلتش في وقتها. اتعمل اكتشاف جديد للمسارات الفعلية على الجهاز:
+- **wp-cli الثنائي:** `C:\Program Files (x86)\Local\resources\extraResources\bin\wp-cli\win32\wp.bat` (مُجمَّع جوه تطبيق Local نفسه، مش جوه فولدر الموقع).
+- **PHP 8.3.29:** `C:\Users\ahmed\AppData\Roaming\Local\lightning-services\php-8.3.29+1\bin\win64`
+- **MySQL client 8.4.0:** `C:\Users\ahmed\AppData\Roaming\Local\lightning-services\mysql-8.4.0\bin\win64\bin`
+- **PHPRC:** `C:\Users\ahmed\AppData\Roaming\Local\run\<site-run-hash>\conf\php` (فيه `php.ini` الفعلي وقت التشغيل)
+- **MYSQL_HOME:** `C:\Users\ahmed\AppData\Roaming\Local\run\<site-run-hash>\conf\mysql` (فيه `my.cnf` بإعدادات الاتصال الفعلية — port 10004، user/pass root/root محليًا فقط)
+
+اتأكد الاتصال بـ`wp core is-installed` و`wp core version` (رجّعت 7.0) قبل أي تعديل.
+
+### 3. تثبيت GeneratePress وGenerateBlocks
+- `wp theme install generatepress` — نزل من `downloads.wordpress.org` مباشرة (v3.6.1)، اتثبّت بنجاح. ثيم third-party عادي، **مش متتبّع بـGit** (زي ما المخطط له في §11).
+- `wp plugin install generateblocks` (v2.3.0) + `wp plugin activate generateblocks` — إضافة third-party عادية، **مش متتبّعة بـGit**.
+
+### 4. بناء ثيم shemo-child (الثيم المخصص — الوحيد المتتبّع بـGit)
+اتعمل جوه الريبو نفسه (`Shemo-Studio-Clean-Start/themes/shemo-child/`) — مش جوه فولدر موقع LocalWP مباشرة — مطابقةً لقاعدة §11 ("Git: version child theme + shemo-core only"):
+
+| الملف | المحتوى |
+|---|---|
+| `style.css` | هيدر الثيم القياسي بووردبريس مع `Template: generatepress` (لازم يطابق اسم فولدر الثيم الأب)، اسم/وصف الثيم |
+| `functions.php` | enqueue صحيح لستايل الأب ثم الابن (`wp_enqueue_style` مع dependency بينهم) — أسلوب GeneratePress الموصى به رسميًا لثيم فرعي |
+
+اتعمل **directory junction** (`New-Item -ItemType Junction`, مش symlink — الـjunction ما بيحتجش صلاحيات Administrator على NTFS) من:
+`C:\Users\ahmed\Local Sites\Shemo-Studio-Clean-Start\app\public\wp-content\themes\shemo-child`
+لـ:
+`C:\Users\ahmed\Desktop\New folder (9)\Shemo-Studio-Clean-Start\themes\shemo-child`
+
+بالشكل ده، أي تعديل لاحق على ملفات الثيم بيتعمل **جوه الريبو مباشرة** وWordPress بيشوفه فورًا من غير نسخ يدوي — والريبو فضل هو مصدر الحقيقة الوحيد للكود.
+
+### 5. `.gitignore` جديد للريبو
+اتضاف `.gitignore` في جذر الريبو (أول مرة) يطبّق قاعدة §11 حرفيًا: يستثني `themes/*` و`plugins/*` بالكامل إلا `themes/shemo-child/` و`plugins/shemo-core/` (لمحطة لاحقة)، بالإضافة لاستثناء `wp-config.php`، `.env`، `*.log`، `/wp/`، `/wp-content/uploads/`، `node_modules/`.
+
+### 6. التفعيل والتحقق
+- `wp theme activate shemo-child` → نجح، `wp theme list` أكّد: `generatepress` بقى `parent`، `shemo-child` بقى `active`.
+- `wp plugin list` أكّد `generateblocks` نشط.
+- فحص HTTP حي لـ`http://shemostudio.local/` رجّع **200 OK** بدون أي PHP fatal error، مع:
+  - `<title>` لسه "Shemo Studio – From Sketch to Screen" (التاجلاين من محطة 1 لسه شغّال)
+  - `<meta name="robots" content="noindex, nofollow">` لسه موجود (إعداد محطة 1 لسه شغّال)
+  - `<link>` لستايل `generatepress` **و**`shemo-child` معًا في الـ`<head>` (enqueue شغّال صح)
+  - `body class` فيها `wp-theme-generatepress wp-child-theme-shemo-child` (تأكيد إضافي إن الثيم الفرعي شغّال فعليًا فوق الأب الصحيح)
+
+### 7. حدود المحطة (ما لم يتم لمسه عمدًا)
+- **مفيش تصميم بصري حقيقي بعد** — الثيم الفرعي حاليًا هيكل فاضي (style.css بس هيدر، مفيش design tokens/ألوان/خطوط) لحد ما تُتخذ قرارات الهوية البصرية (مؤجّلة في `APPROVED-DECISIONS.md`).
+- **مفيش أي إضافة تانية اتثبّتت** (Safe SVG، Fluent Forms، SureCart، Rank Math، Wordfence، ShortPixel، Duplicator) — كل دول لسه منتظرين محطة تثبيت إضافات منفصلة.
+- **`shemo-core` plugin** (نمذجة المحتوى، Projects CPT) لسه منتظر محطة لاحقة — وهيّ نفس المحطة اللي لازم يتعرض فيها قرار ACF Pro (مدفوع) من جديد على المستخدم قبل أي شراء.
+- **GeneratePress وGenerateBlocks لسه على الإعدادات الافتراضية تمامًا** — مفيش أي تخصيص (Site Library، ألوان، تايبوغرافي) اتعمل، ده هيحتاج محطة تصميم لاحقة.
+- إيميل الأدمن placeholder لسه متلموسش (من محطة 1، لسه مفتوح).
+
+### 8. بوابة المراجعة
+المحطة 3 خلصت: اتسجّل تراجع المستخدم الصريح عن قرار Bricks Builder المدفوع واتعتمد بديل مجاني (GeneratePress + GenerateBlocks) بدل منه في `APPROVED-DECISIONS.md` قبل أي تنفيذ، ثيم `shemo-child` اتبنى فعليًا جوه الريبو وبقى الثيم النشط على الموقع عبر directory junction (Git هو مصدر الحقيقة للكود مش فولدر LocalWP)، و`.gitignore` اتضاف لأول مرة يطبّق قاعدة "child theme + shemo-core بس متتبّعين". اتحقق كل حاجة بفحص HTTP حي للموقع مش بس قراءة قيم. **القرار المفتوح:** ACF Pro (قرار 5) لازم يتعرض من جديد على المستخدم في بداية محطة نمذجة المحتوى. **في انتظار موافقة المستخدم للانتقال إلى المحطة 4.**
