@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shemo Studio — Cinematic Noir Mockup</title>
+  <link rel="icon" href="phase14-favicon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --bg: #0E0F12;
+      --surface: #1C1E22;
+      --surface-2: #23262B;
+      --text: #F5F2EC;
+      --text-muted: #A7A39B;
+      --accent: #FF5A2C;
+      --border: #33363C;
+      --focus: #FF5A2C;
+      --shadow: rgba(0, 0, 0, .34);
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      color-scheme: dark;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(245, 242, 236, .035) 1px, transparent 1px) 0 0 / 72px 72px,
+        linear-gradient(180deg, rgba(245, 242, 236, .025) 1px, transparent 1px) 0 0 / 72px 72px,
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 4px;
+    }
+
+    .site-shell {
+      overflow: hidden;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(14, 15, 18, .84);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      width: min(100% - 40px, var(--max));
+      height: 78px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 220px;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+    }
+
+    .brand-name {
+      margin: 0;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .brand-line {
+      margin: 2px 0 0;
+      color: var(--text-muted);
+      font-size: .82rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      color: var(--text-muted);
+      font-size: .94rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button-primary {
+      background: var(--accent);
+      color: var(--bg);
+      box-shadow: 0 18px 42px rgba(255, 90, 44, .18);
+    }
+
+    .button-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .button-ghost {
+      min-height: auto;
+      padding: 0;
+      border: 0;
+      color: var(--accent);
+      background: transparent;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 780px;
+      display: grid;
+      align-items: center;
+      padding: 84px 0 72px;
+      isolation: isolate;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 90, 44, .11), transparent 42%),
+        linear-gradient(180deg, transparent 0%, rgba(14, 15, 18, .78) 92%);
+      z-index: -2;
+    }
+
+    .hero-inner {
+      width: min(100% - 40px, var(--max));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(340px, .7fr);
+      gap: 54px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 22px;
+      color: var(--text-muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 42px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 999px;
+    }
+
+    .hero-title {
+      max-width: 830px;
+      margin: 0;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 6.4rem;
+      line-height: .9;
+      font-weight: 700;
+    }
+
+    .hero-title span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--text);
+      text-stroke: 2px var(--text);
+    }
+
+    .hero-copy {
+      max-width: 610px;
+      margin: 26px 0 0;
+      color: var(--text-muted);
+      font-size: 1.08rem;
+    }
+
+    .hero-copy strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .arabic-note {
+      direction: rtl;
+      text-align: right;
+      max-width: 510px;
+      margin-top: 20px;
+      color: var(--text-muted);
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    .storyboard {
+      position: relative;
+      min-height: 560px;
+      transform: rotate(-4deg);
+    }
+
+    .storyboard::before,
+    .storyboard::after {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      height: 10px;
+      border-top: 2px solid rgba(245, 242, 236, .55);
+      border-bottom: 2px solid rgba(245, 242, 236, .55);
+    }
+
+    .storyboard::before {
+      top: -22px;
+    }
+
+    .storyboard::after {
+      bottom: -22px;
+    }
+
+    .frame {
+      position: absolute;
+      width: 58%;
+      min-height: 260px;
+      padding: 18px;
+      background: linear-gradient(145deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 28px 70px var(--shadow);
+    }
+
+    .frame-one {
+      top: 10px;
+      left: 0;
+    }
+
+    .frame-two {
+      right: 0;
+      top: 144px;
+    }
+
+    .frame-three {
+      left: 46px;
+      bottom: 6px;
+    }
+
+    .frame-label {
+      color: var(--accent);
+      font-weight: 800;
+      font-size: .78rem;
+    }
+
+    .frame-title {
+      margin: 32px 0 12px;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 1.72rem;
+      line-height: 1.05;
+    }
+
+    .sketch-line {
+      width: 100%;
+      height: 94px;
+      margin-top: 22px;
+    }
+
+    .section {
+      padding: 88px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-inner {
+      width: min(100% - 40px, var(--max));
+      margin: 0 auto;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, .76fr) minmax(260px, .38fr);
+      gap: 34px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: .86rem;
+      font-weight: 800;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 3.4rem;
+      line-height: .98;
+    }
+
+    .section-copy {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .work-card {
+      min-height: 420px;
+      padding: 18px;
+      display: grid;
+      align-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .poster {
+      position: relative;
+      min-height: 230px;
+      margin: -18px -18px 24px;
+      background:
+        linear-gradient(135deg, rgba(255, 90, 44, .16), transparent 38%),
+        repeating-linear-gradient(90deg, rgba(245, 242, 236, .09) 0 1px, transparent 1px 22px),
+        var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .poster svg {
+      position: absolute;
+      inset: 18px;
+      width: calc(100% - 36px);
+      height: calc(100% - 36px);
+    }
+
+    .work-card h3 {
+      margin: 0;
+      font-size: 1.28rem;
+    }
+
+    .work-card p {
+      margin: 10px 0 0;
+      color: var(--text-muted);
+      font-size: .95rem;
+    }
+
+    .service-band {
+      background: var(--surface);
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .service {
+      min-height: 210px;
+      padding: 24px;
+      border-right: 1px solid var(--border);
+    }
+
+    .service:last-child {
+      border-right: 0;
+    }
+
+    .service b {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 26px;
+    }
+
+    .service h3 {
+      margin: 0 0 12px;
+      font-size: 1.22rem;
+    }
+
+    .service p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    .system-grid {
+      display: grid;
+      grid-template-columns: .78fr 1.22fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .brand-panel,
+    .tokens-panel {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .brand-panel h3,
+    .tokens-panel h3 {
+      margin: 0 0 18px;
+      font-size: 1.12rem;
+    }
+
+    .mark-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .mark-option {
+      display: grid;
+      place-items: center;
+      min-height: 172px;
+      padding: 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .mark-option p {
+      margin: 12px 0 0;
+      color: var(--text-muted);
+      font-size: .84rem;
+      text-align: center;
+    }
+
+    .token-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .token {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 56px;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: .92rem;
+    }
+
+    .swatch {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      border: 1px solid rgba(245, 242, 236, .3);
+      border-radius: 4px;
+    }
+
+    .contrast-table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .contrast-table th,
+    .contrast-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: .9rem;
+    }
+
+    .contrast-table th {
+      color: var(--accent);
+      background: var(--surface-2);
+    }
+
+    .contrast-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .final-cta {
+      padding: 82px 0 100px;
+      background:
+        linear-gradient(90deg, rgba(255, 90, 44, .1), transparent 34%),
+        var(--bg);
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-strip {
+      width: min(100% - 40px, var(--max));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 26px;
+      align-items: center;
+      padding: 30px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .cta-strip h2 {
+      margin: 0;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .cta-strip p {
+      margin: 8px 0 0;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 980px) {
+      .nav-inner {
+        height: auto;
+        padding: 16px 0;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-inner,
+      .section-head,
+      .system-grid,
+      .cta-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        font-size: 4.6rem;
+      }
+
+      .storyboard {
+        min-height: auto;
+        display: grid;
+        gap: 14px;
+        transform: none;
+      }
+
+      .storyboard::before,
+      .storyboard::after {
+        position: static;
+        display: block;
+        margin: 0 16px;
+      }
+
+      .frame {
+        position: relative;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        width: 100%;
+        min-height: 230px;
+      }
+
+      .work-grid,
+      .services {
+        grid-template-columns: 1fr;
+      }
+
+      .service {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .service:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .nav-inner,
+      .hero-inner,
+      .section-inner,
+      .cta-strip {
+        width: min(100% - 28px, var(--max));
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand-name {
+        font-size: 1.25rem;
+      }
+
+      .brand-line {
+        display: none;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .hero {
+        padding-top: 54px;
+      }
+
+      .hero-title {
+        font-size: 3.15rem;
+      }
+
+      .hero-title span {
+        -webkit-text-stroke-width: 1px;
+        text-stroke-width: 1px;
+      }
+
+      .frame-title {
+        font-size: 1.55rem;
+      }
+
+      .section {
+        padding: 62px 0;
+      }
+
+      .section-title,
+      .cta-strip h2 {
+        font-size: 2.3rem;
+      }
+
+      .mark-row,
+      .token-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="#top" aria-label="Shemo Studio home">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="14" fill="#0E0F12"/>
+            <path d="M14 18 C21 11, 34 11, 38 19 C42 28, 30 31, 22 35 C12 40, 12 48, 22 52 C30 55, 42 53, 47 44" fill="none" stroke="#F5F2EC" stroke-width="4.6" stroke-linecap="round"/>
+            <path d="M50 19 C44 13, 32 13, 28 20 C25 27, 35 31, 43 35 C52 39, 53 47, 44 52 C36 56, 25 53, 20 45" fill="none" stroke="#F5F2EC" stroke-width="3" stroke-linecap="round" opacity=".72"/>
+            <path d="M13 13 L51 13 M13 53 L51 53" fill="none" stroke="#FF5A2C" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <span>
+            <span class="brand-name">Shemo Studio</span>
+            <span class="brand-line">From Sketch to Screen</span>
+          </span>
+        </a>
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a href="#work">Work</a>
+          <a href="#services">Services</a>
+          <a href="#brand">Identity</a>
+          <a class="button button-secondary" href="#start">Start a Project</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-inner">
+          <div>
+            <p class="eyebrow">Cinematic creative studio</p>
+            <h1 class="hero-title" id="hero-title">From Sketch <span>to Screen</span></h1>
+            <p class="hero-copy">
+              Shemo Studio shapes rough visual ideas into finished campaigns, motion pieces,
+              brand systems, and launch-ready creative assets with a dark-screen visual language.
+            </p>
+            <p class="arabic-note">من الاسكتش الأول لحد الشاشة النهائية: تنفيذ بصري واضح، سينمائي، وقابل للاستخدام في الحملات الحقيقية.</p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#start">Start a Project</a>
+              <a class="button button-secondary" href="#work">See Selected Work</a>
+            </div>
+          </div>
+
+          <div class="storyboard" aria-label="Storyboard style visual">
+            <article class="frame frame-one">
+              <span class="frame-label">SKETCH</span>
+              <h2 class="frame-title">Loose lines find the shot.</h2>
+              <svg class="sketch-line" viewBox="0 0 320 120" aria-hidden="true">
+                <path d="M12 82 C58 20, 120 25, 156 68 C183 100, 245 101, 304 30" fill="none" stroke="#F5F2EC" stroke-width="4" stroke-linecap="round" opacity=".75"/>
+                <path d="M34 30 L82 78 L126 42 L174 92 L248 24" fill="none" stroke="#FF5A2C" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </article>
+            <article class="frame frame-two">
+              <span class="frame-label">CUT</span>
+              <h2 class="frame-title">The idea gets rhythm.</h2>
+              <svg class="sketch-line" viewBox="0 0 320 120" aria-hidden="true">
+                <path d="M18 62 H84 M106 62 H188 M208 62 H302" fill="none" stroke="#F5F2EC" stroke-width="5" stroke-linecap="round"/>
+                <path d="M80 30 L112 62 L80 94 M185 30 L217 62 L185 94" fill="none" stroke="#A7A39B" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </article>
+            <article class="frame frame-three">
+              <span class="frame-label">SCREEN</span>
+              <h2 class="frame-title">The finish holds attention.</h2>
+              <svg class="sketch-line" viewBox="0 0 320 120" aria-hidden="true">
+                <rect x="28" y="20" width="264" height="78" rx="4" fill="none" stroke="#F5F2EC" stroke-width="4"/>
+                <path d="M142 48 L188 59 L142 72 Z" fill="#FF5A2C"/>
+              </svg>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="work">
+        <div class="section-inner">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Selected work</p>
+              <h2 class="section-title">Three sample lanes for the launch portfolio.</h2>
+            </div>
+            <p class="section-copy">Placeholder cards only. Final case studies wait for the Phase 15 content strategy decision.</p>
+          </div>
+
+          <div class="work-grid">
+            <article class="work-card">
+              <div>
+                <div class="poster">
+                  <svg viewBox="0 0 360 260" aria-hidden="true">
+                    <path d="M42 200 C96 50, 185 44, 221 127 C243 177, 286 178, 323 74" fill="none" stroke="#F5F2EC" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="104" cy="96" r="24" fill="none" stroke="#FF5A2C" stroke-width="4"/>
+                  </svg>
+                </div>
+                <h3>Launch Film Titles</h3>
+                <p>Motion direction, title cards, and edit language for a founder-led launch.</p>
+              </div>
+              <a class="button button-ghost" href="#start">Request similar</a>
+            </article>
+            <article class="work-card">
+              <div>
+                <div class="poster">
+                  <svg viewBox="0 0 360 260" aria-hidden="true">
+                    <path d="M50 44 H292 V208 H50 Z" fill="none" stroke="#F5F2EC" stroke-width="4"/>
+                    <path d="M82 74 H260 M82 110 H218 M82 146 H278 M82 182 H198" stroke="#A7A39B" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M276 38 L318 80" stroke="#FF5A2C" stroke-width="5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <h3>Campaign Visual Kit</h3>
+                <p>Social graphics, thumbnail rules, and reusable composition templates.</p>
+              </div>
+              <a class="button button-ghost" href="#start">Request similar</a>
+            </article>
+            <article class="work-card">
+              <div>
+                <div class="poster">
+                  <svg viewBox="0 0 360 260" aria-hidden="true">
+                    <path d="M74 192 C89 88, 152 50, 214 68 C271 84, 298 132, 284 198" fill="none" stroke="#F5F2EC" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M124 124 C154 108, 196 108, 232 130" fill="none" stroke="#FF5A2C" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M106 206 H260" stroke="#A7A39B" stroke-width="4" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <h3>Storyboard System</h3>
+                <p>Sketch frames, scene beats, and creative planning before production.</p>
+              </div>
+              <a class="button button-ghost" href="#start">Request similar</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section service-band" id="services">
+        <div class="section-inner">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Services</p>
+              <h2 class="section-title">A compact system for creative production.</h2>
+            </div>
+            <p class="section-copy">The same visual tokens support editorial pages, quote forms, and case studies after approval.</p>
+          </div>
+          <div class="services">
+            <article class="service">
+              <b>01</b>
+              <h3>Video editing and motion</h3>
+              <p>Rhythm, titles, transitions, and screen-ready finishing.</p>
+            </article>
+            <article class="service">
+              <b>02</b>
+              <h3>Graphic design and branding</h3>
+              <p>Launch graphics, identity extensions, and visual rules.</p>
+            </article>
+            <article class="service">
+              <b>03</b>
+              <h3>Sketch and storyboarding</h3>
+              <p>Fast visual planning before pixels get expensive.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="brand">
+        <div class="section-inner">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Identity review</p>
+              <h2 class="section-title">Wordmark, monogram, favicon, and tokens.</h2>
+            </div>
+            <p class="section-copy">Primary SVG assets are code-built and live next to this mockup for review.</p>
+          </div>
+
+          <div class="system-grid">
+            <section class="brand-panel" aria-labelledby="brand-title">
+              <h3 id="brand-title">Brand mark options</h3>
+              <div class="mark-row">
+                <div class="mark-option">
+                  <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <rect width="100" height="100" rx="14" fill="#0E0F12" stroke="#33363C"/>
+                    <path d="M20 28 C33 15, 55 16, 63 30 C72 48, 50 53, 35 60 C18 68, 18 82, 36 88 C50 93, 70 89, 78 73" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round"/>
+                    <path d="M80 30 C68 18, 49 17, 41 31 C33 48, 55 54, 70 61 C88 69, 88 82, 72 89 C56 96, 37 89, 29 76" fill="none" stroke="#F5F2EC" stroke-width="4.5" stroke-linecap="round" opacity=".7"/>
+                    <path d="M18 18 H82 M18 84 H82" stroke="#FF5A2C" stroke-width="4" stroke-linecap="round"/>
+                  </svg>
+                  <p>Primary SS frame</p>
+                </div>
+                <div class="mark-option">
+                  <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="42" fill="#0E0F12" stroke="#33363C"/>
+                    <path d="M23 34 C37 19, 59 22, 64 36 C70 53, 45 54, 34 64 C22 75, 35 87, 55 82 C66 79, 73 71, 77 62" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round"/>
+                    <path d="M20 20 L82 82" stroke="#FF5A2C" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                  <p>Alt A diagonal cue</p>
+                </div>
+                <div class="mark-option">
+                  <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <rect x="14" y="14" width="72" height="72" rx="4" fill="#0E0F12" stroke="#33363C"/>
+                    <path d="M28 30 C42 18, 61 22, 63 36 C65 48, 46 49, 36 58 C25 68, 35 82, 55 78 C65 76, 72 68, 76 59" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round"/>
+                    <path d="M24 71 H78" stroke="#FF5A2C" stroke-width="4" stroke-linecap="round"/>
+                  </svg>
+                  <p>Alt B sharp frame</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="tokens-panel" aria-labelledby="tokens-title">
+              <h3 id="tokens-title">Design tokens and measured contrast</h3>
+              <div class="token-list">
+                <div class="token"><span class="swatch" style="background:#0E0F12"></span>Obsidian #0E0F12</div>
+                <div class="token"><span class="swatch" style="background:#1C1E22"></span>Graphite #1C1E22</div>
+                <div class="token"><span class="swatch" style="background:#23262B"></span>Graphite 2 #23262B</div>
+                <div class="token"><span class="swatch" style="background:#F5F2EC"></span>Ivory #F5F2EC</div>
+                <div class="token"><span class="swatch" style="background:#A7A39B"></span>Muted #A7A39B</div>
+                <div class="token"><span class="swatch" style="background:#FF5A2C"></span>Ember #FF5A2C</div>
+              </div>
+              <table class="contrast-table">
+                <thead>
+                  <tr><th>Pair</th><th>Ratio</th><th>AA</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Ivory on Obsidian</td><td>17.15:1</td><td>Normal pass</td></tr>
+                  <tr><td>Muted on Obsidian</td><td>7.63:1</td><td>Normal pass</td></tr>
+                  <tr><td>Ember on Obsidian</td><td>6.16:1</td><td>Normal pass</td></tr>
+                  <tr><td>Obsidian on Ember CTA</td><td>6.16:1</td><td>Normal pass</td></tr>
+                  <tr><td>Ivory on Ember CTA</td><td>2.78:1</td><td>Rejected</td></tr>
+                </tbody>
+              </table>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="final-cta" id="start">
+        <div class="cta-strip">
+          <div>
+            <h2>Bring the next idea to screen.</h2>
+            <p>The Ember action color stays limited to CTAs, focus, and small signal marks.</p>
+          </div>
+          <a class="button button-primary" href="mailto:hello@shemostudio.local">Start a Project</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1063,3 +1063,96 @@ bind() to 0.0.0.0:80 failed (10013: An attempt was made to access a socket in a 
 
 ### 5. بوابة المراجعة
 المحطة 13 خلصت كبوابة قرارات نضيفة: البنود التلاتة المانعة لأي شغل تصميم/محتوى (sitemap، اللغة، الهوية البصرية) اتقفلوا بموافقة صريحة من المستخدم بعد عرض واضح للبدائل والتكلفة/الفائدة لكل واحد، مش افتراض أو استنتاج. تم اكتشاف وتوضيح إن ملف `shemo-studio-plan.md` القديم فيه تفضيلات سابقة للعميل من قبل الـ"Clean Start" (بايلينجوال، sitemap أخف) بُنيت على بيئة اتمسحت بالكامل — تم التعامل معها كسياق تاريخي بس، وطُلب تأكيد صريح جديد للبناء الحالي بدل الاستيراد الآلي. `APPROVED-DECISIONS.md` اتحدّث بقرارات جديدة 20-22 وقسم البنود المفتوحة اتحدّث ليعكس التفاصيل التنفيذية المتبقية (مش القرارات نفسها). **البند الفني المفتوح الوحيد الناتج عن هذه المحطة: التحقق من توافق Polylang مع `shemo-core`/GeneratePress قبل أي تركيب فعلي في محطة لاحقة. في انتظار توجيه المستخدم للانتقال إلى المحطة 14.**
+
+---
+
+## المحطة 14 — الهوية البصرية كاملة (بوابة مراجعة الموكاب واللوجو)
+
+**التاريخ:** 2026-07-01
+**الحالة:** ⏳ جاهزة للمراجعة — ليست مكتملة نهائيًا بعد
+**النوع:** تنفيذ موكاب/هوية ثابتة داخل الريبو فقط — بدون تعديل WordPress/GenerateBlocks حتى الاعتماد
+
+### السياق
+بدأت المحطة 14 بناءً على قرار 22 المعتمد في `APPROVED-DECISIONS.md`: اتجاه **Cinematic Noir** كتوكينز واتجاه عام فقط، وليس موكابًا أو لوجو نهائيًا. قرأت قبل التنفيذ الملفات الإلزامية: `APPROVED-DECISIONS.md`، `محطات/roadmap.md`، `محطات/stages-log.md`، وراجعت `git log --oneline -20` و`git status`.
+
+حالة Git قبل التنفيذ: الفرع `main...origin/main`، وآخر commit هو `edd3c47 Consolidate remaining roadmap from 22 phases to 10 (Phases 14-23)`، والملف الوحيد غير المتتبع هو `MASTER-PLAN.md` كما هو موثق سابقًا.
+
+### 1. تنفيذ الموكاب الحي
+تم إنشاء موكاب HTML ثابت كامل، بدون build step وبدون سيرفر:
+
+```text
+design/mockups/phase14-cinematic-noir-v1.html
+```
+
+الموكاب يستخدم توكينز قرار 22:
+
+| Token | Hex |
+|---|---|
+| Obsidian | `#0E0F12` |
+| Graphite | `#1C1E22` |
+| Graphite 2 | `#23262B` |
+| Ivory | `#F5F2EC` |
+| Muted | `#A7A39B` |
+| Ember | `#FF5A2C` |
+
+الصفحة التجريبية تشمل hero بعنوان `From Sketch to Screen`، storyboard rail بخطوط sketch، كروت selected work وهمية، services preview، CTA بلون Ember، وقسم review يعرض بدائل المونوجرام والتوكينز. استخدام Ember اتقيد كـaccent/CTA فقط، وليس لونًا مسيطرًا.
+
+### 2. Logo/Brand Mark
+تم إنشاء SVG مباشر بالكود للـwordmark والمونوجرام والـfavicon:
+
+```text
+design/mockups/phase14-wordmark.svg
+design/mockups/phase14-ss-monogram.svg
+design/mockups/phase14-favicon.svg
+```
+
+الموكاب يحتوي 3 بدائل بسيطة للمونوجرام:
+
+| البديل | الفكرة |
+|---|---|
+| Primary SS frame | مونوجرام SS داخل frame سينمائي بخطوط sketch عاجية وخط Ember محدود |
+| Alt A diagonal cue | دائرة وخط قطري يوحي بالتحويل من sketch إلى screen |
+| Alt B sharp frame | إطار أكثر حدة وأقل دائرية |
+
+لم يتم اعتبار أي بديل “معتمد نهائيًا”؛ هذه بوابة مراجعة بصرية فقط.
+
+### 3. اختبار التباين الفعلي
+تم إنشاء وتشغيل سكريبت Python لحساب relative luminance وWCAG contrast ratio فعليًا:
+
+```text
+design/mockups/phase14-contrast-check.py
+```
+
+نتائج التشغيل:
+
+| الزوج | النسبة | النتيجة |
+|---|---:|---|
+| Ivory on Obsidian | `17.15:1` | PASS للنص العادي والكبير |
+| Muted on Obsidian | `7.63:1` | PASS للنص العادي والكبير |
+| Ember on Obsidian | `6.16:1` | PASS للنص العادي والكبير |
+| Ivory on Graphite | `14.94:1` | PASS للنص العادي والكبير |
+| Muted on Graphite | `6.64:1` | PASS للنص العادي والكبير |
+| Ember on Graphite | `5.37:1` | PASS للنص العادي والكبير |
+| Obsidian on Ember | `6.16:1` | PASS للنص العادي والكبير |
+| Ivory on Ember | `2.78:1` | FAIL — تم رفضه كاختيار CTA |
+| Ivory on Graphite 2 | `13.58:1` | PASS للنص العادي والكبير |
+| Ember on Graphite 2 | `4.88:1` | PASS للنص العادي والكبير |
+
+بناءً على النتيجة، زرار الـCTA يستخدم نص Obsidian على Ember بدل Ivory على Ember.
+
+### 4. التحقق البصري/الفني
+- `python design\mockups\phase14-contrast-check.py` نجح وأخرج الأرقام أعلاه.
+- تم عمل HTML parse بسيط للملف ونجح.
+- تم فتح الملف عبر Playwright باستخدام Chrome المحلي المثبت على الجهاز، لأن Playwright browser bundle غير موجودة ولم يتم تنزيل dependency جديد.
+- تم التقاط فحص desktop وmobile من `file:///.../phase14-cinematic-noir-v1.html`: `heroText` = `From Sketch\nto Screen`، عدد كروت العمل = `3`، لون الخلفية = `rgb(14, 15, 18)`، ولا يوجد horizontal overflow على عرض موبايل `390px`.
+- ظهرت مشكلة أولية في تداخل storyboard cards على الموبايل، وتم تعديل CSS لجعلها stack responsive بدل overlap.
+
+### 5. حدود المحطة وما لم يتم لمسه عمدًا
+- لم يتم تعديل `themes/shemo-child` بعد.
+- لم يتم تطبيق global colors داخل GenerateBlocks بعد.
+- لم يتم تشغيل WP-CLI لهذه المحطة، لأن جزء WordPress/Design System مشروط نصًا باعتماد المستخدم للموكاب واللوجو أولًا.
+- لم يتم تعديل `APPROVED-DECISIONS.md`، لأن لا يوجد قرار جديد معتمد بعد. اعتماد المستخدم القادم للموكاب/اللوجو، لو حدث، يجب تسجيله كقرار رقم 23 قبل تنفيذ الثيم.
+- لم يتم الانتقال للمحطة 15.
+
+### 6. بوابة المراجعة
+بوابة مراجعة المحطة 14 جاهزة: الموكاب الحي، wordmark، monogram، favicon، وسكريبت التباين موجودين داخل الريبو. المطلوب الآن اعتماد المستخدم صراحةً لأحد اتجاهات العلامة/الموكاب أو طلب تعديلات. بعد الاعتماد فقط يتم تنفيذ الجزء الثالث: تحويل التوكينز المعتمدة إلى CSS custom properties داخل `themes/shemo-child` وتطبيقها كـglobal styles في GenerateBlocks ومكونات الأزرار/الكروت/حقول الفورم.

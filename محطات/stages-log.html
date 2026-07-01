@@ -16,6 +16,7 @@
   .meta { color: var(--muted); font-size: .95rem; }
   .badge { display: inline-block; padding: .15rem .6rem; border-radius: 999px; font-size: .85rem; font-weight: 600; }
   .badge.done { background: rgba(63,185,132,.15); color: var(--ok); border: 1px solid var(--ok); }
+  .badge.pending { background: rgba(233,162,59,.15); color: var(--warn); border: 1px solid var(--warn); }
   table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--surface); }
   th, td { border: 1px solid var(--border); padding: .5rem .7rem; text-align: right; font-size: .95rem; }
   th { background: var(--surface2); color: var(--accent); }
@@ -999,6 +1000,87 @@ Registered URLs:
 البند الفني المفتوح الوحيد الناتج عن هذه المحطة: التحقق من توافق Polylang مع <code>shemo-core</code>/GeneratePress قبل أي تركيب فعلي في محطة لاحقة. في انتظار توجيه المستخدم للانتقال إلى <strong>المحطة 14</strong>.
 </div>
 
+</div>
+
+<div class="stage" id="stage-14">
+<h2>المحطة 14 — الهوية البصرية كاملة (بوابة مراجعة الموكاب واللوجو)</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge pending">⏳ جاهزة للمراجعة — ليست مكتملة نهائيًا بعد</span> ·
+  النوع: تنفيذ موكاب/هوية ثابتة داخل الريبو فقط — بدون تعديل WordPress/GenerateBlocks حتى الاعتماد
+</p>
+
+<h3>السياق</h3>
+<p>بدأت المحطة 14 بناءً على قرار 22 المعتمد في <code>APPROVED-DECISIONS.md</code>: اتجاه <strong>Cinematic Noir</strong> كتوكينز واتجاه عام فقط، وليس موكابًا أو لوجو نهائيًا. تمت قراءة الملفات الإلزامية قبل التنفيذ: <code>APPROVED-DECISIONS.md</code>، <code>محطات/roadmap.md</code>، <code>محطات/stages-log.md</code>، مع مراجعة <code>git log --oneline -20</code> و<code>git status</code>.</p>
+<p>حالة Git قبل التنفيذ: الفرع <code>main...origin/main</code>، وآخر commit هو <code>edd3c47 Consolidate remaining roadmap from 22 phases to 10 (Phases 14-23)</code>، والملف الوحيد غير المتتبع هو <code>MASTER-PLAN.md</code> كما هو موثق سابقًا.</p>
+
+<h3>1. تنفيذ الموكاب الحي</h3>
+<p>تم إنشاء موكاب HTML ثابت كامل، بدون build step وبدون سيرفر:</p>
+<pre><code>design/mockups/phase14-cinematic-noir-v1.html</code></pre>
+<p>الموكاب يستخدم توكينز قرار 22:</p>
+<table>
+<tr><th>Token</th><th>Hex</th></tr>
+<tr><td>Obsidian</td><td><code>#0E0F12</code></td></tr>
+<tr><td>Graphite</td><td><code>#1C1E22</code></td></tr>
+<tr><td>Graphite 2</td><td><code>#23262B</code></td></tr>
+<tr><td>Ivory</td><td><code>#F5F2EC</code></td></tr>
+<tr><td>Muted</td><td><code>#A7A39B</code></td></tr>
+<tr><td>Ember</td><td><code>#FF5A2C</code></td></tr>
+</table>
+<p>الصفحة التجريبية تشمل hero بعنوان <code>From Sketch to Screen</code>، storyboard rail بخطوط sketch، كروت selected work وهمية، services preview، CTA بلون Ember، وقسم review يعرض بدائل المونوجرام والتوكينز. استخدام Ember اتقيد كـaccent/CTA فقط، وليس لونًا مسيطرًا.</p>
+
+<h3>2. Logo/Brand Mark</h3>
+<p>تم إنشاء SVG مباشر بالكود للـwordmark والمونوجرام والـfavicon:</p>
+<pre><code>design/mockups/phase14-wordmark.svg
+design/mockups/phase14-ss-monogram.svg
+design/mockups/phase14-favicon.svg</code></pre>
+<table>
+<tr><th>البديل</th><th>الفكرة</th></tr>
+<tr><td>Primary SS frame</td><td>مونوجرام SS داخل frame سينمائي بخطوط sketch عاجية وخط Ember محدود</td></tr>
+<tr><td>Alt A diagonal cue</td><td>دائرة وخط قطري يوحي بالتحويل من sketch إلى screen</td></tr>
+<tr><td>Alt B sharp frame</td><td>إطار أكثر حدة وأقل دائرية</td></tr>
+</table>
+<p>لم يتم اعتبار أي بديل “معتمد نهائيًا”؛ هذه بوابة مراجعة بصرية فقط.</p>
+
+<h3>3. اختبار التباين الفعلي</h3>
+<p>تم إنشاء وتشغيل سكريبت Python لحساب relative luminance وWCAG contrast ratio فعليًا:</p>
+<pre><code>design/mockups/phase14-contrast-check.py</code></pre>
+<table>
+<tr><th>الزوج</th><th>النسبة</th><th>النتيجة</th></tr>
+<tr><td>Ivory on Obsidian</td><td><code>17.15:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Muted on Obsidian</td><td><code>7.63:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Ember on Obsidian</td><td><code>6.16:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Ivory on Graphite</td><td><code>14.94:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Muted on Graphite</td><td><code>6.64:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Ember on Graphite</td><td><code>5.37:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Obsidian on Ember</td><td><code>6.16:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Ivory on Ember</td><td><code>2.78:1</code></td><td>FAIL — تم رفضه كاختيار CTA</td></tr>
+<tr><td>Ivory on Graphite 2</td><td><code>13.58:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+<tr><td>Ember on Graphite 2</td><td><code>4.88:1</code></td><td>PASS للنص العادي والكبير</td></tr>
+</table>
+<p>بناءً على النتيجة، زرار الـCTA يستخدم نص Obsidian على Ember بدل Ivory على Ember.</p>
+
+<h3>4. التحقق البصري/الفني</h3>
+<ul>
+<li><code>python design\mockups\phase14-contrast-check.py</code> نجح وأخرج الأرقام أعلاه.</li>
+<li>تم عمل HTML parse بسيط للملف ونجح.</li>
+<li>تم فتح الملف عبر Playwright باستخدام Chrome المحلي المثبت على الجهاز، لأن Playwright browser bundle غير موجودة ولم يتم تنزيل dependency جديد.</li>
+<li>تم التقاط فحص desktop وmobile من <code>file:///.../phase14-cinematic-noir-v1.html</code>: <code>heroText</code> = <code>From Sketch\nto Screen</code>، عدد كروت العمل = <code>3</code>، لون الخلفية = <code>rgb(14, 15, 18)</code>، ولا يوجد horizontal overflow على عرض موبايل <code>390px</code>.</li>
+<li>ظهرت مشكلة أولية في تداخل storyboard cards على الموبايل، وتم تعديل CSS لجعلها stack responsive بدل overlap.</li>
+</ul>
+
+<h3>5. حدود المحطة وما لم يتم لمسه عمدًا</h3>
+<ul>
+<li>لم يتم تعديل <code>themes/shemo-child</code> بعد.</li>
+<li>لم يتم تطبيق global colors داخل GenerateBlocks بعد.</li>
+<li>لم يتم تشغيل WP-CLI لهذه المحطة، لأن جزء WordPress/Design System مشروط نصًا باعتماد المستخدم للموكاب واللوجو أولًا.</li>
+<li>لم يتم تعديل <code>APPROVED-DECISIONS.md</code>، لأن لا يوجد قرار جديد معتمد بعد. اعتماد المستخدم القادم للموكاب/اللوجو، لو حدث، يجب تسجيله كقرار رقم 23 قبل تنفيذ الثيم.</li>
+<li>لم يتم الانتقال للمحطة 15.</li>
+</ul>
+
+<div class="gate">
+<strong>6. بوابة المراجعة:</strong> بوابة مراجعة المحطة 14 جاهزة: الموكاب الحي، wordmark، monogram، favicon، وسكريبت التباين موجودين داخل الريبو. المطلوب الآن اعتماد المستخدم صراحةً لأحد اتجاهات العلامة/الموكاب أو طلب تعديلات. بعد الاعتماد فقط يتم تنفيذ الجزء الثالث: تحويل التوكينز المعتمدة إلى CSS custom properties داخل <code>themes/shemo-child</code> وتطبيقها كـglobal styles في GenerateBlocks ومكونات الأزرار/الكروت/حقول الفورم.
+</div>
 </div>
 
 </body>

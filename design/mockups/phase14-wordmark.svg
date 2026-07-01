@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 180" role="img" aria-labelledby="title desc">
+  <title id="title">Shemo Studio wordmark</title>
+  <desc id="desc">A cinematic Shemo Studio wordmark with a hand-drawn SS monogram.</desc>
+  <rect width="760" height="180" fill="#0E0F12"/>
+  <g transform="translate(36 24)">
+    <rect x="0" y="0" width="132" height="132" rx="18" fill="#1C1E22" stroke="#33363C" stroke-width="2"/>
+    <path d="M27 40 C42 25, 70 25, 79 42 C88 61, 66 68, 49 75 C28 84, 24 101, 43 113 C59 123, 82 119, 94 103" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round"/>
+    <path d="M104 42 C91 30, 66 30, 58 44 C50 61, 72 69, 90 76 C110 85, 114 102, 96 114 C81 124, 58 120, 47 106" fill="none" stroke="#F5F2EC" stroke-width="4.5" stroke-linecap="round" opacity=".74"/>
+    <path d="M23 28 L109 28 M23 119 L109 119" fill="none" stroke="#FF5A2C" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <text x="204" y="86" fill="#F5F2EC" font-family="Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif" font-size="58">Shemo Studio</text>
+  <text x="207" y="125" fill="#A7A39B" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="21">From Sketch to Screen</text>
+  <path d="M205 144 C307 132, 417 153, 527 140 C594 132, 649 134, 705 145" fill="none" stroke="#F5F2EC" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>
+</svg>
