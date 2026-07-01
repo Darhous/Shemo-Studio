@@ -1223,3 +1223,108 @@ design/mockups/phase14-contrast-check.py
 ### 9. بوابة الإغلاق
 
 المحطة 14 اكتملت: اتجاه الهوية اتراجع في متصفح حقيقي، تعديلات Round 2 اتنفذت، المستخدم اعتمدها صراحةً، والـDesign System اتطبق داخل `shemo-child` مع توثيق القرار رقم 23. لا يتم الانتقال لتنفيذ Polylang أو محتوى الصفحات داخل هذه المحطة؛ المحطة التالية هي محطة فحص/تنفيذ اللغة والتوطين.
+
+---
+
+## المحطة 15 — فحص وتنفيذ اللغة والتوطين
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** فحص توافق تقني + تنفيذ Polylang Free + توثيق قرار
+
+### السياق
+بدأت المحطة بناءً على القرار 21: الموقع ثنائي اللغة من الإطلاق، العربي هو الافتراضي في `/`، الإنجليزي في `/en/`، والتصميم RTL-first. تمت قراءة `APPROVED-DECISIONS.md` خصوصًا القرارين 21 و23، وسجل المحطات، وكود `shemo-core` (`project` CPT + تصنيفات + Meta Box fields) قبل أي تثبيت.
+
+### 1. نتيجة Free مقابل Pro
+
+تم فحص Polylang Free مقابل Pro من مصادر رسمية وحديثة، مع فحص عملي على الستاك الحالي. النتيجة:
+
+| البند | الحكم |
+|---|---|
+| Polylang Free | ✅ يكفي للإطلاق الحالي |
+| Polylang Pro | ⏸️ غير مطلوب الآن |
+| Polylang for WooCommerce | ⛔ غير مطلوب؛ الموقع يستخدم SureCart وليس WooCommerce |
+
+أسباب عدم شراء Pro الآن: الاحتياج الحالي هو لغتان فقط، URL structure عادي، ترجمة صفحات/CPT/taxonomies/media، وكتابة المحتوى يدويًا بلغتين. ميزات Pro المفيدة لكنها غير لازمة الآن: ترجمة slugs مثل `/work/` نفسه، duplicate/sync متقدم، XLIFF/DeepL، دعم Block/Site Editor أعمق، ودعم مدفوع.
+
+### 2. فحص توافق الستاك
+
+| المكوّن | النتيجة |
+|---|---|
+| `shemo-core` CPT | ✅ `project` عام و`show_in_rest=true` وظهر ضمن الأنواع القابلة للترجمة |
+| Meta Box fields | ✅ القيم تعمل كـpost meta مستقلة لكل ترجمة؛ اختبار عملي أثبت أن العربي والإنجليزي يحتفظان بقيم مختلفة لنفس الحقول |
+| تصنيفات `shemo-core` | ✅ الثمانية كلها عامة وقابلة للترجمة: `service`, `project_type`, `industry`, `platform`, `tool`, `content_format`, `client_type`, `visual_style` |
+| GeneratePress + GenerateBlocks | ✅ لا تعارض؛ الثيم يرجع `/` بـ`lang="ar"` و`dir="rtl"`، و`/en/` بـ`lang="en-US"` |
+| Rank Math | ⚠️ يحتاج bridge؛ Rank Math يوثق أن Polylang لا يملك توافقًا أصليًا كاملًا معه في sitemap/canonical. أضيف تكامل محلي داخل `shemo-child` |
+| Complianz | ✅ متوافق مع Polylang عبر صفحات قانونية مكررة وترجمة strings؛ الترجمة الفعلية مؤجلة لمحطة المحتوى/القانونيات |
+| Fluent Forms | ✅ لا مانع تقني الآن؛ لا توجد فورمات نهائية بعد. الترجمة ستتم عند بناء النماذج، إما بفورم مستقل لكل لغة أو connector مجاني مناسب |
+| SureCart | ✅ واجهته translation-ready؛ لا توجد منتجات/checkout flow نهائية بعد. ترجمة واجهات البيع ستراجع في محطة الباقات/الدفع |
+
+### 3. التنفيذ الفعلي
+
+- تم تثبيت وتفعيل `polylang` v3.8.5 من مستودع WordPress الرسمي عبر WP-CLI.
+- تم إضافة اللغات:
+  - العربية `ar` كلغة افتراضية.
+  - الإنجليزية `en_US` بslug `en`.
+- إعدادات URL:
+  - العربي: `http://shemostudio.local/`
+  - الإنجليزي: `http://shemostudio.local/en/`
+  - إخفاء كود اللغة الافتراضية مفعّل.
+  - browser redirect غير مفعّل لتجنب قفزات غير متوقعة أثناء التطوير.
+- تم تفعيل ترجمة `project` وكل تصنيفات البورتفوليو والوسائط.
+- تم إسناد المحتوى الحالي للعربية كافتراضي حتى لا يبقى محتوى بلا لغة.
+
+### 4. تكامل Rank Math
+
+أُضيف ملف:
+
+```text
+themes/shemo-child/inc/rank-math-polylang.php
+```
+
+وتم تحميله من:
+
+```text
+themes/shemo-child/functions.php
+```
+
+التكامل مشروط بوجود Rank Math وPolylang فقط، ويغطي:
+- تعطيل cache السايت ماب داخل Rank Math مع Polylang.
+- تصفية استعلامات sitemap حسب لغات Polylang.
+- canonical صحيح للصفحة الرئيسية حسب اللغة.
+- نسخ/ترجمة Rank Math meta الأساسية وprimary taxonomy meta عند إنشاء الترجمات.
+- تسجيل بعض إعدادات Rank Math القابلة للترجمة داخل Polylang strings.
+
+### 5. الاختبار العملي
+
+تم إنشاء مشروعين draft مؤقتين (`project`) عربي/إنجليزي، وربطهما كترجمات، وإضافة قيم Meta Box مختلفة لكل لغة، وإنشاء term مؤقت في `service` لكل لغة وربطهما كترجمات. النتيجة:
+
+| الاختبار | النتيجة |
+|---|---|
+| ربط project عربي/إنجليزي | ✅ `pll_get_post()` رجّع الترجمة الصحيحة في الاتجاهين |
+| استعلام `lang=ar` و`lang=en` | ✅ كل لغة رجّعت مشروعها الصحيح |
+| Meta Box values | ✅ `shemo_short_summary` احتفظ بقيمة عربية مستقلة وقيمة إنجليزية مستقلة |
+| ترجمة term في `service` | ✅ `pll_get_term()` رجّع term الإنجليزي المقابل |
+| التنظيف | ✅ تم حذف كل بيانات الاختبار المؤقتة بعد الفحص |
+
+تحققات إضافية:
+- `polylang` active v3.8.5.
+- `pll_default_language()` = `ar`.
+- `pll_home_url('ar')` = `http://shemostudio.local/`.
+- `pll_home_url('en')` = `http://shemostudio.local/en/`.
+- `/` يرجع 200 و`lang="ar"` و`dir="rtl"`.
+- `/en/` يرجع 200 و`lang="en-US"`.
+- `php -l` نجح على `functions.php` و`inc/rank-math-polylang.php`.
+- فلاتر Rank Math/Polylang bridge فعّالة داخل WordPress.
+
+### 6. حدود المحطة
+
+- لم يتم كتابة محتوى صفحات أو بناء صفحات.
+- لم يتم ترجمة محتوى Complianz القانوني فعليًا؛ فقط أصبح المسار التقني جاهزًا.
+- لم يتم بناء Fluent Forms أو SureCart flows.
+- لم يتم شراء Polylang Pro.
+- فجوة sitemap XML المحلية القديمة بسبب LocalWP/Nginx مع ملفات `.xml` قد تبقى منفصلة عن Polylang؛ لم يتم لمس إعدادات Nginx في هذه المحطة.
+
+### 7. بوابة الإغلاق
+
+المحطة 15 اكتملت: Free مقابل Pro اتقفل لصالح Polylang Free، وتم تنفيذ الثنائية اللغوية تقنيًا بدون شراء، وتوثيق القرار رقم 24 في `APPROVED-DECISIONS.md`. الموقع الآن Arabic-first تقنيًا في `/` وEnglish في `/en/`، والمرحلة التالية هي بناء/ترجمة المحتوى الفعلي داخل محطات الصفحات اللاحقة.

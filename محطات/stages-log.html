@@ -1130,5 +1130,76 @@ design/mockups/phase14-favicon.svg</code></pre>
 </div>
 </div>
 
+<div class="stage" id="stage-15">
+<h2>المحطة 15 — فحص وتنفيذ اللغة والتوطين</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: فحص توافق تقني + تنفيذ Polylang Free + توثيق قرار
+</p>
+
+<h3>السياق</h3>
+<p>بدأت المحطة بناءً على القرار 21: الموقع ثنائي اللغة من الإطلاق، العربي هو الافتراضي في <code>/</code>، الإنجليزي في <code>/en/</code>، والتصميم RTL-first. تمت قراءة <code>APPROVED-DECISIONS.md</code> خصوصًا القرارين 21 و23، وسجل المحطات، وكود <code>shemo-core</code> قبل أي تثبيت.</p>
+
+<h3>1. نتيجة Free مقابل Pro</h3>
+<table>
+<tr><th>البند</th><th>الحكم</th></tr>
+<tr><td>Polylang Free</td><td>✅ يكفي للإطلاق الحالي</td></tr>
+<tr><td>Polylang Pro</td><td>⏸️ غير مطلوب الآن</td></tr>
+<tr><td>Polylang for WooCommerce</td><td>⛔ غير مطلوب؛ الموقع يستخدم SureCart وليس WooCommerce</td></tr>
+</table>
+<p>أسباب عدم شراء Pro الآن: الاحتياج الحالي هو لغتان فقط، URL structure عادي، ترجمة صفحات/CPT/taxonomies/media، وكتابة المحتوى يدويًا بلغتين. ميزات Pro المفيدة لكنها غير لازمة الآن: ترجمة slugs مثل <code>/work/</code> نفسه، duplicate/sync متقدم، XLIFF/DeepL، دعم Block/Site Editor أعمق، ودعم مدفوع.</p>
+
+<h3>2. فحص توافق الستاك</h3>
+<table>
+<tr><th>المكوّن</th><th>النتيجة</th></tr>
+<tr><td><code>shemo-core</code> CPT</td><td>✅ <code>project</code> عام و<code>show_in_rest=true</code> وظهر ضمن الأنواع القابلة للترجمة</td></tr>
+<tr><td>Meta Box fields</td><td>✅ القيم تعمل كـpost meta مستقلة لكل ترجمة؛ اختبار عملي أثبت أن العربي والإنجليزي يحتفظان بقيم مختلفة لنفس الحقول</td></tr>
+<tr><td>تصنيفات <code>shemo-core</code></td><td>✅ الثمانية كلها عامة وقابلة للترجمة</td></tr>
+<tr><td>GeneratePress + GenerateBlocks</td><td>✅ لا تعارض؛ <code>/</code> يرجع <code>lang="ar"</code> و<code>dir="rtl"</code>، و<code>/en/</code> يرجع <code>lang="en-US"</code></td></tr>
+<tr><td>Rank Math</td><td>⚠️ يحتاج bridge؛ أضيف تكامل محلي داخل <code>shemo-child</code></td></tr>
+<tr><td>Complianz</td><td>✅ متوافق مع Polylang عبر صفحات قانونية مكررة وترجمة strings؛ الترجمة الفعلية مؤجلة لمحطة المحتوى/القانونيات</td></tr>
+<tr><td>Fluent Forms</td><td>✅ لا مانع تقني الآن؛ الترجمة ستتم عند بناء النماذج، إما بفورم مستقل لكل لغة أو connector مجاني مناسب</td></tr>
+<tr><td>SureCart</td><td>✅ واجهته translation-ready؛ لا توجد منتجات/checkout flow نهائية بعد</td></tr>
+</table>
+
+<h3>3. التنفيذ الفعلي</h3>
+<ul>
+<li>تم تثبيت وتفعيل <code>polylang</code> v3.8.5 من مستودع WordPress الرسمي عبر WP-CLI.</li>
+<li>تم إضافة العربية <code>ar</code> كلغة افتراضية، والإنجليزية <code>en_US</code> بslug <code>en</code>.</li>
+<li>العربي: <code>http://shemostudio.local/</code>، الإنجليزي: <code>http://shemostudio.local/en/</code>.</li>
+<li>إخفاء كود اللغة الافتراضية مفعّل، وbrowser redirect غير مفعّل.</li>
+<li>تم تفعيل ترجمة <code>project</code> وكل تصنيفات البورتفوليو والوسائط.</li>
+<li>تم إسناد المحتوى الحالي للعربية كافتراضي حتى لا يبقى محتوى بلا لغة.</li>
+</ul>
+
+<h3>4. تكامل Rank Math</h3>
+<p>أُضيف ملف <code>themes/shemo-child/inc/rank-math-polylang.php</code> وتم تحميله من <code>themes/shemo-child/functions.php</code>. التكامل مشروط بوجود Rank Math وPolylang فقط، ويغطي sitemap filtering، canonical الصفحة الرئيسية حسب اللغة، ونسخ/ترجمة Rank Math meta الأساسية عند إنشاء الترجمات.</p>
+
+<h3>5. الاختبار العملي</h3>
+<table>
+<tr><th>الاختبار</th><th>النتيجة</th></tr>
+<tr><td>ربط project عربي/إنجليزي</td><td>✅ <code>pll_get_post()</code> رجّع الترجمة الصحيحة في الاتجاهين</td></tr>
+<tr><td>استعلام <code>lang=ar</code> و<code>lang=en</code></td><td>✅ كل لغة رجّعت مشروعها الصحيح</td></tr>
+<tr><td>Meta Box values</td><td>✅ <code>shemo_short_summary</code> احتفظ بقيمة عربية مستقلة وقيمة إنجليزية مستقلة</td></tr>
+<tr><td>ترجمة term في <code>service</code></td><td>✅ <code>pll_get_term()</code> رجّع term الإنجليزي المقابل</td></tr>
+<tr><td>التنظيف</td><td>✅ تم حذف كل بيانات الاختبار المؤقتة بعد الفحص</td></tr>
+</table>
+<p>تحققات إضافية: <code>polylang</code> active v3.8.5، <code>pll_default_language()</code> = <code>ar</code>، <code>pll_home_url('ar')</code> = <code>http://shemostudio.local/</code>، <code>pll_home_url('en')</code> = <code>http://shemostudio.local/en/</code>، و<code>php -l</code> نجح على ملفات الثيم المعدّلة.</p>
+
+<h3>6. حدود المحطة</h3>
+<ul>
+<li>لم يتم كتابة محتوى صفحات أو بناء صفحات.</li>
+<li>لم يتم ترجمة محتوى Complianz القانوني فعليًا؛ فقط أصبح المسار التقني جاهزًا.</li>
+<li>لم يتم بناء Fluent Forms أو SureCart flows.</li>
+<li>لم يتم شراء Polylang Pro.</li>
+<li>فجوة sitemap XML المحلية القديمة بسبب LocalWP/Nginx مع ملفات <code>.xml</code> لم يتم لمسها في هذه المحطة.</li>
+</ul>
+
+<div class="gate">
+<strong>7. بوابة الإغلاق:</strong> المحطة 15 اكتملت: Free مقابل Pro اتقفل لصالح Polylang Free، وتم تنفيذ الثنائية اللغوية تقنيًا بدون شراء، وتوثيق القرار رقم 24 في <code>APPROVED-DECISIONS.md</code>. الموقع الآن Arabic-first تقنيًا في <code>/</code> وEnglish في <code>/en/</code>، والمرحلة التالية هي بناء/ترجمة المحتوى الفعلي داخل محطات الصفحات اللاحقة.
+</div>
+</div>
+
 </body>
 </html>

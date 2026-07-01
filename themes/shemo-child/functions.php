@@ -6,6 +6,8 @@ add_action( 'after_setup_theme', 'shemo_child_theme_setup' );
 add_action( 'enqueue_block_editor_assets', 'shemo_child_enqueue_editor_assets' );
 add_action( 'init', 'shemo_child_register_block_styles' );
 
+require_once get_stylesheet_directory() . '/inc/rank-math-polylang.php';
+
 function shemo_child_theme_setup() {
 	add_theme_support( 'editor-styles' );
 	add_editor_style( 'style.css' );
