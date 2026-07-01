@@ -23,7 +23,7 @@ while ( have_posts() ) :
 	$credits      = get_post_meta( $project_id, 'shemo_credits', true );
 	$related      = get_post_meta( $project_id, 'shemo_related_projects', true );
 	$archive_url  = get_post_type_archive_link( 'project' );
-	$start_url    = $is_ar ? home_url( '/start-a-project/' ) : home_url( '/en/start-a-project/' );
+	$start_url    = $is_ar ? home_url( '/start-a-project/' ) : home_url( '/en/start-a-project-en/' );
 
 	$tax_labels = array(
 		'service'        => $is_ar ? 'الخدمة' : 'Service',

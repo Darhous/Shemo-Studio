@@ -2011,3 +2011,161 @@ themes/shemo-child/style.css
 ### 9. بوابة الإغلاق
 
 المحطة 20 اكتملت: تم بناء Start a Project وContact وThank You وSearch و404 والسياسات المطلوبة بالعربية والإنجليزية، وربط الترجمات عبر Polylang، وإنشاء فورم Start a Project فعلي عبر Fluent Forms Free مع Turnstile مضاف فعليًا ومتحقق server-side، وحل تعارض Privacy Policy القديمة draft مقابل Complianz المنشورة بدون حذف أو نشر سياسة نهائية جديدة. كل URLs الجديدة ترجع 200 بدون redirect غير متوقع، مع الحفاظ على عدد الإضافات النشطة 15 وعدم إضافة قرارات مالية أو قانونية نهائية جديدة.
+
+---
+
+## المحطة 21 — فحص QA شامل واحد
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** فحص إطلاق محلي شامل + إصلاحات محدودة داخل الثيم + توثيق فجوات منفصلة
+
+### السياق
+
+بدأت المحطة بعد تشغيل ذاكرة Codex المشتركة وقراءة `APPROVED-DECISIONS.md` خصوصًا القرارات 20، 21، 24، 25، و`محطات/roadmap.md`، وآخر محطات 19-20 من هذا السجل، و`design/content/tone-of-voice.md`، و`git log --oneline -15`.
+
+الواقع المؤكد قبل الفحص:
+
+- الفرع `main` كان مواكبًا لـ`origin/main` على commit المحطة 20.
+- يوجد ملف غير متتبع سابق `MASTER-PLAN.md` ولم يتم لمسه.
+- عدد الإضافات النشطة = 15.
+- `debug.log` غير موجود قبل الفحص.
+
+### 1. أدوات الفحص المضافة
+
+تمت إضافة أدوات تدقيق قابلة لإعادة التشغيل:
+
+- `tools/stage21-audit.php`: قراءة رجعية من WordPress/DB للصفحات، Polylang، Rank Math، النماذج، Turnstile، عدد الإضافات، حالة privacy، وعدد submissions.
+- `tools/stage21-http-audit.mjs`: فحص HTTP/HTML حي لـ48 صفحة، canonical، hreflang، `lang/dir`، الروابط الداخلية، والموارد الخارجية.
+- `tools/stage21-browser-audit.mjs`: فحص Playwright ممثل لـ12 viewport/page مع screenshots في مجلد temp، overflow، heading count، labels، أسماء الروابط/الأزرار، وcontrast لعناصر `main`.
+
+تم تحميل Playwright Chromium مؤقتًا في cache المستخدم فقط لإجراء screenshots، بدون إضافة dependency أو `node_modules` داخل الريبو.
+
+### 2. الإصلاحات المحدودة داخل المحطة
+
+تم تنفيذ إصلاحات صغيرة ومباشرة ظهرت أثناء QA:
+
+- إصلاح رابط CTA الإنجليزي داخل `single-project.php` من `/en/start-a-project/` إلى `/en/start-a-project-en/`.
+- إضافة `prefers-reduced-motion: reduce` لإيقاف transitions/transform عند طلب تقليل الحركة.
+- إضافة `dir="ltr"` صريح للصفحات الإنجليزية عبر `language_attributes`.
+- إضافة canonical fallback لأرشيف Work/Projects لأن Rank Math لم يخرجه للأرشيف.
+- تعطيل Sidebar الافتراضي لـGeneratePress على صفحات Shemo، Work archive، Case Study، Search، و404 حتى تظهر الصفحات كاملة العرض كما صُممت.
+
+لم يتم تعديل `APPROVED-DECISIONS.md` لأن المحطة لم تعتمد أي قرار جديد.
+
+### 3. فحص bilingual / SEO / HTTP
+
+نجح `tools/stage21-audit.php`:
+
+- كل أزواج الصفحات الأساسية منشورة ومربوطة عبر Polylang.
+- مشاريع Work = 3 عربي + 3 English، وكل مشروع له ترجمة مقابلة ووسم Demo/Concept داخل Rank Math description.
+- لا توجد روابط قديمة داخل post content إلى `/en/start-a-project/` أو `/en/contact/`.
+- Rank Math descriptions موجودة للصفحات الأساسية.
+- عدد الإضافات النشطة = 15.
+- `blog_public=0` كما يجب في LocalWP pre-launch.
+
+نجح `tools/stage21-http-audit.mjs`:
+
+- 48 صفحة مفحوصة.
+- 48 رابط داخلي مفحوص.
+- كل canonical/hreflang/lang/dir مرّت بعد الإصلاحات.
+- الموارد الخارجية المرصودة: Google Fonts، Cloudflare Turnstile، و`cookiedatabase.org` من Complianz.
+
+فحص `curl -I` لكل URL مهم رجع `HTTP/1.1 200 OK` بدون `Location` redirect غير متوقع، بما في ذلك Home، About، Services + 6 صفحات خدمة، Work archive، Case Study، Packages، Request a Quote، Process، Testimonials، FAQ، Start a Project، Contact، السياسات، Search، وSureCart test checkout. صفحة 404 التجريبية رجعت `HTTP/1.1 404 Not Found`.
+
+خرائط XML ما زالت ترجع 404:
+
+- `/wp-sitemap.xml` = `404`
+- `/sitemap_index.xml` = `404`
+
+هذا مطابق لفجوة LocalWP/Nginx الموثقة منذ المحطة 5، ولم يتم تعديل config مولّد تلقائيًا بدون موافقة صريحة. يجب حلها في بند إصلاح/إطلاق منفصل قبل الإنتاج أو بعد الانتقال لاستضافة حقيقية.
+
+### 4. فحص responsive / RTL-LTR / accessibility
+
+نجح `tools/stage21-browser-audit.mjs` على 12 عينة ممثلة:
+
+- Home عربي/English موبايل + Home عربي desktop.
+- Services عربي موبايل.
+- Work عربي desktop وEnglish موبايل.
+- Case Study English موبايل.
+- Packages عربي desktop.
+- Request a Quote English موبايل.
+- Start a Project عربي موبايل.
+- Contact English موبايل.
+- Deposit Policy عربي موبايل.
+
+النتائج:
+
+- لا overflow أفقي على أحجام الموبايل المفحوصة.
+- لا تداخل بصري واضح في الهيدر، CTA، الكروت، النماذج، أو hero sections.
+- RTL/LTR يعملان فعليًا، والإنجليزي أصبح يصرّح بـ`dir="ltr"`.
+- labels للنماذج موجودة.
+- عناصر links/buttons الظاهرة لها أسماء قابلة للقراءة.
+- contrast المحسوب لعناصر النص داخل `main` نجح بعد احتساب الخلفيات الشفافة بشكل صحيح.
+- focus states موجودة عبر `:focus-visible`.
+- `prefers-reduced-motion` أضيف صراحة.
+
+ملاحظة: بانر Complianz يظهر بالإنجليزية ويغطي أول viewport على أول زيارة، وهذا سلوك موافقة كوكيز حاليًا وليس فشل layout بعد قبول البانر، لكنه مرتبط بفجوة تعريب Complianz أدناه.
+
+### 5. فحص performance الأساسي
+
+عينة الأداء عبر HTML/موارد الصفحات:
+
+| الصفحة | HTML تقريبًا | Scripts | Styles | ملاحظات |
+|---|---:|---:|---:|---|
+| `/` | 146 KB | 14 | 18 | لا صور فعلية |
+| `/en/` | 144 KB | 14 | 17 | لا صور فعلية |
+| `/work/` | 146 KB | 14 | 18 | أرشيف CPT |
+| `/packages/` | 142 KB | 14 | 18 | SureCart cart assets ظاهرة |
+| `/request-a-quote/` | 149 KB | 17 | 20 | Fluent Forms |
+| `/start-a-project/` | 152 KB | 18 | 20 | Fluent Forms + Turnstile |
+| `/checkout/?mode=test...` | 555 KB | 16 | 19 | SureCart test checkout أثقل صفحة |
+
+الملاحظات:
+
+- Google Fonts ما زالت خارجية ومحمّلة من `fonts.googleapis.com`.
+- Turnstile يظهر فقط حيث يلزم للنماذج.
+- لا توجد صور حقيقية/ثقيلة حاليًا؛ ضغط ShortPixel ليس عاملًا مؤثرًا في LocalWP الحالي.
+- SureCart checkout ثقيل نسبيًا لكنه test-only ومقبول كفجوة أداء مؤجلة للإطلاق الحقيقي.
+
+### 6. فحص security / forms / interactions
+
+- Wordfence نشط: `wordfence_active=yes`, `wflogs_exists=yes`, version `8.2.2`.
+- عدد الإضافات النشطة = 15 كما هو متوقع.
+- لا يوجد `debug.log` قبل/بعد الفحص.
+- فحص أسرار عالي الثقة رجع مطابقات نصية غير سرية مثل أسماء options (`secretKey`) وكلمة `token` داخل سكربتات الفحص أو ملفات توثيق، بدون قيم مفاتيح مكشوفة.
+- `Request a Quote` تم اختباره فعليًا عبر HTTP POST صحيح إلى Fluent Forms:
+  - Form 3 رجع `success=true`.
+  - أضيفت submissions جديدة، وأصبح form 3 = 3 submissions، form 4 = 1 submission.
+- `Start a Project` تم اختباره بدون Turnstile token:
+  - Form 5 رجع `HTTP 422` برسالة `Turnstile verification failed, please try again.`
+  - لم تُنشأ submissions للنموذجين 5/6.
+- البحث `/?s=motion` رجع نتائج.
+- 404 التجريبي رجع 404.
+- SureCart test checkout يحتوي `SureCart/sc-checkout` وسياق `mode=test`.
+- Work filter تم اختباره على `service=service-video-motion-ar` وأظهر مشروع Frame Pulse.
+
+### 7. فجوات لا تُحل داخل المحطة 21
+
+هذه البنود أكبر من إصلاح محدود، ولا تُحل بدون موافقة/مراجعة منفصلة:
+
+1. **Sitemap XML 404 في LocalWP**: ما زال قائمًا بسبب Nginx static XML routing الموثق من المحطة 5. يحتاج قرار لمس config مولّد تلقائيًا أو يؤجل للاستضافة الحقيقية.
+2. **Complianz Privacy/Cookie bilingual gap**: صفحتا Complianz المنشورتان ID 17 و18 معلّمتان عربيًا في Polylang (`lang=ar`) لكن محتواهما/عناوينهما إنجليزية ولا يوجد زوج English. تعريبهما أو استبدالهما يحتاج مراجعة قانونية/خصوصية منفصلة، وليس ترجمة عشوائية داخل QA.
+3. **Complianz banner language**: البانر الحالي إنجليزي على العربي والإنجليزي. مرتبط بنفس فجوة Complianz/Polylang ويحتاج بند إعداد/تعريب منفصل.
+4. **Production-only items**: GA4/Site Kit، SMTP إنتاجي بدل Gmail المؤقت، DNS/SSL، وقياس Core Web Vitals الحقيقي على استضافة عامة تبقى للمحطات 22-23 حسب القرارات السابقة.
+
+### 8. فحوص الإغلاق
+
+- `php -l` نجح على ملفات الثيم وسكربتات المحطة.
+- `node --check` نجح على سكربتات Stage 21.
+- `tools/stage21-audit.php` نجح.
+- `tools/stage21-http-audit.mjs` نجح.
+- `tools/stage21-browser-audit.mjs` نجح.
+- `curl -I` لكل URL مهم نجح بالحالة المتوقعة.
+- `git diff --check` نجح مع تحذيرات CRLF المعروفة فقط.
+- `phpcs`/WPCS غير متاح في PATH.
+- تحذير PHP CLI المتكرر `php_imagick.dll` موجود في بيئة LocalWP CLI، لكنه لا يمنع syntax/WP-CLI checks ولا يظهر كـ`debug.log`.
+
+### 9. بوابة الإغلاق
+
+المحطة 21 اكتملت: تم فحص الموقع ثنائي اللغة من قاعدة البيانات وHTTP والمتصفح، وإصلاح مشاكل محدودة في رابط Case Study الإنجليزي، `dir=ltr`، canonical أرشيف Work، reduced motion، وظهور Sidebar الافتراضي. كل الصفحات الأساسية ترجع الحالة المتوقعة، Polylang/hreflang/canonical مرّت، النماذج والتفاعلات الأساسية اختُبرت، والأمان/الأداء الأساسيان موثقان. تبقى فجوتا sitemap XML وComplianz bilingual/legal كعناصر إصلاح منفصلة قبل الإطلاق، دون تمديد المحطة 21 أو إضافة قرارات جديدة.

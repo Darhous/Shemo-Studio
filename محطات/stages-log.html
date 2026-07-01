@@ -1610,5 +1610,112 @@ Demo / Concept Project - Not commissioned by a client</code></pre>
 </div>
 </div>
 
+<hr>
+
+<div class="stage">
+<h2>المحطة 21 — فحص QA شامل واحد</h2>
+<p class="meta"><strong>التاريخ:</strong> 2026-07-01<br>
+<strong>الحالة:</strong> ✅ مكتملة<br>
+<strong>النوع:</strong> فحص إطلاق محلي شامل + إصلاحات محدودة داخل الثيم + توثيق فجوات منفصلة</p>
+
+<h3>السياق</h3>
+<p>بدأت المحطة بعد تشغيل ذاكرة Codex المشتركة وقراءة <code>APPROVED-DECISIONS.md</code> خصوصًا القرارات 20، 21، 24، 25، و<code>محطات/roadmap.md</code>، وآخر محطات 19-20، و<code>design/content/tone-of-voice.md</code>، و<code>git log --oneline -15</code>.</p>
+<ul>
+<li>الفرع <code>main</code> كان مواكبًا لـ<code>origin/main</code> على commit المحطة 20.</li>
+<li>يوجد ملف غير متتبع سابق <code>MASTER-PLAN.md</code> ولم يتم لمسه.</li>
+<li>عدد الإضافات النشطة = 15.</li>
+<li><code>debug.log</code> غير موجود قبل الفحص.</li>
+</ul>
+
+<h3>1. أدوات الفحص المضافة</h3>
+<ul>
+<li><code>tools/stage21-audit.php</code>: قراءة رجعية من WordPress/DB للصفحات، Polylang، Rank Math، النماذج، Turnstile، عدد الإضافات، حالة privacy، وعدد submissions.</li>
+<li><code>tools/stage21-http-audit.mjs</code>: فحص HTTP/HTML حي لـ48 صفحة، canonical، hreflang، <code>lang/dir</code>، الروابط الداخلية، والموارد الخارجية.</li>
+<li><code>tools/stage21-browser-audit.mjs</code>: فحص Playwright ممثل لـ12 viewport/page مع screenshots في مجلد temp، overflow، heading count، labels، أسماء الروابط/الأزرار، وcontrast لعناصر <code>main</code>.</li>
+</ul>
+<p>تم تحميل Playwright Chromium مؤقتًا في cache المستخدم فقط لإجراء screenshots، بدون إضافة dependency أو <code>node_modules</code> داخل الريبو.</p>
+
+<h3>2. الإصلاحات المحدودة داخل المحطة</h3>
+<ul>
+<li>إصلاح رابط CTA الإنجليزي داخل <code>single-project.php</code> من <code>/en/start-a-project/</code> إلى <code>/en/start-a-project-en/</code>.</li>
+<li>إضافة <code>prefers-reduced-motion: reduce</code> لإيقاف transitions/transform عند طلب تقليل الحركة.</li>
+<li>إضافة <code>dir="ltr"</code> صريح للصفحات الإنجليزية عبر <code>language_attributes</code>.</li>
+<li>إضافة canonical fallback لأرشيف Work/Projects لأن Rank Math لم يخرجه للأرشيف.</li>
+<li>تعطيل Sidebar الافتراضي لـGeneratePress على صفحات Shemo، Work archive، Case Study، Search، و404 حتى تظهر الصفحات كاملة العرض كما صُممت.</li>
+</ul>
+<p>لم يتم تعديل <code>APPROVED-DECISIONS.md</code> لأن المحطة لم تعتمد أي قرار جديد.</p>
+
+<h3>3. فحص bilingual / SEO / HTTP</h3>
+<p>نجح <code>tools/stage21-audit.php</code>: كل أزواج الصفحات الأساسية منشورة ومربوطة عبر Polylang، مشاريع Work = 3 عربي + 3 English، لا توجد روابط قديمة داخل post content إلى <code>/en/start-a-project/</code> أو <code>/en/contact/</code>، Rank Math descriptions موجودة، عدد الإضافات النشطة = 15، و<code>blog_public=0</code>.</p>
+<p>نجح <code>tools/stage21-http-audit.mjs</code>: 48 صفحة مفحوصة، 48 رابط داخلي مفحوص، وكل canonical/hreflang/lang/dir مرّت بعد الإصلاحات. الموارد الخارجية المرصودة: Google Fonts، Cloudflare Turnstile، و<code>cookiedatabase.org</code> من Complianz.</p>
+<p><code>curl -I</code> لكل URL مهم رجع <code>HTTP/1.1 200 OK</code> بدون <code>Location</code> redirect غير متوقع، وصفحة 404 التجريبية رجعت <code>HTTP/1.1 404 Not Found</code>.</p>
+<p>خرائط XML ما زالت ترجع 404: <code>/wp-sitemap.xml</code> و<code>/sitemap_index.xml</code>. هذا مطابق لفجوة LocalWP/Nginx الموثقة منذ المحطة 5، ولم يتم تعديل config مولّد تلقائيًا بدون موافقة صريحة.</p>
+
+<h3>4. فحص responsive / RTL-LTR / accessibility</h3>
+<p>نجح <code>tools/stage21-browser-audit.mjs</code> على 12 عينة ممثلة: Home، Services، Work، Case Study، Packages، Request a Quote، Start a Project، Contact، وDeposit Policy، على mobile وdesktop حسب الحاجة.</p>
+<ul>
+<li>لا overflow أفقي على أحجام الموبايل المفحوصة.</li>
+<li>لا تداخل بصري واضح في الهيدر، CTA، الكروت، النماذج، أو hero sections.</li>
+<li>RTL/LTR يعملان فعليًا، والإنجليزي أصبح يصرّح بـ<code>dir="ltr"</code>.</li>
+<li>labels للنماذج موجودة.</li>
+<li>عناصر links/buttons الظاهرة لها أسماء قابلة للقراءة.</li>
+<li>contrast المحسوب لعناصر النص داخل <code>main</code> نجح.</li>
+<li>focus states موجودة عبر <code>:focus-visible</code>.</li>
+<li><code>prefers-reduced-motion</code> أضيف صراحة.</li>
+</ul>
+<p>ملاحظة: بانر Complianz يظهر بالإنجليزية ويغطي أول viewport على أول زيارة، وهذا سلوك موافقة كوكيز حاليًا وليس فشل layout بعد قبول البانر، لكنه مرتبط بفجوة تعريب Complianz.</p>
+
+<h3>5. فحص performance الأساسي</h3>
+<table>
+<tr><th>الصفحة</th><th>HTML تقريبًا</th><th>Scripts</th><th>Styles</th><th>ملاحظات</th></tr>
+<tr><td><code>/</code></td><td>146 KB</td><td>14</td><td>18</td><td>لا صور فعلية</td></tr>
+<tr><td><code>/en/</code></td><td>144 KB</td><td>14</td><td>17</td><td>لا صور فعلية</td></tr>
+<tr><td><code>/work/</code></td><td>146 KB</td><td>14</td><td>18</td><td>أرشيف CPT</td></tr>
+<tr><td><code>/packages/</code></td><td>142 KB</td><td>14</td><td>18</td><td>SureCart cart assets ظاهرة</td></tr>
+<tr><td><code>/request-a-quote/</code></td><td>149 KB</td><td>17</td><td>20</td><td>Fluent Forms</td></tr>
+<tr><td><code>/start-a-project/</code></td><td>152 KB</td><td>18</td><td>20</td><td>Fluent Forms + Turnstile</td></tr>
+<tr><td><code>/checkout/?mode=test...</code></td><td>555 KB</td><td>16</td><td>19</td><td>SureCart test checkout أثقل صفحة</td></tr>
+</table>
+<p>Google Fonts ما زالت خارجية، Turnstile يظهر فقط حيث يلزم للنماذج، ولا توجد صور حقيقية/ثقيلة حاليًا. SureCart checkout ثقيل نسبيًا لكنه test-only ومقبول كفجوة أداء مؤجلة للإطلاق الحقيقي.</p>
+
+<h3>6. فحص security / forms / interactions</h3>
+<ul>
+<li>Wordfence نشط: <code>wordfence_active=yes</code>, <code>wflogs_exists=yes</code>, version <code>8.2.2</code>.</li>
+<li>عدد الإضافات النشطة = 15.</li>
+<li>لا يوجد <code>debug.log</code> قبل/بعد الفحص.</li>
+<li>فحص الأسرار رجع مطابقات نصية غير سرية فقط، بدون قيم مفاتيح مكشوفة.</li>
+<li><code>Request a Quote</code> تم اختباره فعليًا عبر HTTP POST صحيح إلى Fluent Forms: form 3 رجع <code>success=true</code> وأصبح form 3 = 3 submissions، form 4 = 1 submission.</li>
+<li><code>Start a Project</code> بدون Turnstile token رجع <code>HTTP 422</code> برسالة <code>Turnstile verification failed, please try again.</code> ولم تُنشأ submissions للنموذجين 5/6.</li>
+<li>البحث <code>/?s=motion</code> رجع نتائج، و404 التجريبي رجع 404.</li>
+<li>SureCart test checkout يحتوي <code>SureCart/sc-checkout</code> وسياق <code>mode=test</code>.</li>
+<li>Work filter تم اختباره على <code>service=service-video-motion-ar</code> وأظهر مشروع Frame Pulse.</li>
+</ul>
+
+<h3>7. فجوات لا تُحل داخل المحطة 21</h3>
+<ol>
+<li><strong>Sitemap XML 404 في LocalWP:</strong> ما زال قائمًا بسبب Nginx static XML routing الموثق من المحطة 5. يحتاج قرار لمس config مولّد تلقائيًا أو يؤجل للاستضافة الحقيقية.</li>
+<li><strong>Complianz Privacy/Cookie bilingual gap:</strong> صفحتا Complianz المنشورتان ID 17 و18 معلّمتان عربيًا في Polylang (<code>lang=ar</code>) لكن محتواهما/عناوينهما إنجليزية ولا يوجد زوج English. تعريبهما أو استبدالهما يحتاج مراجعة قانونية/خصوصية منفصلة.</li>
+<li><strong>Complianz banner language:</strong> البانر الحالي إنجليزي على العربي والإنجليزي، ومرتبط بنفس فجوة Complianz/Polylang.</li>
+<li><strong>Production-only items:</strong> GA4/Site Kit، SMTP إنتاجي بدل Gmail المؤقت، DNS/SSL، وقياس Core Web Vitals الحقيقي تبقى للمحطات 22-23.</li>
+</ol>
+
+<h3>8. فحوص الإغلاق</h3>
+<ul>
+<li><code>php -l</code> نجح على ملفات الثيم وسكربتات المحطة.</li>
+<li><code>node --check</code> نجح على سكربتات Stage 21.</li>
+<li><code>tools/stage21-audit.php</code> نجح.</li>
+<li><code>tools/stage21-http-audit.mjs</code> نجح.</li>
+<li><code>tools/stage21-browser-audit.mjs</code> نجح.</li>
+<li><code>curl -I</code> لكل URL مهم نجح بالحالة المتوقعة.</li>
+<li><code>git diff --check</code> نجح مع تحذيرات CRLF المعروفة فقط.</li>
+<li><code>phpcs</code>/WPCS غير متاح في PATH.</li>
+<li>تحذير PHP CLI المتكرر <code>php_imagick.dll</code> موجود في بيئة LocalWP CLI، لكنه لا يمنع syntax/WP-CLI checks ولا يظهر كـ<code>debug.log</code>.</li>
+</ul>
+
+<div class="gate">
+<strong>9. بوابة الإغلاق:</strong> المحطة 21 اكتملت: تم فحص الموقع ثنائي اللغة من قاعدة البيانات وHTTP والمتصفح، وإصلاح مشاكل محدودة في رابط Case Study الإنجليزي، <code>dir=ltr</code>، canonical أرشيف Work، reduced motion، وظهور Sidebar الافتراضي. كل الصفحات الأساسية ترجع الحالة المتوقعة، Polylang/hreflang/canonical مرّت، النماذج والتفاعلات الأساسية اختُبرت، والأمان/الأداء الأساسيان موثقان. تبقى فجوتا sitemap XML وComplianz bilingual/legal كعناصر إصلاح منفصلة قبل الإطلاق، دون تمديد المحطة 21 أو إضافة قرارات جديدة.
+</div>
+</div>
+
 </body>
 </html>

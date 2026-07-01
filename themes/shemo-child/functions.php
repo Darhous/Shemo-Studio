@@ -6,6 +6,9 @@ add_action( 'after_setup_theme', 'shemo_child_theme_setup' );
 add_action( 'enqueue_block_editor_assets', 'shemo_child_enqueue_editor_assets' );
 add_action( 'init', 'shemo_child_register_block_styles' );
 add_action( 'pre_get_posts', 'shemo_child_filter_project_archive_query' );
+add_action( 'wp_head', 'shemo_child_project_archive_canonical_tag', 1 );
+add_filter( 'language_attributes', 'shemo_child_language_attributes_dir', 20 );
+add_filter( 'generate_sidebar_layout', 'shemo_child_sidebar_layout' );
 
 require_once get_stylesheet_directory() . '/inc/rank-math-polylang.php';
 
@@ -94,6 +97,35 @@ function shemo_child_current_language(): string {
 	}
 
 	return is_rtl() ? 'ar' : 'en';
+}
+
+function shemo_child_language_attributes_dir( string $output ): string {
+	if ( false !== strpos( $output, 'dir=' ) ) {
+		return $output;
+	}
+
+	return trim( $output . ' dir="' . esc_attr( is_rtl() ? 'rtl' : 'ltr' ) . '"' );
+}
+
+function shemo_child_project_archive_canonical_tag(): void {
+	if ( ! is_post_type_archive( 'project' ) ) {
+		return;
+	}
+
+	$archive = get_post_type_archive_link( 'project' );
+	if ( ! $archive ) {
+		return;
+	}
+
+	printf( '<link rel="canonical" href="%s" />' . "\n", esc_url( trailingslashit( $archive ) ) );
+}
+
+function shemo_child_sidebar_layout( string $layout ): string {
+	if ( is_page() || is_post_type_archive( 'project' ) || is_singular( 'project' ) || is_search() || is_404() ) {
+		return 'no-sidebar';
+	}
+
+	return $layout;
 }
 
 function shemo_child_demo_project_label( ?string $lang = null ): string {
