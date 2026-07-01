@@ -507,5 +507,65 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 
 </div>
 
+<div class="stage" id="stage-7">
+<h2>المحطة 7 — تركيب الإضافات الأربعة المعتمدة (Turnstile، Complianz، GA4/Site Kit، FluentCRM)</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تعديل فعلي على موقع LocalWP — تثبيت وتفعيل 3 إضافات third-party + اكتشاف قدرة مدمجة في إضافة موجودة
+</p>
+
+<h3>السياق</h3>
+<p>المحطة 6 قفلت القرارات 13–16 (Cloudflare Turnstile، Complianz، GA4 عبر Site Kit، FluentCRM) بدون تركيب فعلي. المحطة 7 مخصصة للتركيب الفعلي، بنفس أسلوب المحطة 5، مع قيد تسلسل صريح: <strong>Complianz قبل GA4/Site Kit</strong> حتى لا يبدأ تتبّع GA4 قبل ظهور بانر موافقة الكوكيز.</p>
+
+<h3>1. تجهيز بيئة wp-cli</h3>
+<p>نفس الإعداد الموثّق من المحطات السابقة (run-hash <code>3PbB5bi_t</code> لسه نفسه، تم التأكد بفحص فولدر <code>run\</code> من جديد بدل افتراضه). تم التأكد من <code>admin_email</code> قبل أي تعديل: رجّعت <code>ahmeddarhous@gmail.com</code> (تعديل المحطة 6 لسه محفوظ). Baseline: 10 إضافات نشطة، <code>/</code> و<code>/work/</code> كلاهما <strong>200 OK</strong>.</p>
+
+<h3>2. التثبيت بالترتيب المطلوب (Complianz أولًا، بعدين Site Kit)</h3>
+<table>
+<tr><th>الترتيب</th><th>الإضافة</th><th>Slug</th><th>النسخة</th><th>الحالة</th></tr>
+<tr><td>1</td><td>Complianz (موافقة الكوكيز)</td><td><code>complianz-gdpr</code></td><td>7.5.0</td><td>✅ نشطة</td></tr>
+<tr><td>2</td><td>Site Kit by Google (لـGA4)</td><td><code>google-site-kit</code></td><td>1.182.0</td><td>✅ نشطة</td></tr>
+<tr><td>3</td><td>FluentCRM</td><td><code>fluent-crm</code></td><td>3.1.8</td><td>✅ نشطة</td></tr>
+</table>
+<p>اتحقق بعد كل تثبيت على حدة: رسالة <code>activated</code> بدون PHP Fatal Error، ثم فحص HTTP حي على <code>/</code> و<code>/work/</code> (كلاهما <strong>200 OK</strong>) قبل الانتقال للإضافة التالية. Complianz اتثبتت وتفعّلت <strong>قبل</strong> Site Kit فعليًا (ترتيب تنفيذ حرفي، مش بس ترتيب جدول).</p>
+
+<h3>3. Cloudflare Turnstile — مفيش إضافة منفصلة، القدرة موجودة جوه Fluent Forms نفسها</h3>
+<p>بدل تركيب إضافة third-party جديدة، تم اكتشاف أن <strong>Fluent Forms (المثبتة بالفعل من المحطة 5) عندها موديول Cloudflare Turnstile مدمج داخليًا</strong> — ملفات <code>app/Modules/Turnstile/Turnstile.php</code> و<code>app/Services/FormBuilder/Components/Turnstile.php</code> موجودة فعليًا في نسخة <code>fluentform</code> 6.2.5. يعني قرار 13 بيتحقق <strong>بدون تركيب إضافة جديدة إطلاقًا</strong> — نفس منطق Meta Box (محطة 4) وGeneratePress (محطة 3). البحث في wordpress.org أكّد عدم وجود إضافة Turnstile مخصصة لـFluent Forms — كل النتائج إضافات عامة لتسجيل الدخول/تعليقات، تركيبها كان هيكون تكرار وتعارض محتمل.</p>
+<p class="meta">اتحقق أن الموديول لسه غير مُهيّأ (بحث في options الخاصة بـFluent Forms رجّع فاضي) — القرار مقفول والقدرة موجودة، لكن التفعيل الفعلي محتاج مفاتيح Cloudflare حقيقية (راجع قسم 5).</p>
+
+<h3>4. التحقق النهائي من عدم وجود تعارض (end-to-end)</h3>
+<ul>
+<li><code>wp plugin list</code>: <strong>14 إضافة</strong> (3 جديدة + 11 من المحطات السابقة) كلها <code>active</code> بدون أي علامة خطأ</li>
+<li><code>/</code> → <strong>200 OK</strong> طوال كل خطوة (بعد كل تثبيت على حدة)</li>
+<li><code>/work/</code> (أرشيف shemo-core) → <strong>200 OK</strong> طوال كل خطوة</li>
+<li><code>/wp-login.php</code> → <strong>200 OK</strong> بعد كل التثبيتات</li>
+<li><code>wp rewrite flush</code> نجح بدون أخطاء، ومفيش <code>debug.log</code> جديد أو أخطاء PHP</li>
+</ul>
+
+<h3>5. خطوات تالية تحتاج تدخل المستخدم مباشرة</h3>
+<ul>
+<li><strong>Cloudflare Turnstile:</strong> يحتاج حساب Cloudflare حقيقي لإنشاء Site Key + Secret Key، بعدين ربطهم في إعدادات Fluent Forms. الموديول موجود جوه Fluent Forms بس مش مُفعّل</li>
+<li><strong>Complianz:</strong> معالج الإعداد الأول (Consent Wizard) لسه محتاج إكمال يدوي — تفاعلي بطبيعته، مش حاجة تُفترض عبر wp-cli</li>
+<li><strong>GA4 عبر Site Kit:</strong> يحتاج تسجيل دخول OAuth بحساب Google حقيقي — الإضافة مُفعّلة بس غير متصلة بحساب</li>
+<li><strong>FluentCRM/SMTP:</strong> اتسأل المستخدم صراحةً "عندك حساب SMTP جاهز؟" — الرد: <strong>لسه مش جاهز، أجّلها</strong>. بدون SMTP حقيقي، FluentCRM مثبّت ومفعّل لكن مش قادر يبعت إيميل فعلي دلوقتي</li>
+</ul>
+
+<h3>6. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>مفيش تهيئة/تفعيل فعلي لأي من الأربعة بعد التثبيت الأساسي — الربط بحسابات/مفاتيح حقيقية (Cloudflare، Google، SMTP) لسه مفتوح</li>
+<li>مفيش بانر كوكيز ظاهر فعليًا بعد — Complianz مُفعّلة بس معالج الإعداد الأول لسه يدوي</li>
+<li>مفيش تتبّع GA4 فعلي يحصل — Site Kit مُفعّل بس غير مربوط بحساب Google</li>
+<li>الفجوة الفنية بتاعة sitemaps 404 (موثّقة في المحطة 5) لسه مفتوحة، متلموستش في المحطة دي</li>
+<li>بنود "لا تزال غير معتمدة" التانية (تفاصيل النماذج/البيع، اللغة، الهوية البصرية، الموشن، الافتراضات A1–A9) لسه برّة نطاق كل المحطات</li>
+</ul>
+
+<div class="gate">
+<strong>7. بوابة المراجعة:</strong> المحطة 7 خلصت: القرارات 13–16 الأربعة اتنفذوا فعليًا — Complianz وGA4 عبر Site Kit وFluentCRM اتثبتوا وتفعّلوا عبر wp-cli بالترتيب التسلسلي المطلوب (Complianz قبل Site Kit)، وCloudflare Turnstile اتحقق إنه متوفر أصلاً كموديول مدمج جوه Fluent Forms بدون احتياج إضافة جديدة. اتحقق من عدم وجود تعارض بين الـ14 إضافة النهائية عبر فحوصات HTTP حية بعد كل خطوة — كلها بدون أخطاء PHP. تم سؤال المستخدم صراحةً عن بيانات SMTP لـFluentCRM بدل افتراضها؛ الرد كان تأجيل الربط لمحطة لاحقة. كل الخطوات التفاعلية المتبقية (مفاتيح Turnstile، معالج Complianz، OAuth لـSite Kit، SMTP لـFluentCRM) موثّقة كبنود مفتوحة تحتاج بيانات حقيقية من المستخدم، مش افتراضات.
+في انتظار توجيه المستخدم للانتقال إلى <strong>المحطة 8</strong>.
+</div>
+
+</div>
+
 </body>
 </html>
