@@ -577,6 +577,126 @@ select:focus,
 	padding: clamp(1.5rem, 5vw, 3rem);
 }
 
+.shemo-page .shemo-hero {
+	min-height: min(620px, 78vh);
+}
+
+.shemo-page .shemo-hero h1 {
+	max-width: 12ch;
+}
+
+.shemo-page .shemo-section--intro {
+	padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.shemo-page__eyebrow {
+	color: var(--shemo-text-muted);
+	display: block;
+	font-size: 0.9rem;
+	font-weight: 700;
+	margin-bottom: 0.55rem;
+}
+
+.shemo-narrative {
+	display: grid;
+	gap: clamp(1.5rem, 4vw, 2.5rem);
+	grid-template-columns: minmax(0, 0.72fr) minmax(280px, 0.28fr);
+}
+
+.shemo-narrative__body {
+	color: var(--shemo-text-muted);
+	font-size: clamp(1rem, 1.7vw, 1.16rem);
+}
+
+.shemo-narrative__body p {
+	max-width: 760px;
+}
+
+.shemo-aside-note {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	color: var(--shemo-text-muted);
+	padding: clamp(1rem, 2vw, 1.35rem);
+}
+
+.shemo-aside-note strong {
+	color: var(--shemo-text);
+	display: block;
+	margin-bottom: 0.35rem;
+}
+
+.shemo-service-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	min-height: 100%;
+}
+
+.shemo-service-card .shemo-button {
+	align-self: flex-start;
+	margin-top: auto;
+}
+
+.shemo-check-list,
+.shemo-pill-list {
+	display: grid;
+	gap: 0.7rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.shemo-check-list li {
+	background: rgba(245, 242, 236, 0.035);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	color: var(--shemo-text-muted);
+	padding: 0.85rem 1rem;
+}
+
+.shemo-check-list li::before {
+	color: var(--shemo-accent);
+	content: "•";
+	font-weight: 900;
+	margin-inline-end: 0.55rem;
+}
+
+.shemo-pill-list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.shemo-pill-list li {
+	border: 1px solid rgba(255, 90, 44, 0.42);
+	border-radius: 999px;
+	color: var(--shemo-text-muted);
+	font-size: 0.88rem;
+	padding: 0.35rem 0.7rem;
+}
+
+.shemo-workflow {
+	display: grid;
+	gap: 0.85rem;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.shemo-workflow__step {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	padding: 1rem;
+}
+
+.shemo-workflow__step span {
+	color: var(--shemo-accent);
+	display: block;
+	font-family: var(--shemo-font-display);
+	font-size: 1.25rem;
+	font-weight: 800;
+	margin-bottom: 0.35rem;
+}
+
 .full-width-content .inside-article {
 	padding: 0;
 }
@@ -588,9 +708,11 @@ select:focus,
 @media (max-width: 900px) {
 	.shemo-hero,
 	.shemo-split,
+	.shemo-narrative,
 	.shemo-grid,
 	.shemo-grid--two,
-	.shemo-showreel {
+	.shemo-showreel,
+	.shemo-workflow {
 		grid-template-columns: 1fr;
 	}
 

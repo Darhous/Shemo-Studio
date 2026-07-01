@@ -1524,3 +1524,121 @@ Demo / Concept Project - Not commissioned by a client
 ### 8. بوابة الإغلاق
 
 المحطة 16 اكتملت بعد Round 2: الصفحة الرئيسية العربية أصبحت الافتراضية في `/`، والإنجليزية تعمل في `/en/` عبر Polylang بتحميل مباشر `200 OK` بدون redirect، والمحتوى ملتزم بالهوية Cinematic Noir والنبرة المعتمدة ووسم Demo/Concept بدون ادعاءات وهمية. تم التحقق عبر HTTP headers وWordPress/Polylang وresponsive أساسي.
+
+---
+
+## المحطة 17 — About + Services Overview + 6 صفحات خدمة ثنائية اللغة
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** بناء محتوى وصفحات WordPress فعلية + CSS داعم + تحقق Polylang/HTTP
+
+### السياق
+
+بدأت المحطة بناءً على خريطة `محطات/roadmap.md`: بناء صفحة About، صفحة Services Overview، وست صفحات خدمة تفصيلية، باللغتين العربية والإنجليزية، مع العربي كافتراضي والإنجليزي تحت `/en/`.
+
+تمت قراءة الملفات المطلوبة قبل التنفيذ:
+
+- `APPROVED-DECISIONS.md` خصوصًا القرارات 1، 20، 21، 23، 24، 25.
+- `محطات/roadmap.md` و`محطات/stages-log.md` خصوصًا المحطة 16 وRound 2.
+- `design/content/tone-of-voice.md`.
+- كود `themes/shemo-child` و`plugins/shemo-core`.
+
+### 1. التنفيذ
+
+تم بناء 16 صفحة منشورة داخل WordPress:
+
+| النوع | عربي | English |
+|---|---|---|
+| About | `/about/` | `/en/about-en/` |
+| Services overview | `/services/` | `/en/services-en/` |
+| Video Editing & Motion | `/services/video-editing-motion/` | `/en/services-en/video-editing-motion-en/` |
+| Graphic Design | `/services/graphic-design/` | `/en/services-en/graphic-design-en/` |
+| Sketch & Illustration | `/services/sketch-illustration/` | `/en/services-en/sketch-illustration-en/` |
+| Storyboarding & Creative Planning | `/services/storyboarding-creative-planning/` | `/en/services-en/storyboarding-creative-planning-en/` |
+| Branding | `/services/branding/` | `/en/services-en/branding-en/` |
+| Creative Direction / Custom | `/services/creative-direction-custom/` | `/en/services-en/creative-direction-custom-en/` |
+
+التنفيذ تم عبر Block Editor content داخل الصفحات، مع سكربت قابل لإعادة التشغيل:
+
+```text
+tools/stage17-build-about-services.php
+```
+
+أُضيف سكربت تحقق ديناميكي:
+
+```text
+tools/stage17-verify.php
+```
+
+السكربتات تضبط لغة Polylang، تربط الترجمات، تضع صفحات الخدمات التفصيلية كأبناء لصفحة الخدمات في كل لغة، وتفعّل إعدادات GeneratePress للصفحات (`_generate-disable-headline=true` و`_generate-full-width-content=true`). تم الإبقاء على `polylang.redirect_lang=true` وتنظيف كاش اللغات وflush rewrite rules لتفادي باج `/en/` الذي ظهر في المحطة 16.
+
+تمت إضافة CSS داعم محدود في:
+
+```text
+themes/shemo-child/style.css
+```
+
+الإضافات/الثيمات المستخدمة كما هي معتمدة: GeneratePress + GenerateBlocks/Block Editor، بدون شراء أي إضافة جديدة.
+
+### 2. المحتوى
+
+صفحة About تعرض شيمو كمؤسس ظاهر وقائد إبداعي، مع الحفاظ على Shemo Studio كاستوديو بوتيك قابل للنمو، وليس براند شخصي بحت. تم تجنب أي أسماء عملاء أو شهادات أو نتائج وهمية.
+
+صفحة Services Overview تربط بصفحات الخدمات الست في النسختين العربية والإنجليزية. كل صفحة خدمة تحتوي:
+
+- المشكلة التي تعالجها الخدمة.
+- ما يتم تسليمه.
+- طريقة العمل.
+- CTA واضح للبدء أو الرجوع لكل الخدمات.
+
+الخدمات الست المبنية:
+
+- Video Editing & Motion.
+- Graphic Design.
+- Sketch & Illustration.
+- Storyboarding & Creative Planning.
+- Branding.
+- Creative Direction / Custom.
+
+النبرة اتبعت دليل `design/content/tone-of-voice.md`: Hybrid studio + visible founder، وضوح عملي، ثقة بدون مبالغة، عربي أولًا، وإنجليزي كمقابل طبيعي غير حرفي.
+
+### 3. تحقق WordPress / Polylang
+
+تم تشغيل `tools/stage17-verify.php` بنجاح. نتيجة التحقق:
+
+| الصفحة | عربي | English | الربط |
+|---|---:|---:|---|
+| about | 25 | 26 | `ar_to_en=26`, `en_to_ar=25` |
+| services | 27 | 28 | `ar_to_en=28`, `en_to_ar=27` |
+| video-editing-motion | 29 | 30 | `ar_to_en=30`, `en_to_ar=29` |
+| graphic-design | 31 | 32 | `ar_to_en=32`, `en_to_ar=31` |
+| sketch-illustration | 33 | 34 | `ar_to_en=34`, `en_to_ar=33` |
+| storyboarding-creative-planning | 35 | 36 | `ar_to_en=36`, `en_to_ar=35` |
+| branding | 37 | 38 | `ar_to_en=38`, `en_to_ar=37` |
+| creative-direction-custom | 39 | 40 | `ar_to_en=40`, `en_to_ar=39` |
+
+كل صفحات العربي لغتها `ar`، وكل صفحات الإنجليزي لغتها `en`.
+
+### 4. تحقق HTTP
+
+تم فحص headers لكل صفحات المحطة بالإضافة إلى `/en/`:
+
+| النتيجة | الروابط |
+|---|---|
+| `HTTP/1.1 200 OK` بدون `Location` redirect | كل صفحات About/Services والخدمات الست عربي/إنجليزي |
+| `HTTP/1.1 200 OK` بدون `Location` redirect | `/en/` بعد بناء المحطة 17 |
+
+تم فحص وجود روابط الخدمات الست داخل صفحة Services Overview في النسختين، وظهور حضور المؤسس في About، ووجود قسم المشكلة في صفحة خدمة Video Editing & Motion.
+
+### 5. حدود المحطة
+
+- لم يتم تعديل `APPROVED-DECISIONS.md` لأن المحطة لم تحتج قرارًا جديدًا بموافقة صريحة.
+- لم يتم إنشاء أعمال عملاء أو نتائج أو شهادات وهمية.
+- روابط `Start a Project` و`Contact` لا تزال تشير لمسارات مستقبلية ستُبنى في محطات لاحقة.
+- لم يتم اعتماد أسعار أو نطاقات باقات؛ ذلك مؤجل للمحطة 19.
+- فحص متصفح Playwright لم يُنفّذ لأن `playwright-cli` و`playwright`/`puppeteer` غير متاحة في بيئة الريبو الحالية؛ تم الاعتماد هنا على curl/WordPress/Polylang وفحوصات المحتوى المباشرة.
+
+### 6. بوابة الإغلاق
+
+المحطة 17 اكتملت: About وServices Overview وست صفحات خدمة أصبحت منشورة بالعربية والإنجليزية، مترابطة في Polylang، وتعمل روابطها المباشرة تحت `/` و`/en/` بدون redirects خاطئة. المحتوى ملتزم بالهوية Cinematic Noir ونبرة Hybrid studio + visible founder، بدون ادعاءات وهمية أو إضافات مدفوعة.

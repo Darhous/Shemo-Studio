@@ -1316,5 +1316,82 @@ Demo / Concept Project - Not commissioned by a client</code></pre>
 </div>
 </div>
 
+<hr>
+
+<div class="stage">
+<h2>المحطة 17 — About + Services Overview + 6 صفحات خدمة ثنائية اللغة</h2>
+<p class="meta"><strong>التاريخ:</strong> 2026-07-01<br>
+<strong>الحالة:</strong> ✅ مكتملة<br>
+<strong>النوع:</strong> بناء محتوى وصفحات WordPress فعلية + CSS داعم + تحقق Polylang/HTTP</p>
+
+<h3>السياق</h3>
+<p>بدأت المحطة بناءً على خريطة <code>محطات/roadmap.md</code>: بناء صفحة About، صفحة Services Overview، وست صفحات خدمة تفصيلية، باللغتين العربية والإنجليزية، مع العربي كافتراضي والإنجليزي تحت <code>/en/</code>.</p>
+<p>تمت قراءة <code>APPROVED-DECISIONS.md</code> خصوصًا القرارات 1، 20، 21، 23، 24، 25، و<code>محطات/roadmap.md</code>، و<code>محطات/stages-log.md</code>، و<code>design/content/tone-of-voice.md</code>، وكود <code>shemo-child</code> و<code>shemo-core</code>.</p>
+
+<h3>1. التنفيذ</h3>
+<p>تم بناء 16 صفحة منشورة داخل WordPress:</p>
+<table>
+<tr><th>النوع</th><th>عربي</th><th>English</th></tr>
+<tr><td>About</td><td><code>/about/</code></td><td><code>/en/about-en/</code></td></tr>
+<tr><td>Services overview</td><td><code>/services/</code></td><td><code>/en/services-en/</code></td></tr>
+<tr><td>Video Editing &amp; Motion</td><td><code>/services/video-editing-motion/</code></td><td><code>/en/services-en/video-editing-motion-en/</code></td></tr>
+<tr><td>Graphic Design</td><td><code>/services/graphic-design/</code></td><td><code>/en/services-en/graphic-design-en/</code></td></tr>
+<tr><td>Sketch &amp; Illustration</td><td><code>/services/sketch-illustration/</code></td><td><code>/en/services-en/sketch-illustration-en/</code></td></tr>
+<tr><td>Storyboarding &amp; Creative Planning</td><td><code>/services/storyboarding-creative-planning/</code></td><td><code>/en/services-en/storyboarding-creative-planning-en/</code></td></tr>
+<tr><td>Branding</td><td><code>/services/branding/</code></td><td><code>/en/services-en/branding-en/</code></td></tr>
+<tr><td>Creative Direction / Custom</td><td><code>/services/creative-direction-custom/</code></td><td><code>/en/services-en/creative-direction-custom-en/</code></td></tr>
+</table>
+<p>التنفيذ تم عبر Block Editor content داخل الصفحات، مع سكربت قابل لإعادة التشغيل: <code>tools/stage17-build-about-services.php</code>. أُضيف كذلك سكربت تحقق ديناميكي: <code>tools/stage17-verify.php</code>.</p>
+<p>السكربتات تضبط لغة Polylang، تربط الترجمات، تضع صفحات الخدمات التفصيلية كأبناء لصفحة الخدمات في كل لغة، وتفعّل إعدادات GeneratePress للصفحات (<code>_generate-disable-headline=true</code> و<code>_generate-full-width-content=true</code>). تم الإبقاء على <code>polylang.redirect_lang=true</code> وتنظيف كاش اللغات وflush rewrite rules لتفادي باج <code>/en/</code> الذي ظهر في المحطة 16.</p>
+<p>أُضيف CSS داعم محدود في <code>themes/shemo-child/style.css</code>. لم يتم شراء أو تركيب أي إضافة جديدة.</p>
+
+<h3>2. المحتوى</h3>
+<p>صفحة About تعرض شيمو كمؤسس ظاهر وقائد إبداعي، مع الحفاظ على Shemo Studio كاستوديو بوتيك قابل للنمو، وليس براند شخصي بحت. تم تجنب أي أسماء عملاء أو شهادات أو نتائج وهمية.</p>
+<p>صفحة Services Overview تربط بصفحات الخدمات الست في النسختين العربية والإنجليزية. كل صفحة خدمة تحتوي: المشكلة التي تعالجها الخدمة، ما يتم تسليمه، طريقة العمل، وCTA واضح.</p>
+<ul>
+<li>Video Editing &amp; Motion.</li>
+<li>Graphic Design.</li>
+<li>Sketch &amp; Illustration.</li>
+<li>Storyboarding &amp; Creative Planning.</li>
+<li>Branding.</li>
+<li>Creative Direction / Custom.</li>
+</ul>
+
+<h3>3. تحقق WordPress / Polylang</h3>
+<p>تم تشغيل <code>tools/stage17-verify.php</code> بنجاح. كل صفحات العربي لغتها <code>ar</code>، وكل صفحات الإنجليزي لغتها <code>en</code>، وكل زوج ترجمة مرتبط في الاتجاهين.</p>
+<table>
+<tr><th>الصفحة</th><th>عربي</th><th>English</th><th>الربط</th></tr>
+<tr><td>about</td><td>25</td><td>26</td><td><code>ar_to_en=26</code>, <code>en_to_ar=25</code></td></tr>
+<tr><td>services</td><td>27</td><td>28</td><td><code>ar_to_en=28</code>, <code>en_to_ar=27</code></td></tr>
+<tr><td>video-editing-motion</td><td>29</td><td>30</td><td><code>ar_to_en=30</code>, <code>en_to_ar=29</code></td></tr>
+<tr><td>graphic-design</td><td>31</td><td>32</td><td><code>ar_to_en=32</code>, <code>en_to_ar=31</code></td></tr>
+<tr><td>sketch-illustration</td><td>33</td><td>34</td><td><code>ar_to_en=34</code>, <code>en_to_ar=33</code></td></tr>
+<tr><td>storyboarding-creative-planning</td><td>35</td><td>36</td><td><code>ar_to_en=36</code>, <code>en_to_ar=35</code></td></tr>
+<tr><td>branding</td><td>37</td><td>38</td><td><code>ar_to_en=38</code>, <code>en_to_ar=37</code></td></tr>
+<tr><td>creative-direction-custom</td><td>39</td><td>40</td><td><code>ar_to_en=40</code>, <code>en_to_ar=39</code></td></tr>
+</table>
+
+<h3>4. تحقق HTTP</h3>
+<table>
+<tr><th>النتيجة</th><th>الروابط</th></tr>
+<tr><td><code>HTTP/1.1 200 OK</code> بدون <code>Location</code> redirect</td><td>كل صفحات About/Services والخدمات الست عربي/إنجليزي</td></tr>
+<tr><td><code>HTTP/1.1 200 OK</code> بدون <code>Location</code> redirect</td><td><code>/en/</code> بعد بناء المحطة 17</td></tr>
+</table>
+<p>تم فحص وجود روابط الخدمات الست داخل صفحة Services Overview في النسختين، وظهور حضور المؤسس في About، ووجود قسم المشكلة في صفحة خدمة Video Editing &amp; Motion.</p>
+
+<h3>5. حدود المحطة</h3>
+<ul>
+<li>لم يتم تعديل <code>APPROVED-DECISIONS.md</code> لأن المحطة لم تحتج قرارًا جديدًا بموافقة صريحة.</li>
+<li>لم يتم إنشاء أعمال عملاء أو نتائج أو شهادات وهمية.</li>
+<li>روابط <code>Start a Project</code> و<code>Contact</code> لا تزال تشير لمسارات مستقبلية ستُبنى في محطات لاحقة.</li>
+<li>لم يتم اعتماد أسعار أو نطاقات باقات؛ ذلك مؤجل للمحطة 19.</li>
+<li>فحص متصفح Playwright لم يُنفّذ لأن <code>playwright-cli</code> و<code>playwright</code>/<code>puppeteer</code> غير متاحة في بيئة الريبو الحالية؛ تم الاعتماد هنا على curl/WordPress/Polylang وفحوصات المحتوى المباشرة.</li>
+</ul>
+
+<div class="gate">
+<strong>6. بوابة الإغلاق:</strong> المحطة 17 اكتملت: About وServices Overview وست صفحات خدمة أصبحت منشورة بالعربية والإنجليزية، مترابطة في Polylang، وتعمل روابطها المباشرة تحت <code>/</code> و<code>/en/</code> بدون redirects خاطئة. المحتوى ملتزم بالهوية Cinematic Noir ونبرة Hybrid studio + visible founder، بدون ادعاءات وهمية أو إضافات مدفوعة.
+</div>
+</div>
+
 </body>
 </html>
