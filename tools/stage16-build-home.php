@@ -48,6 +48,24 @@ function shemo_stage16_upsert_page( string $slug, string $title, string $content
 	return (int) $post_id;
 }
 
+function shemo_stage16_enable_polylang_front_page_language_urls(): void {
+	$options = get_option( 'polylang' );
+
+	if ( ! is_array( $options ) ) {
+		WP_CLI::warning( 'Polylang options are not an array; skipped redirect_lang update.' );
+		return;
+	}
+
+	$options['redirect_lang'] = true;
+	update_option( 'polylang', $options );
+
+	if ( function_exists( 'PLL' ) && isset( PLL()->model ) && method_exists( PLL()->model, 'clean_languages_cache' ) ) {
+		PLL()->model->clean_languages_cache();
+	}
+
+	flush_rewrite_rules( false );
+}
+
 $ar_content = <<<'HTML'
 <!-- wp:group {"tagName":"main","className":"shemo-home","layout":{"type":"default"}} -->
 <main class="wp-block-group shemo-home">
@@ -291,5 +309,6 @@ pll_save_post_translations(
 
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $ar_id );
+shemo_stage16_enable_polylang_front_page_language_urls();
 
-WP_CLI::success( 'Stage 16 home pages built. Arabic ID: ' . $ar_id . ', English ID: ' . $en_id );
+WP_CLI::success( 'Stage 16 home pages built. Arabic ID: ' . $ar_id . ', English ID: ' . $en_id . '. Polylang redirect_lang enabled.' );

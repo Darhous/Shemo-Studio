@@ -1498,6 +1498,29 @@ Demo / Concept Project - Not commissioned by a client
 - روابط `Start a Project` و`Contact` تشير لمسارات مستقبلية ستُبنى في محطات لاحقة.
 - لم يتم تعديل `APPROVED-DECISIONS.md` لأن المحطة لم تحتج قرارًا جديدًا بموافقة صريحة.
 
-### 7. بوابة الإغلاق
+### 7. Round 2 — إصلاح canonical الصفحة الإنجليزية
 
-المحطة 16 اكتملت: الصفحة الرئيسية العربية أصبحت الافتراضية في `/`، والإنجليزية تعمل في `/en/` عبر Polylang، والمحتوى ملتزم بالهوية Cinematic Noir والنبرة المعتمدة ووسم Demo/Concept بدون ادعاءات وهمية. تم التحقق عبر HTTP وWordPress/Polylang وresponsive أساسي.
+بعد الإغلاق الأولي، ظهر باج فعلي عبر `curl -I`: الرابط `/en/` كان يرجع `301 Moved Permanently` إلى `/en/home-en/` بدل أن يخدم الصفحة الإنجليزية مباشرة على 200. المحتوى نفسه كان صحيحًا على `/en/home-en/`، لذلك المشكلة كانت في ضبط Polylang للـstatic front page URL، لا في محتوى الصفحة.
+
+تمت مراجعة توثيق Polylang الرسمي لصفحة static front page: عند استخدام صفحة رئيسية ثابتة، يجب ترجمتها في كل اللغات، ثم تفعيل خيار URL الخاص بـPolylang: “The front page URL contains the language code instead of the page name or page id”. في كود Polylang هذا الخيار هو `redirect_lang`.
+
+تم تحديث `tools/stage16-build-home.php` ليضبط هذا تلقائيًا عند أي تشغيل مستقبلي:
+
+- تحديث option `polylang.redirect_lang = true`.
+- تنظيف كاش لغات Polylang عبر `PLL()->model->clean_languages_cache()` حتى يُعاد حساب `home_url` لكل لغة.
+- تنفيذ `flush_rewrite_rules(false)`.
+
+التحقق الرجعي بعد التصحيح:
+
+| البند | النتيجة |
+|---|---|
+| `pll_home_url('ar')` | `http://shemostudio.local/` |
+| `pll_home_url('en')` | `http://shemostudio.local/en/` |
+| لغة `ar` front page | Page ID `21` |
+| لغة `en` front page | Page ID `22` |
+| `curl -sI http://shemostudio.local/` | `HTTP/1.1 200 OK` |
+| `curl -sI http://shemostudio.local/en/` | `HTTP/1.1 200 OK` — بدون 301 |
+
+### 8. بوابة الإغلاق
+
+المحطة 16 اكتملت بعد Round 2: الصفحة الرئيسية العربية أصبحت الافتراضية في `/`، والإنجليزية تعمل في `/en/` عبر Polylang بتحميل مباشر `200 OK` بدون redirect، والمحتوى ملتزم بالهوية Cinematic Noir والنبرة المعتمدة ووسم Demo/Concept بدون ادعاءات وهمية. تم التحقق عبر HTTP headers وWordPress/Polylang وresponsive أساسي.

@@ -1291,8 +1291,28 @@ Demo / Concept Project - Not commissioned by a client</code></pre>
 <li>لم يتم تعديل <code>APPROVED-DECISIONS.md</code> لأن المحطة لم تحتج قرارًا جديدًا بموافقة صريحة.</li>
 </ul>
 
+<h3>6. Round 2 — إصلاح canonical الصفحة الإنجليزية</h3>
+<p>بعد الإغلاق الأولي، ظهر باج فعلي عبر <code>curl -I</code>: الرابط <code>/en/</code> كان يرجع <code>301 Moved Permanently</code> إلى <code>/en/home-en/</code> بدل أن يخدم الصفحة الإنجليزية مباشرة على 200. المحتوى نفسه كان صحيحًا على <code>/en/home-en/</code>، لذلك المشكلة كانت في ضبط Polylang للـstatic front page URL، لا في محتوى الصفحة.</p>
+<p>تمت مراجعة توثيق Polylang الرسمي لصفحة static front page: عند استخدام صفحة رئيسية ثابتة، يجب ترجمتها في كل اللغات، ثم تفعيل خيار URL الخاص بـPolylang: “The front page URL contains the language code instead of the page name or page id”. في كود Polylang هذا الخيار هو <code>redirect_lang</code>.</p>
+<p>تم تحديث <code>tools/stage16-build-home.php</code> ليضبط هذا تلقائيًا عند أي تشغيل مستقبلي:</p>
+<ul>
+<li>تحديث option <code>polylang.redirect_lang = true</code>.</li>
+<li>تنظيف كاش لغات Polylang عبر <code>PLL()-&gt;model-&gt;clean_languages_cache()</code> حتى يُعاد حساب <code>home_url</code> لكل لغة.</li>
+<li>تنفيذ <code>flush_rewrite_rules(false)</code>.</li>
+</ul>
+<p>التحقق الرجعي بعد التصحيح:</p>
+<table>
+<tr><th>البند</th><th>النتيجة</th></tr>
+<tr><td><code>pll_home_url('ar')</code></td><td><code>http://shemostudio.local/</code></td></tr>
+<tr><td><code>pll_home_url('en')</code></td><td><code>http://shemostudio.local/en/</code></td></tr>
+<tr><td>لغة <code>ar</code> front page</td><td>Page ID <code>21</code></td></tr>
+<tr><td>لغة <code>en</code> front page</td><td>Page ID <code>22</code></td></tr>
+<tr><td><code>curl -sI http://shemostudio.local/</code></td><td><code>HTTP/1.1 200 OK</code></td></tr>
+<tr><td><code>curl -sI http://shemostudio.local/en/</code></td><td><code>HTTP/1.1 200 OK</code> — بدون 301</td></tr>
+</table>
+
 <div class="gate">
-<strong>6. بوابة الإغلاق:</strong> المحطة 16 اكتملت: الصفحة الرئيسية العربية أصبحت الافتراضية في <code>/</code>، والإنجليزية تعمل في <code>/en/</code> عبر Polylang، والمحتوى ملتزم بالهوية Cinematic Noir والنبرة المعتمدة ووسم Demo/Concept بدون ادعاءات وهمية. تم التحقق عبر HTTP وWordPress/Polylang وresponsive أساسي.
+<strong>7. بوابة الإغلاق:</strong> المحطة 16 اكتملت بعد Round 2: الصفحة الرئيسية العربية أصبحت الافتراضية في <code>/</code>، والإنجليزية تعمل في <code>/en/</code> عبر Polylang بتحميل مباشر <code>200 OK</code> بدون redirect، والمحتوى ملتزم بالهوية Cinematic Noir والنبرة المعتمدة ووسم Demo/Concept بدون ادعاءات وهمية. تم التحقق عبر HTTP headers وWordPress/Polylang وresponsive أساسي.
 </div>
 </div>
 
