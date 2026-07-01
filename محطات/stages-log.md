@@ -1384,3 +1384,120 @@ design/content/tone-of-voice.md
 ### 10. بوابة الإغلاق
 
 المحطة 15 اكتملت الآن بجزأيها: (1) Polylang Free اتقفل واتنفذ تقنيًا بدون شراء، مع Arabic-first في `/` وEnglish في `/en/` وتوثيق القرار 24، و(2) استراتيجية Case Studies اتقفلت لصالح Demo/Concept Projects موسومة بوضوح، مع دليل نبرة ثنائي اللغة في `design/content/tone-of-voice.md` وتوثيق القرار 25. لا يتم الانتقال للمحطة 16 إلا بعد commit+push النهائي لهذه الإضافة.
+
+---
+
+## المحطة 16 — بناء الصفحة الرئيسية Home ثنائية اللغة
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** بناء محتوى وصفحة WordPress فعلية + CSS داعم + تحقق HTTP/DB/responsive
+
+### السياق
+
+بدأت المحطة بناءً على خريطة `محطات/roadmap.md`: بناء الصفحة الرئيسية بمحتوى عربي وإنجليزي يشمل hero، showreel placeholder، selected work demo/concept teaser، services، sketch-to-screen، process، packages teaser، testimonials/credibility بحذر، FAQ مختصر، وCTA.
+
+تمت قراءة الملفات المطلوبة قبل التنفيذ:
+
+- `APPROVED-DECISIONS.md` خصوصًا القرارات 1، 20، 21، 23، 24، 25.
+- `محطات/roadmap.md` و`محطات/stages-log.md`.
+- `design/content/tone-of-voice.md`.
+- كود `themes/shemo-child` و`plugins/shemo-core`.
+
+### 1. التنفيذ
+
+تم بناء صفحتين منشورتين داخل WordPress:
+
+| اللغة | Page ID | العنوان | الرابط |
+|---|---:|---|---|
+| عربي | 21 | `الرئيسية` | `/` |
+| English | 22 | `Home` | `/en/` |
+
+التنفيذ تم عبر Block Editor content داخل الصفحات، مع سكربت قابل لإعادة التشغيل:
+
+```text
+tools/stage16-build-home.php
+```
+
+السكربت idempotent: يحدّث نفس الصفحتين بدل إنشاء نسخ جديدة، يربطهما كترجمتين في Polylang، يضبط العربية كـstatic front page، ويفعّل إعدادات GeneratePress للصفحة (`_generate-disable-headline=true` و`_generate-full-width-content=true`).
+
+تمت إضافة CSS داعم في:
+
+```text
+themes/shemo-child/style.css
+```
+
+الإضافات/الثيمات المستخدمة كما هي معتمدة: GeneratePress + GenerateBlocks/Block Editor، بدون شراء أي إضافة جديدة.
+
+### 2. المحتوى
+
+الصفحة العربية والإنجليزية تحتويان:
+
+- Hero بنبرة Hybrid studio + visible founder.
+- Showreel placeholder صريح بدون ادعاء وجود فيديو جاهز.
+- Selected work teaser بثلاث عينات Demo/Concept.
+- Services preview للخدمات الست.
+- Sketch-to-screen كقسم يشرح طريقة التفكير.
+- Process من 4 خطوات.
+- Packages teaser بدون أسعار أو اعتماد نطاق نهائي.
+- Credibility section بدون أسماء عملاء أو نتائج أو شهادات وهمية.
+- FAQ مختصر.
+- CTA نهائي.
+
+وسوم Demo/Concept ظهرت حرفيًا حسب القرار 25:
+
+```text
+مشروع تجريبي / Concept - غير منفّذ لعميل تجاري
+Demo / Concept Project - Not commissioned by a client
+```
+
+### 3. تحقق WordPress / Polylang / قاعدة البيانات
+
+تم التحقق عبر WP-CLI وقراءة WordPress/Polylang:
+
+| البند | النتيجة |
+|---|---|
+| `show_on_front` | `page` |
+| `page_on_front` | `21` |
+| لغة الصفحة 21 | `ar` |
+| لغة الصفحة 22 | `en` |
+| ترجمة 21 للإنجليزية | `22` |
+| ترجمة 22 للعربية | `21` |
+| `pll_default_language()` | `ar` |
+| محتوى الصفحة العربية | محفوظ في قاعدة البيانات، `9911` حرفًا |
+| محتوى الصفحة الإنجليزية | محفوظ في قاعدة البيانات، `8281` حرفًا |
+| GeneratePress full-width meta | `true` للصفحتين |
+| Rank Math title meta | موجود للصفحتين |
+
+ملاحظة: أمر `wp db query` المباشر اصطدم بإعداد MySQL المحلي (`localhost:3306`) في LocalWP، لذلك تمت القراءة المعتمدة عبر WordPress/WP-CLI و`$wpdb`/post APIs من اتصال WordPress الفعلي. التحذير المعروف عن `php_imagick.dll` بقي غير مانع.
+
+### 4. تحقق HTTP
+
+| الرابط | الحالة | تحقق |
+|---|---:|---|
+| `/` | 200 | `lang="ar"` و`dir="rtl"` وظهور hero العربي ووسم Demo/Concept |
+| `/en/` | 200 | `lang="en-US"` وظهور hero الإنجليزي ووسم Demo/Concept |
+
+### 5. تحقق responsive أساسي
+
+تم فحص الصفحة بمتصفح فعلي عبر Playwright/Chrome على desktop وmobile:
+
+| الحالة | العرض | النتيجة |
+|---|---:|---|
+| عربي desktop | 1440px | 200، لا أخطاء console، لا horizontal overflow |
+| عربي mobile | 390px | 200، لا أخطاء console، لا horizontal overflow |
+| English desktop | 1440px | 200، لا أخطاء console، لا horizontal overflow |
+| English mobile | 390px | 200، لا أخطاء console، لا horizontal overflow |
+
+تم التأكد كذلك من وجود 3 وسوم Demo/Concept، 4 أسئلة FAQ، وCTA buttons في كل نسخة.
+
+### 6. حدود المحطة
+
+- لم يتم إنشاء أسماء عملاء أو شهادات أو نتائج وهمية.
+- لم يتم اعتماد أسعار أو نطاقات باقات نهائية؛ صفحة الباقات التفصيلية مؤجلة للمحطة 19.
+- روابط `Start a Project` و`Contact` تشير لمسارات مستقبلية ستُبنى في محطات لاحقة.
+- لم يتم تعديل `APPROVED-DECISIONS.md` لأن المحطة لم تحتج قرارًا جديدًا بموافقة صريحة.
+
+### 7. بوابة الإغلاق
+
+المحطة 16 اكتملت: الصفحة الرئيسية العربية أصبحت الافتراضية في `/`، والإنجليزية تعمل في `/en/` عبر Polylang، والمحتوى ملتزم بالهوية Cinematic Noir والنبرة المعتمدة ووسم Demo/Concept بدون ادعاءات وهمية. تم التحقق عبر HTTP وWordPress/Polylang وresponsive أساسي.

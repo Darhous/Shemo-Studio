@@ -293,3 +293,340 @@ select:focus,
 .has-shemo-muted-background-color { background-color: var(--shemo-text-muted); }
 .has-shemo-ember-color { color: var(--shemo-accent); }
 .has-shemo-ember-background-color { background-color: var(--shemo-accent); }
+
+.shemo-home {
+	background: var(--shemo-bg);
+	color: var(--shemo-text);
+	margin-inline: auto;
+	overflow: hidden;
+}
+
+.shemo-home a {
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.22em;
+}
+
+.shemo-section {
+	margin-inline: auto;
+	max-width: var(--shemo-wide);
+	padding: clamp(3.5rem, 7vw, 6.5rem) clamp(1rem, 4vw, 2rem);
+}
+
+.shemo-section--compact {
+	padding-block: clamp(2.5rem, 5vw, 4rem);
+}
+
+.shemo-kicker {
+	color: var(--shemo-accent);
+	display: inline-flex;
+	font-size: 0.78rem;
+	font-weight: 800;
+	letter-spacing: 0;
+	margin: 0 0 0.85rem;
+	text-transform: uppercase;
+}
+
+[dir="rtl"] .shemo-kicker,
+.rtl .shemo-kicker {
+	font-size: 0.82rem;
+	text-transform: none;
+}
+
+.shemo-home h1,
+.shemo-home h2,
+.shemo-home h3,
+.shemo-home p {
+	margin-top: 0;
+}
+
+.shemo-home h1 {
+	font-size: clamp(3rem, 8vw, 6.8rem);
+	max-width: 11ch;
+}
+
+.shemo-home h2 {
+	font-size: clamp(2rem, 5vw, 4.4rem);
+	max-width: 12ch;
+}
+
+[dir="rtl"] .shemo-home h1,
+.rtl .shemo-home h1 {
+	font-size: clamp(3.4rem, 8vw, 7rem);
+}
+
+.shemo-lead {
+	color: var(--shemo-text-muted);
+	font-size: clamp(1.05rem, 1.9vw, 1.28rem);
+	max-width: 680px;
+}
+
+.shemo-muted-text {
+	color: var(--shemo-text-muted);
+}
+
+.shemo-hero {
+	display: grid;
+	gap: clamp(2rem, 5vw, 4rem);
+	grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
+	min-height: min(760px, 88vh);
+	place-items: center;
+}
+
+.shemo-hero__actions,
+.shemo-button-row {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.8rem;
+	margin-top: 1.5rem;
+}
+
+.shemo-hero__meta {
+	border-inline-start: 2px solid var(--shemo-accent);
+	color: var(--shemo-text-muted);
+	margin-top: 2rem;
+	max-width: 560px;
+	padding-inline-start: 1rem;
+}
+
+.shemo-frame {
+	aspect-ratio: 4 / 5;
+	background:
+		linear-gradient(135deg, rgba(255, 90, 44, 0.16), transparent 42%),
+		var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	box-shadow: var(--shemo-shadow);
+	display: grid;
+	min-height: 420px;
+	padding: clamp(1rem, 3vw, 1.5rem);
+	position: relative;
+	width: min(100%, 460px);
+}
+
+.shemo-frame::before {
+	border: 1px solid rgba(245, 242, 236, 0.16);
+	content: "";
+	inset: 1rem;
+	position: absolute;
+}
+
+.shemo-frame__screen {
+	align-self: end;
+	border: 1px solid rgba(245, 242, 236, 0.18);
+	display: grid;
+	min-height: 58%;
+	padding: 1rem;
+	position: relative;
+	z-index: 1;
+}
+
+.shemo-frame__screen::before,
+.shemo-frame__screen::after {
+	background: var(--shemo-text);
+	content: "";
+	height: 2px;
+	opacity: 0.58;
+	position: absolute;
+	transform: rotate(-8deg);
+	width: 46%;
+}
+
+.shemo-frame__screen::before {
+	inset-block-start: 28%;
+	inset-inline-start: 12%;
+}
+
+.shemo-frame__screen::after {
+	inset-block-start: 48%;
+	inset-inline-end: 14%;
+	width: 34%;
+}
+
+.shemo-frame__label {
+	align-self: end;
+	color: var(--shemo-text-muted);
+	font-size: 0.86rem;
+	margin: 0;
+}
+
+.shemo-showreel {
+	background:
+		linear-gradient(135deg, rgba(255, 90, 44, 0.14), transparent 38%),
+		var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: minmax(0, 1fr) auto;
+	min-height: 320px;
+	padding: clamp(1.2rem, 3vw, 2rem);
+	place-items: end start;
+}
+
+.shemo-play-mark {
+	align-items: center;
+	background: var(--shemo-accent);
+	border-radius: 999px;
+	color: var(--shemo-bg);
+	display: inline-flex;
+	font-weight: 900;
+	height: 64px;
+	justify-content: center;
+	width: 64px;
+}
+
+.shemo-grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shemo-grid--two {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shemo-mini-card {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	color: var(--shemo-text);
+	padding: clamp(1rem, 2vw, 1.35rem);
+}
+
+.shemo-mini-card h3 {
+	font-size: clamp(1.25rem, 2vw, 1.65rem);
+	margin-bottom: 0.65rem;
+}
+
+.shemo-mini-card p:last-child,
+.shemo-section p:last-child {
+	margin-bottom: 0;
+}
+
+.shemo-tag {
+	border: 1px solid rgba(255, 90, 44, 0.52);
+	border-radius: 999px;
+	color: var(--shemo-accent);
+	display: inline-flex;
+	font-size: 0.76rem;
+	font-weight: 800;
+	margin-bottom: 0.85rem;
+	padding: 0.22rem 0.55rem;
+}
+
+.shemo-split {
+	align-items: center;
+	display: grid;
+	gap: clamp(1.5rem, 5vw, 3rem);
+	grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+.shemo-step-list {
+	counter-reset: shemo-step;
+	display: grid;
+	gap: 0.85rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.shemo-step-list li {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	counter-increment: shemo-step;
+	padding: 1rem;
+}
+
+.shemo-step-list li::before {
+	color: var(--shemo-accent);
+	content: counter(shemo-step, decimal-leading-zero);
+	display: block;
+	font-family: var(--shemo-font-display);
+	font-size: 1.35rem;
+	font-weight: 800;
+	margin-bottom: 0.35rem;
+}
+
+.shemo-faq details {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	margin-bottom: 0.75rem;
+	padding: 1rem;
+}
+
+.shemo-faq summary {
+	color: var(--shemo-text);
+	cursor: pointer;
+	font-weight: 800;
+}
+
+.shemo-faq p {
+	color: var(--shemo-text-muted);
+	margin: 0.75rem 0 0;
+}
+
+.shemo-cta-panel {
+	background:
+		linear-gradient(135deg, rgba(255, 90, 44, 0.18), transparent 42%),
+		var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	padding: clamp(1.5rem, 5vw, 3rem);
+}
+
+.full-width-content .inside-article {
+	padding: 0;
+}
+
+.full-width-content .entry-content {
+	margin-top: 0;
+}
+
+@media (max-width: 900px) {
+	.shemo-hero,
+	.shemo-split,
+	.shemo-grid,
+	.shemo-grid--two,
+	.shemo-showreel {
+		grid-template-columns: 1fr;
+	}
+
+	.shemo-hero {
+		min-height: auto;
+	}
+
+	.shemo-frame {
+		aspect-ratio: 1 / 1;
+		min-height: 320px;
+		width: 100%;
+	}
+}
+
+@media (max-width: 520px) {
+	.shemo-section {
+		padding-inline: 1rem;
+	}
+
+	.shemo-home h1 {
+		font-size: clamp(2.7rem, 18vw, 4.2rem);
+	}
+
+	[dir="rtl"] .shemo-home h1,
+	.rtl .shemo-home h1 {
+		font-size: clamp(3rem, 18vw, 4.6rem);
+	}
+
+	.shemo-hero__actions,
+	.shemo-button-row {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.shemo-hero__actions .wp-block-button__link,
+	.shemo-button-row .wp-block-button__link {
+		width: 100%;
+	}
+}

@@ -1227,5 +1227,74 @@ design/mockups/phase14-favicon.svg</code></pre>
 </div>
 </div>
 
+<div class="stage" id="stage-16">
+<h2>المحطة 16 — بناء الصفحة الرئيسية Home ثنائية اللغة</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: بناء محتوى وصفحة WordPress فعلية + CSS داعم + تحقق HTTP/DB/responsive
+</p>
+
+<h3>السياق</h3>
+<p>بدأت المحطة بناءً على <code>محطات/roadmap.md</code>: بناء الصفحة الرئيسية بمحتوى عربي وإنجليزي يشمل hero، showreel placeholder، selected work demo/concept teaser، services، sketch-to-screen، process، packages teaser، credibility بحذر، FAQ مختصر، وCTA. تمت قراءة القرارات المطلوبة، دليل النبرة، وسجل المحطات، وكود <code>shemo-child</code> و<code>shemo-core</code> قبل التنفيذ.</p>
+
+<h3>1. التنفيذ</h3>
+<p>تم بناء صفحتين منشورتين داخل WordPress وربطهما كترجمتين في Polylang:</p>
+<table>
+<tr><th>اللغة</th><th>Page ID</th><th>العنوان</th><th>الرابط</th></tr>
+<tr><td>عربي</td><td>21</td><td><code>الرئيسية</code></td><td><code>/</code></td></tr>
+<tr><td>English</td><td>22</td><td><code>Home</code></td><td><code>/en/</code></td></tr>
+</table>
+<p>تم التنفيذ عبر Block Editor content داخل الصفحات، مع سكربت قابل لإعادة التشغيل: <code>tools/stage16-build-home.php</code>. السكربت يحدّث نفس الصفحتين، يربط الترجمة، يضبط العربية كـstatic front page، ويفعّل إعدادات GeneratePress: <code>_generate-disable-headline=true</code> و<code>_generate-full-width-content=true</code>.</p>
+<p>أُضيف CSS داعم للصفحة في <code>themes/shemo-child/style.css</code> لاستخدام هوية Cinematic Noir والتوكينز المعتمدة، بدون شراء أي إضافة جديدة.</p>
+
+<h3>2. المحتوى</h3>
+<p>الصفحة العربية والإنجليزية تحتويان: hero، showreel placeholder، selected work teaser بثلاث عينات Demo/Concept، خدمات، sketch-to-screen، process من 4 خطوات، packages teaser بدون أسعار نهائية، credibility بدون ادعاءات وهمية، FAQ، وCTA نهائي.</p>
+<p>وسوم Demo/Concept ظهرت حرفيًا حسب القرار 25:</p>
+<pre><code>مشروع تجريبي / Concept - غير منفّذ لعميل تجاري
+Demo / Concept Project - Not commissioned by a client</code></pre>
+
+<h3>3. تحقق WordPress / Polylang / قاعدة البيانات</h3>
+<table>
+<tr><th>البند</th><th>النتيجة</th></tr>
+<tr><td><code>show_on_front</code></td><td><code>page</code></td></tr>
+<tr><td><code>page_on_front</code></td><td><code>21</code></td></tr>
+<tr><td>لغة الصفحة 21</td><td><code>ar</code></td></tr>
+<tr><td>لغة الصفحة 22</td><td><code>en</code></td></tr>
+<tr><td>ترجمة 21 للإنجليزية</td><td><code>22</code></td></tr>
+<tr><td>ترجمة 22 للعربية</td><td><code>21</code></td></tr>
+<tr><td><code>pll_default_language()</code></td><td><code>ar</code></td></tr>
+<tr><td>محتوى الصفحة العربية</td><td><code>9911</code> حرفًا محفوظًا</td></tr>
+<tr><td>محتوى الصفحة الإنجليزية</td><td><code>8281</code> حرفًا محفوظًا</td></tr>
+<tr><td>GeneratePress full-width meta</td><td><code>true</code> للصفحتين</td></tr>
+<tr><td>Rank Math title meta</td><td>موجود للصفحتين</td></tr>
+</table>
+<p class="meta">ملاحظة: أمر <code>wp db query</code> المباشر اصطدم بإعداد MySQL المحلي (<code>localhost:3306</code>) في LocalWP، لذلك تمت القراءة المعتمدة عبر WordPress/WP-CLI وpost APIs من اتصال WordPress الفعلي. تحذير <code>php_imagick.dll</code> المعروف بقي غير مانع.</p>
+
+<h3>4. تحقق HTTP وresponsive</h3>
+<table>
+<tr><th>الرابط/الحالة</th><th>النتيجة</th></tr>
+<tr><td><code>/</code></td><td>200، <code>lang="ar"</code> و<code>dir="rtl"</code> وظهور hero العربي ووسم Demo/Concept</td></tr>
+<tr><td><code>/en/</code></td><td>200، <code>lang="en-US"</code> وظهور hero الإنجليزي ووسم Demo/Concept</td></tr>
+<tr><td>عربي desktop 1440px</td><td>لا أخطاء console، لا horizontal overflow</td></tr>
+<tr><td>عربي mobile 390px</td><td>لا أخطاء console، لا horizontal overflow</td></tr>
+<tr><td>English desktop 1440px</td><td>لا أخطاء console، لا horizontal overflow</td></tr>
+<tr><td>English mobile 390px</td><td>لا أخطاء console، لا horizontal overflow</td></tr>
+</table>
+<p>تم التأكد كذلك من وجود 3 وسوم Demo/Concept، 4 أسئلة FAQ، وCTA buttons في كل نسخة.</p>
+
+<h3>5. حدود المحطة</h3>
+<ul>
+<li>لم يتم إنشاء أسماء عملاء أو شهادات أو نتائج وهمية.</li>
+<li>لم يتم اعتماد أسعار أو نطاقات باقات نهائية؛ صفحة الباقات التفصيلية مؤجلة للمحطة 19.</li>
+<li>روابط <code>Start a Project</code> و<code>Contact</code> تشير لمسارات مستقبلية ستُبنى في محطات لاحقة.</li>
+<li>لم يتم تعديل <code>APPROVED-DECISIONS.md</code> لأن المحطة لم تحتج قرارًا جديدًا بموافقة صريحة.</li>
+</ul>
+
+<div class="gate">
+<strong>6. بوابة الإغلاق:</strong> المحطة 16 اكتملت: الصفحة الرئيسية العربية أصبحت الافتراضية في <code>/</code>، والإنجليزية تعمل في <code>/en/</code> عبر Polylang، والمحتوى ملتزم بالهوية Cinematic Noir والنبرة المعتمدة ووسم Demo/Concept بدون ادعاءات وهمية. تم التحقق عبر HTTP وWordPress/Polylang وresponsive أساسي.
+</div>
+</div>
+
 </body>
 </html>
