@@ -8,3 +8,288 @@ Template:     generatepress
 Version:      1.0.0
 Text Domain:  shemo-child
 */
+
+:root {
+	--shemo-bg: #0E0F12;
+	--shemo-surface: #1C1E22;
+	--shemo-surface-2: #23262B;
+	--shemo-text: #F5F2EC;
+	--shemo-text-muted: #A7A39B;
+	--shemo-accent: #FF5A2C;
+	--shemo-border: #33363C;
+	--shemo-focus: #FF5A2C;
+	--shemo-radius: 8px;
+	--shemo-radius-control: 6px;
+	--shemo-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+	--shemo-content: 780px;
+	--shemo-wide: 1180px;
+	--shemo-font-body: Inter, "Segoe UI", Arial, sans-serif;
+	--shemo-font-display: Fraunces, Georgia, serif;
+	--shemo-font-arabic-body: "Noto Kufi Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+	--shemo-font-arabic-display: "Aref Ruqaa", "Noto Kufi Arabic", serif;
+	--contrast: var(--shemo-text);
+	--contrast-2: var(--shemo-text-muted);
+	--contrast-3: #6E6A64;
+	--base: var(--shemo-surface);
+	--base-2: var(--shemo-bg);
+	--base-3: var(--shemo-surface-2);
+	--accent: var(--shemo-accent);
+	--gp-search-modal-bg-color: var(--shemo-surface);
+	--gp-search-modal-text-color: var(--shemo-text);
+	--gp-search-modal-overlay-bg-color: rgba(14, 15, 18, 0.78);
+}
+
+body {
+	background:
+		linear-gradient(90deg, rgba(245, 242, 236, 0.035) 1px, transparent 1px) 0 0 / 72px 72px,
+		linear-gradient(180deg, rgba(245, 242, 236, 0.025) 1px, transparent 1px) 0 0 / 72px 72px,
+		var(--shemo-bg);
+	color: var(--shemo-text);
+	font-family: var(--shemo-font-body);
+	line-height: 1.65;
+}
+
+.site-header,
+.main-navigation,
+.main-navigation ul ul,
+.separate-containers .inside-article,
+.separate-containers .comments-area,
+.separate-containers .page-header,
+.one-container .container,
+.separate-containers .paging-navigation,
+.inside-page-header,
+.sidebar .widget,
+.footer-widgets,
+.site-info {
+	background-color: var(--shemo-surface);
+	color: var(--shemo-text);
+}
+
+a,
+.main-navigation .main-nav ul li:not([class*="current-menu-"]):hover > a,
+.main-navigation .main-nav ul li:not([class*="current-menu-"]):focus > a,
+.main-navigation .main-nav ul li.sfHover:not([class*="current-menu-"]) > a,
+.main-navigation .menu-bar-item:hover > a,
+.main-navigation .menu-bar-item.sfHover > a,
+.main-navigation .main-nav ul li[class*="current-menu-"] > a {
+	color: var(--shemo-accent);
+}
+
+a:hover,
+a:focus,
+a:active {
+	color: var(--shemo-text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.main-title,
+.entry-title {
+	color: var(--shemo-text);
+	font-family: var(--shemo-font-display);
+	font-weight: 800;
+	line-height: 1.04;
+}
+
+.main-title a,
+.main-title a:hover,
+.entry-title a {
+	color: var(--shemo-text);
+}
+
+.site-description,
+.entry-meta {
+	color: var(--shemo-text-muted);
+}
+
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"],
+a.button,
+.wp-block-button__link,
+.shemo-button {
+	align-items: center;
+	background-color: var(--shemo-accent);
+	border: 1px solid var(--shemo-accent);
+	border-radius: var(--shemo-radius-control);
+	color: var(--shemo-bg);
+	display: inline-flex;
+	font-family: var(--shemo-font-body);
+	font-weight: 800;
+	justify-content: center;
+	min-height: 46px;
+	padding: 0.85rem 1.15rem;
+	text-decoration: none;
+	transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+button:hover,
+button:focus,
+html input[type="button"]:hover,
+html input[type="button"]:focus,
+input[type="reset"]:hover,
+input[type="reset"]:focus,
+input[type="submit"]:hover,
+input[type="submit"]:focus,
+a.button:hover,
+a.button:focus,
+.wp-block-button__link:hover,
+.wp-block-button__link:focus,
+.shemo-button:hover,
+.shemo-button:focus {
+	background-color: #ff744f;
+	border-color: #ff744f;
+	color: var(--shemo-bg);
+	transform: translateY(-1px);
+}
+
+.shemo-button--secondary,
+.wp-block-button.is-style-shemo-secondary .wp-block-button__link {
+	background-color: transparent;
+	border-color: var(--shemo-border);
+	color: var(--shemo-text);
+}
+
+.shemo-button--secondary:hover,
+.shemo-button--secondary:focus,
+.wp-block-button.is-style-shemo-secondary .wp-block-button__link:hover,
+.wp-block-button.is-style-shemo-secondary .wp-block-button__link:focus {
+	background-color: var(--shemo-surface-2);
+	border-color: var(--shemo-text-muted);
+	color: var(--shemo-text);
+}
+
+.shemo-button--ghost,
+.wp-block-button.is-style-shemo-ghost .wp-block-button__link {
+	background-color: transparent;
+	border-color: transparent;
+	color: var(--shemo-accent);
+	min-height: auto;
+	padding-inline: 0;
+}
+
+.shemo-button--ghost:hover,
+.shemo-button--ghost:focus,
+.wp-block-button.is-style-shemo-ghost .wp-block-button__link:hover,
+.wp-block-button.is-style-shemo-ghost .wp-block-button__link:focus {
+	background-color: transparent;
+	border-color: transparent;
+	color: var(--shemo-text);
+	transform: none;
+}
+
+.wp-block-button.is-style-shemo-primary .wp-block-button__link {
+	background-color: var(--shemo-accent);
+	border-color: var(--shemo-accent);
+	color: var(--shemo-bg);
+}
+
+.shemo-card,
+.wp-block-group.is-style-shemo-card {
+	background-color: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	box-shadow: var(--shemo-shadow);
+	color: var(--shemo-text);
+	padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.shemo-surface {
+	background-color: var(--shemo-surface);
+	color: var(--shemo-text);
+}
+
+.shemo-surface-2 {
+	background-color: var(--shemo-surface-2);
+	color: var(--shemo-text);
+}
+
+.shemo-muted {
+	color: var(--shemo-text-muted);
+}
+
+.shemo-display {
+	font-family: var(--shemo-font-display);
+	font-weight: 800;
+	line-height: 1.04;
+}
+
+[dir="rtl"],
+.rtl {
+	font-family: var(--shemo-font-arabic-body);
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+.rtl h1,
+.rtl h2,
+.rtl h3,
+.shemo-arabic-display {
+	font-family: var(--shemo-font-arabic-display);
+	line-height: 1.22;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select,
+.shemo-field {
+	background-color: var(--shemo-surface-2);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius-control);
+	color: var(--shemo-text);
+	font-family: var(--shemo-font-body);
+	min-height: 46px;
+	padding: 0.8rem 0.9rem;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus,
+.shemo-field:focus {
+	background-color: var(--shemo-surface-2);
+	border-color: var(--shemo-focus);
+	box-shadow: 0 0 0 3px rgba(255, 90, 44, 0.22);
+	color: var(--shemo-text);
+	outline: none;
+}
+
+::selection {
+	background-color: var(--shemo-accent);
+	color: var(--shemo-bg);
+}
+
+:focus-visible {
+	outline: 3px solid var(--shemo-focus);
+	outline-offset: 4px;
+}
+
+.has-shemo-obsidian-color { color: var(--shemo-bg); }
+.has-shemo-obsidian-background-color { background-color: var(--shemo-bg); }
+.has-shemo-graphite-color { color: var(--shemo-surface); }
+.has-shemo-graphite-background-color { background-color: var(--shemo-surface); }
+.has-shemo-graphite-2-color { color: var(--shemo-surface-2); }
+.has-shemo-graphite-2-background-color { background-color: var(--shemo-surface-2); }
+.has-shemo-ivory-color { color: var(--shemo-text); }
+.has-shemo-ivory-background-color { background-color: var(--shemo-text); }
+.has-shemo-muted-color { color: var(--shemo-text-muted); }
+.has-shemo-muted-background-color { background-color: var(--shemo-text-muted); }
+.has-shemo-ember-color { color: var(--shemo-accent); }
+.has-shemo-ember-background-color { background-color: var(--shemo-accent); }

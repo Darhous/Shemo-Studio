@@ -1006,8 +1006,8 @@ Registered URLs:
 <h2>المحطة 14 — الهوية البصرية كاملة (بوابة مراجعة الموكاب واللوجو)</h2>
 <p class="meta">
   التاريخ: 2026-07-01 ·
-  <span class="badge pending">⏳ جاهزة للمراجعة — ليست مكتملة نهائيًا بعد</span> ·
-  النوع: تنفيذ موكاب/هوية ثابتة داخل الريبو فقط — بدون تعديل WordPress/GenerateBlocks حتى الاعتماد
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تنفيذ موكاب/هوية ثابتة + اعتماد نهائي + تطبيق Design System داخل <code>shemo-child</code>
 </p>
 
 <h3>السياق</h3>
@@ -1079,7 +1079,7 @@ design/mockups/phase14-favicon.svg</code></pre>
 </ul>
 
 <div class="gate">
-<strong>6. بوابة المراجعة:</strong> بوابة مراجعة المحطة 14 جاهزة: الموكاب الحي، wordmark، monogram، favicon، وسكريبت التباين موجودين داخل الريبو. المطلوب الآن اعتماد المستخدم صراحةً لأحد اتجاهات العلامة/الموكاب أو طلب تعديلات. بعد الاعتماد فقط يتم تنفيذ الجزء الثالث: تحويل التوكينز المعتمدة إلى CSS custom properties داخل <code>themes/shemo-child</code> وتطبيقها كـglobal styles في GenerateBlocks ومكونات الأزرار/الكروت/حقول الفورم.
+<strong>6. بوابة المراجعة:</strong> بوابة مراجعة المحطة 14 اتفتحت أولًا كموكاب حي وwordmark وmonogram وfavicon وسكريبت تباين داخل الريبو. بعد Round 2، اعتمد المستخدم التعديلات صراحةً برسالة: <strong>"اعتمد التعديلات"</strong> — وبناءً عليه اتسجل القرار رقم 23 في <code>APPROVED-DECISIONS.md</code>، واتفتح الجزء الثالث لتنفيذ الـDesign System داخل <code>themes/shemo-child</code>.
 </div>
 
 <h3>7. Round 2 — تعديلات بعد مراجعة المستخدم</h3>
@@ -1090,7 +1090,44 @@ design/mockups/phase14-favicon.svg</code></pre>
 <li><strong>RTL/العربي:</strong> أُضيف قسم <code>RTL-first preview</code> داخل الموكاب لاختبار اتجاه عربي حقيقي، مع <code>dir="rtl"</code> و<code>lang="ar"</code> وhero عربي مصغّر بعنوان <code>من الاسكتش إلى الشاشة</code>.</li>
 </ol>
 <p>تحققات Round 2: تحميل الخطوط رجع <code>true</code> في <code>document.fonts.check()</code> لـ<code>Fraunces</code> و<code>Inter</code> و<code>Aref Ruqaa</code> و<code>Noto Kufi Arabic</code>، لا يوجد horizontal overflow على عرض موبايل <code>390px</code>، اتجاه قسم RTL هو <code>rtl</code>، وتم اختبار الفافيكون/المونوجرام كـinline SVG عند <code>16px</code> و<code>32px</code> و<code>64px</code>. تم استبعاد <code>Aref Ruqaa Ink</code> بعد فحص بصري لأنه ظهر كـcolor/ink font أحمر ويكسر قيد Ember كـaccent محدود. اختبار التباين لم يتغير لأن الألوان لم تتغير.</p>
-<p>الحدود ما زالت كما هي: لم يتم تنفيذ Design System داخل <code>themes/shemo-child</code>، ولم يتم لمس GenerateBlocks أو WP-CLI في Round 2. الاعتماد النهائي ما زال مطلوبًا قبل الجزء الثالث.</p>
+<p>حدود Round 2 وقتها كانت: لم يتم تنفيذ Design System داخل <code>themes/shemo-child</code>، ولم يتم لمس GenerateBlocks أو WP-CLI قبل الاعتماد. هذه الحدود انتهت بعد اعتماد المستخدم الصريح وبدء الجزء الثالث.</p>
+
+<h3>8. Part 3 — تنفيذ Design System داخل <code>shemo-child</code></h3>
+<p>بعد الاعتماد النهائي، تم تنفيذ الهوية داخل الثيم الفرعي بدل إبقائها كموكاب فقط:</p>
+<table>
+<tr><th>الملف</th><th>ما تم تنفيذه</th></tr>
+<tr><td><code>themes/shemo-child/theme.json</code></td><td>تعريف palette رسمي بألوان Shemo، typography families، font sizes، spacing tokens، وbase styles للبلوكات والـeditor</td></tr>
+<tr><td><code>themes/shemo-child/functions.php</code></td><td>تحميل خطوط Google Fonts المعتمدة، تفعيل editor styles، وتسجيل block styles للأزرار والكروت</td></tr>
+<tr><td><code>themes/shemo-child/style.css</code></td><td>CSS custom properties، mapping لتوكينز GeneratePress، خلفية Noir، typography، buttons، cards، fields، RTL typography، وhelper color classes</td></tr>
+</table>
+<p>التوكينز المنفذة:</p>
+<table>
+<tr><th>Token</th><th>Hex / Font</th></tr>
+<tr><td>Obsidian</td><td><code>#0E0F12</code></td></tr>
+<tr><td>Graphite</td><td><code>#1C1E22</code></td></tr>
+<tr><td>Graphite 2</td><td><code>#23262B</code></td></tr>
+<tr><td>Ivory</td><td><code>#F5F2EC</code></td></tr>
+<tr><td>Muted</td><td><code>#A7A39B</code></td></tr>
+<tr><td>Ember</td><td><code>#FF5A2C</code></td></tr>
+<tr><td>English display</td><td><code>Fraunces</code></td></tr>
+<tr><td>English/body text</td><td><code>Inter</code></td></tr>
+<tr><td>Arabic display</td><td><code>Aref Ruqaa</code></td></tr>
+<tr><td>Arabic/body text</td><td><code>Noto Kufi Arabic</code></td></tr>
+</table>
+<p>ملاحظة تنفيذية مهمة: نسخة GenerateBlocks الموجودة (<code>2.3.0</code>) لا تظهر لها option/CPT منفصل باسم global styles في قاعدة البيانات؛ لذلك تم تنفيذ الألوان والخطوط من خلال <code>theme.json</code> الرسمي في WordPress، وهو المسار الذي يقرأه محرر البلوكات وGenerateBlocks داخل الـeditor، مع CSS fallback واضح داخل child theme.</p>
+<p>تحققات الجزء الثالث:</p>
+<ul>
+<li><code>functions.php</code> نجح في فحص PHP syntax.</li>
+<li><code>theme.json</code> اتقرا كـJSON صحيح.</li>
+<li><code>WP_Theme_JSON_Resolver</code> داخل WordPress قرأ palette الجديدة وفيها <code>shemo-obsidian</code>.</li>
+<li><code>WP_Block_Styles_Registry</code> سجّل styles: <code>shemo-primary</code>، <code>shemo-secondary</code>، <code>shemo-ghost</code>، و<code>shemo-card</code>.</li>
+<li><code>http://shemostudio.local/</code> رجّع 200 OK بعد تحميل الثيم.</li>
+<li>التحذير الوحيد أثناء WP-CLI هو تحذير LocalWP معروف عن <code>php_imagick.dll</code>، غير مانع وغير متعلق بتعديلات المحطة.</li>
+</ul>
+
+<div class="gate">
+<strong>9. بوابة الإغلاق:</strong> المحطة 14 اكتملت: اتجاه الهوية اتراجع في متصفح حقيقي، تعديلات Round 2 اتنفذت، المستخدم اعتمدها صراحةً، والـDesign System اتطبق داخل <code>shemo-child</code> مع توثيق القرار رقم 23. لا يتم الانتقال لتنفيذ Polylang أو محتوى الصفحات داخل هذه المحطة؛ المحطة التالية هي محطة فحص/تنفيذ اللغة والتوطين.
+</div>
 </div>
 
 </body>

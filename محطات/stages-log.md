@@ -1069,8 +1069,8 @@ bind() to 0.0.0.0:80 failed (10013: An attempt was made to access a socket in a 
 ## المحطة 14 — الهوية البصرية كاملة (بوابة مراجعة الموكاب واللوجو)
 
 **التاريخ:** 2026-07-01
-**الحالة:** ⏳ جاهزة للمراجعة — ليست مكتملة نهائيًا بعد
-**النوع:** تنفيذ موكاب/هوية ثابتة داخل الريبو فقط — بدون تعديل WordPress/GenerateBlocks حتى الاعتماد
+**الحالة:** ✅ مكتملة
+**النوع:** تنفيذ موكاب/هوية ثابتة + اعتماد نهائي + تطبيق Design System داخل `shemo-child`
 
 ### السياق
 بدأت المحطة 14 بناءً على قرار 22 المعتمد في `APPROVED-DECISIONS.md`: اتجاه **Cinematic Noir** كتوكينز واتجاه عام فقط، وليس موكابًا أو لوجو نهائيًا. قرأت قبل التنفيذ الملفات الإلزامية: `APPROVED-DECISIONS.md`، `محطات/roadmap.md`، `محطات/stages-log.md`، وراجعت `git log --oneline -20` و`git status`.
@@ -1155,7 +1155,7 @@ design/mockups/phase14-contrast-check.py
 - لم يتم الانتقال للمحطة 15.
 
 ### 6. بوابة المراجعة
-بوابة مراجعة المحطة 14 جاهزة: الموكاب الحي، wordmark، monogram، favicon، وسكريبت التباين موجودين داخل الريبو. المطلوب الآن اعتماد المستخدم صراحةً لأحد اتجاهات العلامة/الموكاب أو طلب تعديلات. بعد الاعتماد فقط يتم تنفيذ الجزء الثالث: تحويل التوكينز المعتمدة إلى CSS custom properties داخل `themes/shemo-child` وتطبيقها كـglobal styles في GenerateBlocks ومكونات الأزرار/الكروت/حقول الفورم.
+بوابة مراجعة المحطة 14 اتفتحت أولًا كموكاب حي وwordmark وmonogram وfavicon وسكريبت تباين داخل الريبو. بعد Round 2، اعتمد المستخدم التعديلات صراحةً برسالة: **"اعتمد التعديلات"** — وبناءً عليه اتسجل القرار رقم 23 في `APPROVED-DECISIONS.md`، واتفتح الجزء الثالث لتنفيذ الـDesign System داخل `themes/shemo-child`.
 
 ### 7. Round 2 — تعديلات بعد مراجعة المستخدم
 
@@ -1182,4 +1182,44 @@ design/mockups/phase14-contrast-check.py
 - تم اختبار الفافيكون/المونوجرام فعليًا كـinline SVG عند `16px` و`32px` و`64px`; النسخة الجديدة تقرأ كـ`SS` بوضوح أفضل من النسخة السابقة.
 - اختبار التباين لم يتغير لأن الألوان لم تتغير؛ نتائج `phase14-contrast-check.py` ما زالت مطابقة للأرقام السابقة.
 
-الحدود ما زالت كما هي: لم يتم تنفيذ Design System داخل `themes/shemo-child`، ولم يتم لمس GenerateBlocks أو WP-CLI في Round 2. الاعتماد النهائي ما زال مطلوبًا قبل الجزء الثالث.
+حدود Round 2 وقتها كانت: لم يتم تنفيذ Design System داخل `themes/shemo-child`، ولم يتم لمس GenerateBlocks أو WP-CLI قبل الاعتماد. هذه الحدود انتهت بعد اعتماد المستخدم الصريح وبدء الجزء الثالث.
+
+### 8. Part 3 — تنفيذ Design System داخل `shemo-child`
+
+بعد الاعتماد النهائي، تم تنفيذ الهوية داخل الثيم الفرعي بدل إبقائها كموكاب فقط:
+
+| الملف | ما تم تنفيذه |
+|---|---|
+| `themes/shemo-child/theme.json` | تعريف palette رسمي بألوان Shemo، typography families، font sizes، spacing tokens، وbase styles للبلوكات والـeditor |
+| `themes/shemo-child/functions.php` | تحميل خطوط Google Fonts المعتمدة، تفعيل editor styles، وتسجيل block styles للأزرار والكروت |
+| `themes/shemo-child/style.css` | CSS custom properties، mapping لتوكينز GeneratePress، خلفية Noir، typography، buttons، cards، fields، RTL typography، وhelper color classes |
+
+التوكينز المنفذة:
+
+| Token | Hex / Font |
+|---|---|
+| Obsidian | `#0E0F12` |
+| Graphite | `#1C1E22` |
+| Graphite 2 | `#23262B` |
+| Ivory | `#F5F2EC` |
+| Muted | `#A7A39B` |
+| Ember | `#FF5A2C` |
+| English display | `Fraunces` |
+| English/body text | `Inter` |
+| Arabic display | `Aref Ruqaa` |
+| Arabic/body text | `Noto Kufi Arabic` |
+
+ملاحظة تنفيذية مهمة: نسخة GenerateBlocks الموجودة (`2.3.0`) لا تظهر لها option/CPT منفصل باسم global styles في قاعدة البيانات؛ لذلك تم تنفيذ الألوان والخطوط من خلال `theme.json` الرسمي في WordPress، وهو المسار الذي يقرأه محرر البلوكات وGenerateBlocks داخل الـeditor، مع CSS fallback واضح داخل child theme.
+
+تحققات الجزء الثالث:
+
+- `functions.php` نجح في فحص PHP syntax.
+- `theme.json` اتقرا كـJSON صحيح.
+- `WP_Theme_JSON_Resolver` داخل WordPress قرأ palette الجديدة وفيها `shemo-obsidian`.
+- `WP_Block_Styles_Registry` سجّل styles: `shemo-primary`، `shemo-secondary`، `shemo-ghost`، و`shemo-card`.
+- `http://shemostudio.local/` رجّع 200 OK بعد تحميل الثيم.
+- التحذير الوحيد أثناء WP-CLI هو تحذير LocalWP معروف عن `php_imagick.dll`، غير مانع وغير متعلق بتعديلات المحطة.
+
+### 9. بوابة الإغلاق
+
+المحطة 14 اكتملت: اتجاه الهوية اتراجع في متصفح حقيقي، تعديلات Round 2 اتنفذت، المستخدم اعتمدها صراحةً، والـDesign System اتطبق داخل `shemo-child` مع توثيق القرار رقم 23. لا يتم الانتقال لتنفيذ Polylang أو محتوى الصفحات داخل هذه المحطة؛ المحطة التالية هي محطة فحص/تنفيذ اللغة والتوطين.
