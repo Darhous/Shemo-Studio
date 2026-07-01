@@ -1642,3 +1642,79 @@ themes/shemo-child/style.css
 ### 6. بوابة الإغلاق
 
 المحطة 17 اكتملت: About وServices Overview وست صفحات خدمة أصبحت منشورة بالعربية والإنجليزية، مترابطة في Polylang، وتعمل روابطها المباشرة تحت `/` و`/en/` بدون redirects خاطئة. المحتوى ملتزم بالهوية Cinematic Noir ونبرة Hybrid studio + visible founder، بدون ادعاءات وهمية أو إضافات مدفوعة.
+
+---
+
+## المحطة 18 — Work Archive + قالب Case Study
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** بناء أرشيف CPT `project` + قالب single + مشاريع Demo/Concept ثنائية اللغة
+
+### توثيق أثناء التنفيذ
+
+بدأت المحطة بعد قراءة `APPROVED-DECISIONS.md` خصوصًا القرارات 20، 21، 25، و`محطات/roadmap.md`، وآخر محطات `stages-log.md`، و`design/content/tone-of-voice.md`، و`git log --oneline -15`. كما تمت قراءة بنية `shemo-core` الفعلية: CPT `project` بأرشيف `/work/`، والتصنيفات الثمانية (`service`, `project_type`, `industry`, `platform`, `tool`, `content_format`, `client_type`, `visual_style`) وحقول Meta Box الموجودة.
+
+تم تنفيذ الجزء الأول من المحطة داخل الثيم والإعدادات الحالية، بدون إضافة مدفوعة أو إضافة جديدة:
+
+- إضافة قالب أرشيف `project` قابل للفلترة في `themes/shemo-child/archive-project.php`.
+- إضافة فلترة GET آمنة عبر `pre_get_posts` لتصنيفات `shemo-core` الفعلية.
+- إضافة قالب Case Study مفرد في `themes/shemo-child/single-project.php` يستلهم بنية الـ16 جزءًا من `MASTER-PLAN.md`: hero، summary، context، challenge، creative direction، sketch، process، before/after، final result/gallery، deliverables، tools، outcome، testimonial، related projects، CTA.
+- إضافة CSS داعم محدود في `themes/shemo-child/style.css`.
+- إضافة سكربت بناء قابل لإعادة التشغيل `tools/stage18-build-work.php`.
+- إضافة سكربت تحقق `tools/stage18-verify.php`.
+
+تم تشغيل سكربت البناء بنجاح، وأنشأ/حدّث 3 مشاريع Demo/Concept عربية و3 ترجماتها الإنجليزية داخل CPT `project`، مع ربط كل زوج عبر `pll_save_post_translations`، وربط terms العربية/الإنجليزية عبر `pll_save_term_translations`.
+
+المشاريع المنشورة حتى الآن:
+
+| المشروع | عربي | English |
+|---|---|---|
+| Frame Pulse | `/work/frame-pulse-launch-film/` | `/en/work/frame-pulse-launch-film-en/` |
+| Ember Menu | `/work/ember-menu-social-kit/` | `/en/work/ember-menu-social-kit-en/` |
+| Line Course | `/work/line-course-storyboard-study/` | `/en/work/line-course-storyboard-study-en/` |
+
+الوسم الإلزامي موجود قرب العنوان وداخل metadata المرئية وRank Math description:
+
+- عربي: `مشروع تجريبي / Concept - غير منفّذ لعميل تجاري`
+- English: `Demo / Concept Project - Not commissioned by a client`
+
+تحقق مبدئي تم قبل الإغلاق:
+
+- `php -l` نجح على `functions.php`, `archive-project.php`, `single-project.php`, `stage18-build-work.php`, `stage18-verify.php`.
+- `tools/stage18-verify.php` أثبت وجود 3 مشاريع عربية و3 إنجليزية، وكل زوج مترجم في الاتجاهين.
+- `curl -I` للأرشيف والمشاريع الثمانية الجديدة رجع `HTTP/1.1 200 OK` بدون `Location` redirect.
+- فلتر حقيقي على `service=service-video-motion-ar/en` غيّر عدد كروت الأرشيف من 3 إلى 1 وأظهر مشروع Frame Pulse فقط.
+
+### المتبقي قبل الإغلاق
+
+تم تنفيذ checklist الإغلاق الصارم:
+
+- `curl -I` مباشر لكل URL جديد:
+  - `/work/`
+  - `/en/work/`
+  - `/work/frame-pulse-launch-film/`
+  - `/en/work/frame-pulse-launch-film-en/`
+  - `/work/ember-menu-social-kit/`
+  - `/en/work/ember-menu-social-kit-en/`
+  - `/work/line-course-storyboard-study/`
+  - `/en/work/line-course-storyboard-study-en/`
+- كل الروابط رجعت `HTTP/1.1 200 OK` بدون `Location` redirect.
+- فلتر الأرشيف تم اختباره بقيم حقيقية:
+  - الأرشيف العربي الكامل = 3 كروت، `service=service-video-motion-ar` = كارت واحد فقط: Frame Pulse.
+  - الأرشيف الإنجليزي الكامل = 3 كروت، `service=service-video-motion-en` = كارت واحد فقط: Frame Pulse.
+- فحص المحتوى مقابل `tone-of-voice.md`:
+  - الوسم الحرفي موجود 5 مرات في كل صفحة case study قرب العنوان وداخل metadata المرئية ومناطق السياق.
+  - Rank Math description لكل مشروع يحتوي الوسم الحرفي المناسب للغته.
+  - لا توجد أسماء عملاء وهمية، ولا شهادات وهمية، ولا أرقام أداء/نتائج تجارية مزعومة.
+- عدد الإضافات النشطة = 15، بدون تركيب إضافة جديدة.
+- `debug.log` غير موجود قبل وبعد الفحص، وبالتالي لم تُضف أي أسطر جديدة.
+- `php -l` نجح على ملفات القوالب والسكربتات الجديدة.
+- `stages-log.html` parsed successfully.
+- `git diff --check` نجح، مع تحذيرات CRLF المعروفة فقط.
+- `git grep --untracked` لفحص أسرار شائعة عالي الثقة رجع بلا نتائج.
+- `phpcs`/WPCS غير متاح في PATH، لذلك لم يمكن تشغيله في هذه البيئة.
+
+### بوابة الإغلاق
+
+المحطة 18 اكتملت: أرشيف Work أصبح مبنيًا على CPT `project` الفعلي وقابلًا للفلترة عبر تصنيفات `shemo-core`، وقالب Case Study المفرد يعرض بنية واضحة مستوحاة من الـ16 جزءًا المطلوبة، وتم إنشاء 3 مشاريع Demo/Concept على الأقل بالعربي والإنجليزي وربط ترجماتها في Polylang. كل مشروع موسوم حرفيًا حسب القرار 25 قرب العنوان وفي metadata، بدون ادعاءات عميل أو نتائج غير حقيقية، وبدون إضافة أي أداة مدفوعة أو إضافة جديدة.

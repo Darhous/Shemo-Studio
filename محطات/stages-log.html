@@ -1393,5 +1393,58 @@ Demo / Concept Project - Not commissioned by a client</code></pre>
 </div>
 </div>
 
+<hr>
+
+<div class="stage">
+<h2>المحطة 18 — Work Archive + قالب Case Study</h2>
+<p class="meta"><strong>التاريخ:</strong> 2026-07-01<br>
+<strong>الحالة:</strong> ✅ مكتملة<br>
+<strong>النوع:</strong> بناء أرشيف CPT <code>project</code> + قالب single + مشاريع Demo/Concept ثنائية اللغة</p>
+
+<h3>توثيق أثناء التنفيذ</h3>
+<p>بدأت المحطة بعد قراءة <code>APPROVED-DECISIONS.md</code> خصوصًا القرارات 20، 21، 25، و<code>محطات/roadmap.md</code>، وآخر محطات <code>stages-log.md</code>، و<code>design/content/tone-of-voice.md</code>، و<code>git log --oneline -15</code>. كما تمت قراءة بنية <code>shemo-core</code> الفعلية: CPT <code>project</code> بأرشيف <code>/work/</code>، والتصنيفات الثمانية (<code>service</code>, <code>project_type</code>, <code>industry</code>, <code>platform</code>, <code>tool</code>, <code>content_format</code>, <code>client_type</code>, <code>visual_style</code>) وحقول Meta Box الموجودة.</p>
+
+<p>تم تنفيذ الجزء الأول من المحطة داخل الثيم والإعدادات الحالية، بدون إضافة مدفوعة أو إضافة جديدة:</p>
+<ul>
+<li>إضافة قالب أرشيف <code>project</code> قابل للفلترة في <code>themes/shemo-child/archive-project.php</code>.</li>
+<li>إضافة فلترة GET آمنة عبر <code>pre_get_posts</code> لتصنيفات <code>shemo-core</code> الفعلية.</li>
+<li>إضافة قالب Case Study مفرد في <code>themes/shemo-child/single-project.php</code> يستلهم بنية الـ16 جزءًا من <code>MASTER-PLAN.md</code>.</li>
+<li>إضافة CSS داعم محدود في <code>themes/shemo-child/style.css</code>.</li>
+<li>إضافة سكربت بناء قابل لإعادة التشغيل <code>tools/stage18-build-work.php</code>.</li>
+<li>إضافة سكربت تحقق <code>tools/stage18-verify.php</code>.</li>
+</ul>
+
+<p>تم تشغيل سكربت البناء بنجاح، وأنشأ/حدّث 3 مشاريع Demo/Concept عربية و3 ترجماتها الإنجليزية داخل CPT <code>project</code>، مع ربط كل زوج عبر <code>pll_save_post_translations</code>، وربط terms العربية/الإنجليزية عبر <code>pll_save_term_translations</code>.</p>
+
+<table>
+<tr><th>المشروع</th><th>عربي</th><th>English</th></tr>
+<tr><td>Frame Pulse</td><td><code>/work/frame-pulse-launch-film/</code></td><td><code>/en/work/frame-pulse-launch-film-en/</code></td></tr>
+<tr><td>Ember Menu</td><td><code>/work/ember-menu-social-kit/</code></td><td><code>/en/work/ember-menu-social-kit-en/</code></td></tr>
+<tr><td>Line Course</td><td><code>/work/line-course-storyboard-study/</code></td><td><code>/en/work/line-course-storyboard-study-en/</code></td></tr>
+</table>
+
+<p>الوسم الإلزامي موجود قرب العنوان وداخل metadata المرئية وRank Math description:</p>
+<ul>
+<li>عربي: <code>مشروع تجريبي / Concept - غير منفّذ لعميل تجاري</code></li>
+<li>English: <code>Demo / Concept Project - Not commissioned by a client</code></li>
+</ul>
+
+<h3>تحقق مبدئي</h3>
+<ul>
+<li><code>php -l</code> نجح على ملفات القوالب والسكربتات الجديدة.</li>
+<li><code>tools/stage18-verify.php</code> أثبت وجود 3 مشاريع عربية و3 إنجليزية، وكل زوج مترجم في الاتجاهين.</li>
+<li><code>curl -I</code> للأرشيف والمشاريع الثمانية الجديدة رجع <code>HTTP/1.1 200 OK</code> بدون <code>Location</code> redirect.</li>
+<li>فلتر حقيقي على <code>service=service-video-motion-ar/en</code> غيّر عدد كروت الأرشيف من 3 إلى 1 وأظهر مشروع Frame Pulse فقط.</li>
+</ul>
+
+<div class="gate">
+<strong>فحص الإغلاق:</strong> تم تنفيذ checklist الإغلاق الصارم. كل URLs الجديدة رجعت <code>HTTP/1.1 200 OK</code> بدون <code>Location</code> redirect. فلتر <code>service=service-video-motion-ar/en</code> غيّر نتائج الأرشيف من 3 كروت إلى كارت واحد Frame Pulse. الوسم الحرفي موجود قرب العنوان وداخل metadata المرئية وRank Math description، ولا توجد أسماء عملاء أو شهادات أو نتائج تجارية مزعومة. عدد الإضافات النشطة = 15، و<code>debug.log</code> غير موجود قبل وبعد الفحص. <code>php -l</code> نجح على القوالب والسكربتات، و<code>stages-log.html</code> parsed successfully، و<code>git diff --check</code> نجح مع تحذيرات CRLF المعروفة فقط، و<code>git grep --untracked</code> لفحص الأسرار رجع بلا نتائج. <code>phpcs</code>/WPCS غير متاح في PATH.
+</div>
+
+<h3>بوابة الإغلاق</h3>
+<p>المحطة 18 اكتملت: أرشيف Work أصبح مبنيًا على CPT <code>project</code> الفعلي وقابلًا للفلترة عبر تصنيفات <code>shemo-core</code>، وقالب Case Study المفرد يعرض بنية واضحة مستوحاة من الـ16 جزءًا المطلوبة، وتم إنشاء 3 مشاريع Demo/Concept على الأقل بالعربي والإنجليزي وربط ترجماتها في Polylang. كل مشروع موسوم حرفيًا حسب القرار 25 قرب العنوان وفي metadata، بدون ادعاءات عميل أو نتائج غير حقيقية، وبدون إضافة أي أداة مدفوعة أو إضافة جديدة.</p>
+</div>
+</div>
+
 </body>
 </html>

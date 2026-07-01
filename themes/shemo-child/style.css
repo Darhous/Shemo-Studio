@@ -752,3 +752,234 @@ select:focus,
 		width: 100%;
 	}
 }
+
+.shemo-work-archive,
+.shemo-case-study {
+	background: transparent;
+}
+
+.shemo-section__head {
+	margin-bottom: clamp(1.25rem, 3vw, 2rem);
+}
+
+.shemo-section__head--inline {
+	align-items: end;
+	display: flex;
+	gap: 1rem;
+	justify-content: space-between;
+}
+
+.shemo-filter-form {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.shemo-filter-form label {
+	color: var(--shemo-text);
+	display: grid;
+	font-weight: 800;
+	gap: 0.35rem;
+}
+
+.shemo-filter-form label span {
+	color: var(--shemo-text-muted);
+	font-size: 0.82rem;
+}
+
+.shemo-filter-form select {
+	background: var(--shemo-bg);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius-control);
+	color: var(--shemo-text);
+	min-height: 46px;
+	padding: 0.65rem 0.75rem;
+	width: 100%;
+}
+
+.shemo-filter-form__actions {
+	align-items: end;
+	display: flex;
+	gap: 0.75rem;
+	grid-column: 1 / -1;
+}
+
+.shemo-project-grid {
+	display: grid;
+	gap: clamp(1rem, 3vw, 1.5rem);
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shemo-project-grid--compact {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shemo-project-card {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.shemo-project-card__media {
+	align-items: end;
+	aspect-ratio: 16 / 10;
+	background:
+		linear-gradient(135deg, rgba(255, 90, 44, 0.26), transparent 48%),
+		linear-gradient(90deg, rgba(245, 242, 236, 0.08) 1px, transparent 1px) 0 0 / 28px 28px,
+		var(--shemo-surface-2);
+	display: flex;
+	padding: 1rem;
+	text-decoration: none;
+}
+
+.shemo-project-card__media span {
+	background: rgba(14, 15, 18, 0.78);
+	border: 1px solid var(--shemo-border);
+	border-radius: 999px;
+	color: var(--shemo-text);
+	font-size: 0.82rem;
+	font-weight: 800;
+	padding: 0.28rem 0.7rem;
+}
+
+.shemo-project-card__body {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 0.85rem;
+	padding: 1.15rem;
+}
+
+.shemo-project-card h3 {
+	font-size: clamp(1.35rem, 2.1vw, 1.8rem);
+	margin: 0;
+}
+
+.shemo-project-card p {
+	color: var(--shemo-text-muted);
+	margin: 0;
+}
+
+.shemo-project-card .shemo-button {
+	align-self: flex-start;
+	margin-top: auto;
+}
+
+.shemo-work-count {
+	color: var(--shemo-text-muted);
+	margin: 0;
+}
+
+.shemo-empty-state {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	padding: clamp(1.5rem, 4vw, 2rem);
+}
+
+.shemo-case-hero .shemo-tag {
+	margin-block: 0.35rem 1rem;
+}
+
+.shemo-case-meta {
+	display: grid;
+	gap: clamp(1.5rem, 4vw, 2.5rem);
+	grid-template-columns: minmax(0, 0.9fr) minmax(300px, 1.1fr);
+}
+
+.shemo-case-meta dl {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	display: grid;
+	gap: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.shemo-case-meta dl div {
+	border-bottom: 1px solid var(--shemo-border);
+	display: grid;
+	gap: 0.35rem;
+	grid-template-columns: minmax(120px, 0.38fr) minmax(0, 0.62fr);
+	padding: 0.8rem 1rem;
+}
+
+.shemo-case-meta dl div:last-child {
+	border-bottom: 0;
+}
+
+.shemo-case-meta dt {
+	color: var(--shemo-text-muted);
+	font-size: 0.82rem;
+	font-weight: 800;
+}
+
+.shemo-case-meta dd {
+	color: var(--shemo-text);
+	margin: 0;
+}
+
+.shemo-case-visuals {
+	display: grid;
+	gap: clamp(1.5rem, 4vw, 2.5rem);
+	grid-template-columns: minmax(0, 0.7fr) minmax(300px, 0.3fr);
+}
+
+.shemo-visual-triptych {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.shemo-visual-triptych span {
+	align-items: center;
+	aspect-ratio: 16 / 7;
+	background:
+		linear-gradient(135deg, rgba(255, 90, 44, 0.2), transparent 58%),
+		var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	color: var(--shemo-text-muted);
+	display: flex;
+	font-family: var(--shemo-font-display);
+	font-weight: 800;
+	justify-content: center;
+	text-transform: uppercase;
+}
+
+@media (max-width: 1000px) {
+	.shemo-filter-form,
+	.shemo-project-grid,
+	.shemo-project-grid--compact,
+	.shemo-case-meta,
+	.shemo-case-visuals {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 700px) {
+	.shemo-section__head--inline,
+	.shemo-filter-form__actions {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.shemo-filter-form,
+	.shemo-project-grid,
+	.shemo-project-grid--compact,
+	.shemo-case-meta,
+	.shemo-case-visuals {
+		grid-template-columns: 1fr;
+	}
+
+	.shemo-case-meta dl div {
+		grid-template-columns: 1fr;
+	}
+}

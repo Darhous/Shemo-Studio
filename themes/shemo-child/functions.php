@@ -5,6 +5,7 @@ add_action( 'wp_enqueue_scripts', 'shemo_child_enqueue_styles' );
 add_action( 'after_setup_theme', 'shemo_child_theme_setup' );
 add_action( 'enqueue_block_editor_assets', 'shemo_child_enqueue_editor_assets' );
 add_action( 'init', 'shemo_child_register_block_styles' );
+add_action( 'pre_get_posts', 'shemo_child_filter_project_archive_query' );
 
 require_once get_stylesheet_directory() . '/inc/rank-math-polylang.php';
 
@@ -81,4 +82,86 @@ function shemo_child_register_block_styles() {
 			'label' => __( 'Shemo Card', 'shemo-child' ),
 		)
 	);
+}
+
+function shemo_child_current_language(): string {
+	if ( function_exists( 'pll_current_language' ) ) {
+		$lang = pll_current_language( 'slug' );
+
+		if ( is_string( $lang ) && '' !== $lang ) {
+			return $lang;
+		}
+	}
+
+	return is_rtl() ? 'ar' : 'en';
+}
+
+function shemo_child_demo_project_label( ?string $lang = null ): string {
+	$lang = $lang ?: shemo_child_current_language();
+
+	return 'ar' === $lang
+		? 'مشروع تجريبي / Concept - غير منفّذ لعميل تجاري'
+		: 'Demo / Concept Project - Not commissioned by a client';
+}
+
+function shemo_child_project_archive_filters(): array {
+	if ( 'ar' === shemo_child_current_language() ) {
+		return array(
+			'service'        => 'الخدمة',
+			'project_type'   => 'نوع المشروع',
+			'industry'       => 'القطاع',
+			'platform'       => 'المنصة',
+			'tool'           => 'الأداة',
+			'content_format' => 'صيغة المحتوى',
+			'client_type'    => 'حالة العميل',
+			'visual_style'   => 'الاتجاه البصري',
+		);
+	}
+
+	return array(
+		'service'        => 'Service',
+		'project_type'   => 'Project Type',
+		'industry'       => 'Industry',
+		'platform'       => 'Platform',
+		'tool'           => 'Tool',
+		'content_format' => 'Content Format',
+		'client_type'    => 'Client Type',
+		'visual_style'   => 'Visual Style',
+	);
+}
+
+function shemo_child_filter_project_archive_query( WP_Query $query ): void {
+	if ( is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive( 'project' ) ) {
+		return;
+	}
+
+	$query->set( 'posts_per_page', 9 );
+	$query->set( 'orderby', 'menu_order date' );
+	$query->set( 'order', 'DESC' );
+
+	$tax_query = array();
+
+	foreach ( array_keys( shemo_child_project_archive_filters() ) as $taxonomy ) {
+		if ( empty( $_GET[ $taxonomy ] ) ) {
+			continue;
+		}
+
+		$slug = sanitize_title( wp_unslash( $_GET[ $taxonomy ] ) );
+		$term = get_term_by( 'slug', $slug, $taxonomy );
+
+		if ( ! $term || is_wp_error( $term ) ) {
+			continue;
+		}
+
+		$tax_query[] = array(
+			'taxonomy' => $taxonomy,
+			'field'    => 'slug',
+			'terms'    => $slug,
+		);
+	}
+
+	if ( ! empty( $tax_query ) ) {
+		$tax_query['relation'] = 'AND';
+		$query->set( 'tax_query', $tax_query );
+	}
 }
