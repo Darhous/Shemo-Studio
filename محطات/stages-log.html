@@ -1717,5 +1717,98 @@ Demo / Concept Project - Not commissioned by a client</code></pre>
 </div>
 </div>
 
+<div class="stage">
+<h2>المحطة 22 — إثراء المحتوى التجريبي الكامل</h2>
+<p><strong>التاريخ:</strong> 2026-07-02<br>
+<strong>الحالة:</strong> ✅ مكتملة<br>
+<strong>النوع:</strong> إثراء محتوى وبيانات WordPress قابلة للتعديل + صور Media Library + توثيق مصادر</p>
+
+<h3>السياق الافتتاحي</h3>
+<p>بدأت المحطة بعد تشغيل ذاكرة Codex المشتركة وقراءة الملفات المطلوبة بالترتيب: <code>محطات/roadmap.md</code>، ثم <code>محطات/stages-log.md</code> مع آخر المحطات، ثم <code>APPROVED-DECISIONS.md</code> خصوصًا القرارات 19، 20، 24، 25، ثم فحص LocalWP فعليًا عبر wp-cli.</p>
+<ul>
+<li>الصفحات الأساسية موجودة في قاعدة البيانات وثنائية اللغة عبر Polylang.</li>
+<li>Polylang Free نشط، واللغات الحالية: عربي افتراضي + English تحت <code>/en/</code>.</li>
+<li><code>project</code> CPT موجود وقابل للتحرير، والمشاريع الحالية = 3 عربي + 3 English فقط.</li>
+<li>حقول Meta Box الحالية داخل <code>plugins/shemo-core/includes/fields.php</code> هي 5 مجموعات بمجموع 22 حقلًا على <code>project</code>.</li>
+<li>تصنيف <code>service</code> الحالي يغطي فعليًا 4 أزواج خدمات فقط داخل المشاريع، مع وجود صفحات خدمة إضافية لـSketch/Illustration وCreative Direction لا يغطيها Work بشكل كافٍ.</li>
+<li>السياسات المنشورة من المحطة 20 موجودة لكنها ما زالت تحتاج نصًا أوسع ومراجعة قانونية قبل الإنتاج.</li>
+<li>قوالب Work/Case Study لا تحتوي نصوص مشاريع هارد-كود، لكن عرض الصور كان Placeholder بصريًا؛ سيتم ربط القوالب بالـfeatured image/gallery بدل الرسوم الرمزية.</li>
+</ul>
+
+<h3>خطة التنفيذ الحالية</h3>
+<ol>
+<li>تحديث <code>roadmap.md</code> لإضافة المحطة 22 رسميًا قبل بوابة الاستضافة، وترحيل أرقام الإطلاق اللاحقة.</li>
+<li>إضافة/توسيع schema قابل للتحرير عند الحاجة، خصوصًا CPT للتقييمات التجريبية بدل وضعها كنص ثابت داخل صفحة.</li>
+<li>بناء سكربت محتوى قابل لإعادة التشغيل يحدّث صفحات Packages/About/Policies/Testimonials، ويضيف مشاريع Demo/Concept ثنائية اللغة، ويرفع صورًا مرخصة إلى Media Library ويربطها بالحقول.</li>
+<li>توثيق مصادر الأسعار والصور والترخيص داخل اللوج، والتحقق من قاعدة البيانات وHTTP بعد التنفيذ.</li>
+</ol>
+
+<h3>1. تحديث الخريطة</h3>
+<p>تم تحديث <code>محطات/roadmap.md</code> بإضافة هذه المحطة رسميًا كـ<strong>المحطة 22 — إثراء المحتوى التجريبي الكامل</strong> بعد QA وقبل بوابة الاستضافة، مع ترحيل بوابة الاستضافة إلى 23 ويوم الإطلاق إلى 24. سبب الإضافة: QA أكد أن الموقع جاهز هيكليًا لكنه يحتاج محتوى Demo/Trial غني قبل أي قرار استضافة أو إطلاق.</p>
+
+<h3>2. Schema قابل للتعديل من wp-admin</h3>
+<ul>
+<li>إضافة CPT جديد: <code>package</code> للباقات والأسعار.</li>
+<li>إضافة CPT جديد: <code>testimonial</code> للتقييمات التجريبية.</li>
+<li>إضافة Meta Box group للباقات: <code>shemo_package_details</code> وفيه 12 حقلًا.</li>
+<li>إضافة Meta Box group للتقييمات: <code>shemo_testimonial_details</code> وفيه 7 حقول.</li>
+<li>ترك حقول Project الأصلية الـ22 كما هي، مع استخدامها فعليًا للمشاريع الجديدة.</li>
+<li>تحديث Polylang ليعتبر <code>package</code> و<code>testimonial</code> قابلين للترجمة بجانب <code>project</code>.</li>
+</ul>
+
+<h3>3. الأسعار والباقات</h3>
+<p>تم إنشاء 5 باقات ثنائية اللغة كـCPT <code>package</code>، وليست HTML ثابت داخل صفحة. كل باقة موسومة بأنها Demo/Trial قابلة للتعديل وليست اعتمادًا تجاريًا نهائيًا.</p>
+<table>
+<tr><th>الباقة</th><th>النطاق التجريبي</th></tr>
+<tr><td>Sketch Sprint</td><td>8,000-14,000 EGP</td></tr>
+<tr><td>Motion Cut</td><td>12,000-24,000 EGP</td></tr>
+<tr><td>Social Design Kit</td><td>10,000-18,000 EGP</td></tr>
+<tr><td>Storyboard / Illustration Study</td><td>9,000-18,000 EGP</td></tr>
+<tr><td>Launch Visual System</td><td>25,000-45,000 EGP</td></tr>
+</table>
+<p>مراجع التسعير: Green Mind Egypt للباقات المنشورة 20,700-31,100 EGP، Contra لهوية freelance في مصر 15,000-60,000 EGP، Upwork للفيديو/الموشن/التصميم، وFiverr لنطاقات storyboard marketplace. لم يتم تعديل <code>APPROVED-DECISIONS.md</code> لأن هذه أرقام Demo وليست أسعارًا نهائية معتمدة.</p>
+
+<h3>4. المشاريع/البورتفوليو والصور</h3>
+<p>تم رفع 10 صور فعلية إلى Media Library، وكل صورة لها attachment meta يوثق المصدر والترخيص والcredit. مصادر الترخيص: Pexels License وUnsplash License.</p>
+<table>
+<tr><th>المفتاح</th><th>المصدر</th><th>الترخيص</th></tr>
+<tr><td>video-editor-color</td><td>Pexels / andreeusebio</td><td>Pexels License</td></tr>
+<tr><td>video-workspace-bw</td><td>Pexels / Amar</td><td>Pexels License</td></tr>
+<tr><td>storyboard-close</td><td>Pexels / Ron Lach</td><td>Pexels License</td></tr>
+<tr><td>storyboard-alt</td><td>Pexels / Ron Lach</td><td>Pexels License</td></tr>
+<tr><td>interior-swatches</td><td>Pexels / cottonbro studio</td><td>Pexels License</td></tr>
+<tr><td>brand-strategy</td><td>Pexels / Leeloo The First</td><td>Pexels License</td></tr>
+<tr><td>brand-strategy-wide</td><td>Pexels / Leeloo The First</td><td>Pexels License</td></tr>
+<tr><td>material-board</td><td>Pexels / Tiago Alves</td><td>Pexels License</td></tr>
+<tr><td>tablet-sketch</td><td>Unsplash / Rodrigo Rodrigues | WOLF ART</td><td>Unsplash License</td></tr>
+<tr><td>whiteboard-planning</td><td>Unsplash / Kaleidico</td><td>Unsplash License</td></tr>
+</table>
+<p>تم بناء 8 مشاريع Demo/Concept ثنائية اللغة: Frame Pulse، Ember Menu، Line Course، Ink Signal، Quiet Launch، Studio North، Reel Clinic، Scene Map. كل مشروع يحتوي وسم Demo/Concept، featured image، صور sketch/before/after، gallery من 3 صور على الأقل، case study content، وتصنيفات موزعة على الثمانية taxonomies.</p>
+<p>تم تعديل <code>archive-project.php</code> و<code>single-project.php</code> لإظهار الصور والـgallery من WordPress/Meta Box بدل الـplaceholder البصري القديم، بدون وضع أسماء المشاريع أو محتوى case studies داخل قوالب PHP.</p>
+
+<h3>5. التقييمات التجريبية</h3>
+<p>تم إنشاء 3 تقييمات Demo ثنائية اللغة داخل CPT <code>testimonial</code>: Brief Clarity، Visual System، Editing Rhythm. كل تقييم موسوم صراحة بأنه ليس من عميل حقيقي. صفحة Testimonials تعرضها عبر <code>[shemo_testimonials]</code>.</p>
+
+<h3>6. About والسياسات</h3>
+<p>تم توسيع صفحة About بالعربية والإنجليزية لقصة founder-led متوافقة مع القرار 1 ودليل نبرة الصوت: Hybrid studio بقيادة مؤسس ظاهر، من sketch إلى screen، بدون ادعاء أرقام أو عملاء أو إنجازات غير حقيقية.</p>
+<p>تم تحديث Terms / Revision / Deposit / Refund / Delivery بالعربية والإنجليزية. كل سياسة تبدأ بتحذير واضح أنها مسودة مراجعة قانونية. أبقيت الصفحات منشورة في LocalWP لأنها كانت منشورة من المحطة 20، والموقع محلي و<code>blog_public=0</code>، والروابط تحتاج أن تبقى قابلة للفحص قبل الإطلاق.</p>
+
+<h3>7. التحقق</h3>
+<p>نجح <code>tools/stage22-verify.php</code>:</p>
+<pre><code>Stage 22 verified: projects=8/8 packages=5/5 testimonials=3/3 sourced_assets=10 service_terms=6/6 meta_boxes=7</code></pre>
+<p>فحوص HTTP الحية رجعت 200 لعينات Home/About/Packages/Testimonials/Work/Case Study/Policies بالعربية والإنجليزية. فحص HTML أكد أن <code>[shemo_packages]</code> و<code>[shemo_testimonials]</code> لا يظهران خامًا، وأن Work وCase Studies تحتوي صورًا ووسم Demo/Concept.</p>
+<ul>
+<li><code>php -l</code> نجح على ملفات PHP المعدلة والجديدة.</li>
+<li><code>debug.log</code> غير موجود بعد التنفيذ.</li>
+<li><code>git diff --check</code> نجح مع تحذيرات CRLF المعروفة فقط.</li>
+<li><code>phpcs</code>/WPCS غير متاح في PATH.</li>
+<li>تحذير <code>php_imagick.dll</code> المتكرر من PHP CLI في LocalWP لم يمنع التنفيذ ولم ينشئ <code>debug.log</code>.</li>
+</ul>
+
+<div class="gate">
+<strong>8. بوابة الإغلاق:</strong> المحطة 22 اكتملت: الموقع أصبح مملوءًا بمحتوى Demo/Trial غني وقابل للتحرير من wp-admin: باقات وأسعار مبنية على بحث، 8 مشاريع Demo/Concept ثنائية اللغة بصور حقيقية مرفوعة وموسومة، تقييمات Demo عبر CPT، قصة About موسعة، وسياسات فعلية بمسودة مراجعة قانونية. لم تُضاف قرارات تجارية أو قانونية نهائية إلى <code>APPROVED-DECISIONS.md</code> لأن كل الأسعار/السياسات ما زالت Demo/Trial أو draft review.
+</div>
+</div>
+
 </body>
 </html>

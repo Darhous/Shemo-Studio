@@ -22,6 +22,10 @@ while ( have_posts() ) :
 	$results      = get_post_meta( $project_id, 'shemo_results', true );
 	$credits      = get_post_meta( $project_id, 'shemo_credits', true );
 	$related      = get_post_meta( $project_id, 'shemo_related_projects', true );
+	$sketch_ids   = (array) get_post_meta( $project_id, 'shemo_sketch_image', false );
+	$before_ids   = (array) get_post_meta( $project_id, 'shemo_before_image', false );
+	$after_ids    = (array) get_post_meta( $project_id, 'shemo_after_image', false );
+	$gallery_ids  = (array) get_post_meta( $project_id, 'shemo_gallery', false );
 	$archive_url  = get_post_type_archive_link( 'project' );
 	$start_url    = $is_ar ? home_url( '/start-a-project/' ) : home_url( '/en/start-a-project-en/' );
 
@@ -49,9 +53,13 @@ while ( have_posts() ) :
 				</div>
 			</div>
 			<div class="shemo-frame" aria-label="<?php echo esc_attr( get_the_title() ); ?>">
-				<div class="shemo-frame__screen">
-					<p class="shemo-frame__label">demo / concept / transparent proof</p>
-				</div>
+				<?php if ( has_post_thumbnail() ) : ?>
+					<?php the_post_thumbnail( 'large', array( 'class' => 'shemo-frame__image' ) ); ?>
+				<?php else : ?>
+					<div class="shemo-frame__screen">
+						<p class="shemo-frame__label">demo / concept / transparent proof</p>
+					</div>
+				<?php endif; ?>
 			</div>
 		</section>
 
@@ -108,8 +116,25 @@ while ( have_posts() ) :
 				<h2 id="sketch-title"><?php echo esc_html( $is_ar ? 'اسكتش / تصور أولي' : 'Sketch / initial concept' ); ?></h2>
 				<p><?php echo esc_html( $is_ar ? 'المرحلة الأولى هنا كانت تحويل الرسالة إلى مشاهد بسيطة: لقطة افتتاح، انتقال، وإطار نهائي يثبت الفكرة.' : 'The first step was turning the message into simple frames: opening shot, transition, and final frame that anchors the idea.' ); ?></p>
 			</div>
-			<div class="shemo-visual-triptych" aria-hidden="true">
-				<span>sketch</span><span>direction</span><span>screen</span>
+			<div class="shemo-visual-triptych">
+				<figure>
+					<?php if ( ! empty( $sketch_ids[0] ) ) : ?>
+						<?php echo wp_get_attachment_image( absint( $sketch_ids[0] ), 'medium_large' ); ?>
+					<?php endif; ?>
+					<figcaption><?php echo esc_html( $is_ar ? 'اسكتش' : 'Sketch' ); ?></figcaption>
+				</figure>
+				<figure>
+					<?php if ( ! empty( $before_ids[0] ) ) : ?>
+						<?php echo wp_get_attachment_image( absint( $before_ids[0] ), 'medium_large' ); ?>
+					<?php endif; ?>
+					<figcaption><?php echo esc_html( $is_ar ? 'قبل' : 'Before' ); ?></figcaption>
+				</figure>
+				<figure>
+					<?php if ( ! empty( $after_ids[0] ) ) : ?>
+						<?php echo wp_get_attachment_image( absint( $after_ids[0] ), 'medium_large' ); ?>
+					<?php endif; ?>
+					<figcaption><?php echo esc_html( $is_ar ? 'بعد' : 'After' ); ?></figcaption>
+				</figure>
 			</div>
 		</section>
 
@@ -134,6 +159,21 @@ while ( have_posts() ) :
 			</div>
 			<aside class="shemo-aside-note"><strong><?php echo esc_html( $is_ar ? 'ملاحظة أمان المحتوى' : 'Content safety note' ); ?></strong><?php echo esc_html( $is_ar ? 'لا توجد لقطات عميل أو شعارات خارجية في هذا المشروع.' : 'No client footage or third-party logos are used in this project.' ); ?></aside>
 		</section>
+
+		<?php if ( ! empty( $gallery_ids ) ) : ?>
+			<section class="shemo-section" aria-labelledby="gallery-title">
+				<p class="shemo-kicker"><?php echo esc_html( $is_ar ? 'Gallery' : 'Gallery' ); ?></p>
+				<h2 id="gallery-title"><?php echo esc_html( $is_ar ? 'معرض صور المشروع التجريبي' : 'Demo project image gallery' ); ?></h2>
+				<div class="shemo-gallery-grid">
+					<?php foreach ( array_filter( array_map( 'absint', $gallery_ids ) ) as $attachment_id ) : ?>
+						<figure>
+							<?php echo wp_get_attachment_image( $attachment_id, 'medium_large' ); ?>
+							<figcaption><?php echo esc_html( get_the_title( $attachment_id ) ); ?></figcaption>
+						</figure>
+					<?php endforeach; ?>
+				</div>
+			</section>
+		<?php endif; ?>
 
 		<section class="shemo-section shemo-grid--two" aria-labelledby="deliverables-title">
 			<div>

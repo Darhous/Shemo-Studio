@@ -253,5 +253,142 @@ function shemo_core_register_fields( $meta_boxes ) {
 		),
 	);
 
+	// 6. Package commercial/demo data.
+	$meta_boxes[] = array(
+		'title'      => __( 'Package Details', 'shemo-core' ),
+		'id'         => 'shemo_package_details',
+		'post_types' => 'package',
+		'context'    => 'normal',
+		'priority'   => 'high',
+		'fields'     => array(
+			array(
+				'name' => __( 'Transparency Label', 'shemo-core' ),
+				'id'   => 'shemo_package_label',
+				'type' => 'text',
+			),
+			array(
+				'name' => __( 'Price From', 'shemo-core' ),
+				'id'   => 'shemo_package_price_from',
+				'type' => 'number',
+				'min'  => 0,
+				'step' => 1,
+			),
+			array(
+				'name' => __( 'Price To', 'shemo-core' ),
+				'id'   => 'shemo_package_price_to',
+				'type' => 'number',
+				'min'  => 0,
+				'step' => 1,
+			),
+			array(
+				'name' => __( 'Currency', 'shemo-core' ),
+				'id'   => 'shemo_package_currency',
+				'type' => 'text',
+				'std'  => 'EGP',
+			),
+			array(
+				'name' => __( 'Price Note', 'shemo-core' ),
+				'id'   => 'shemo_package_price_note',
+				'type' => 'textarea',
+				'rows' => 2,
+			),
+			array(
+				'name'       => __( 'Scope Items', 'shemo-core' ),
+				'id'         => 'shemo_package_scope',
+				'type'       => 'text',
+				'clone'      => true,
+				'add_button' => __( '+ Add Scope Item', 'shemo-core' ),
+			),
+			array(
+				'name' => __( 'Best For', 'shemo-core' ),
+				'id'   => 'shemo_package_best_for',
+				'type' => 'textarea',
+				'rows' => 2,
+			),
+			array(
+				'name' => __( 'Timeline', 'shemo-core' ),
+				'id'   => 'shemo_package_timeline',
+				'type' => 'text',
+			),
+			array(
+				'name' => __( 'Revision Count', 'shemo-core' ),
+				'id'   => 'shemo_package_revisions',
+				'type' => 'number',
+				'min'  => 0,
+				'step' => 1,
+			),
+			array(
+				'name' => __( 'Deposit Percent', 'shemo-core' ),
+				'id'   => 'shemo_package_deposit_percent',
+				'type' => 'number',
+				'min'  => 0,
+				'max'  => 100,
+				'step' => 1,
+			),
+			array(
+				'name' => __( 'Checkout URL', 'shemo-core' ),
+				'id'   => 'shemo_package_checkout_url',
+				'type' => 'url',
+			),
+			array(
+				'name' => __( 'Featured Package', 'shemo-core' ),
+				'id'   => 'shemo_package_featured',
+				'type' => 'checkbox',
+			),
+		),
+	);
+
+	// 7. Demo testimonial data.
+	$meta_boxes[] = array(
+		'title'      => __( 'Testimonial Details', 'shemo-core' ),
+		'id'         => 'shemo_testimonial_details',
+		'post_types' => 'testimonial',
+		'context'    => 'normal',
+		'priority'   => 'high',
+		'fields'     => array(
+			array(
+				'name' => __( 'Transparency Label', 'shemo-core' ),
+				'id'   => 'shemo_testimonial_label',
+				'type' => 'text',
+			),
+			array(
+				'name' => __( 'Author Name / Demo Persona', 'shemo-core' ),
+				'id'   => 'shemo_testimonial_author_name',
+				'type' => 'text',
+			),
+			array(
+				'name' => __( 'Author Role', 'shemo-core' ),
+				'id'   => 'shemo_testimonial_author_role',
+				'type' => 'text',
+			),
+			array(
+				'name' => __( 'Service Focus', 'shemo-core' ),
+				'id'   => 'shemo_testimonial_service_focus',
+				'type' => 'text',
+			),
+			array(
+				'name' => __( 'Rating', 'shemo-core' ),
+				'id'   => 'shemo_testimonial_rating',
+				'type' => 'number',
+				'min'  => 1,
+				'max'  => 5,
+				'step' => 1,
+			),
+			array(
+				'name'       => __( 'Related Project', 'shemo-core' ),
+				'id'         => 'shemo_testimonial_related_project',
+				'type'       => 'post',
+				'post_type'  => 'project',
+				'field_type' => 'select_advanced',
+			),
+			array(
+				'name' => __( 'Source Note', 'shemo-core' ),
+				'id'   => 'shemo_testimonial_source_note',
+				'type' => 'textarea',
+				'rows' => 2,
+			),
+		),
+	);
+
 	return $meta_boxes;
 }

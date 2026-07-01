@@ -112,6 +112,9 @@ foreach ( array_keys( $filters ) as $taxonomy ) {
 					?>
 					<article <?php post_class( 'shemo-project-card' ); ?>>
 						<a class="shemo-project-card__media" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr( get_the_title() ); ?>">
+							<?php if ( has_post_thumbnail() ) : ?>
+								<?php the_post_thumbnail( 'large' ); ?>
+							<?php endif; ?>
 							<span><?php echo esc_html( $service && ! is_wp_error( $service ) ? $service[0]->name : ( $is_ar ? 'مشروع' : 'Project' ) ); ?></span>
 						</a>
 						<div class="shemo-project-card__body">
