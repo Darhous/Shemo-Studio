@@ -621,5 +621,58 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 
 </div>
 
+<div class="stage" id="stage-9">
+<h2>المحطة 9 — ربط Cloudflare Turnstile بمفاتيح حقيقية</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تعديل فعلي على موقع LocalWP — ربط Fluent Forms Turnstile module (المكتشف جاهزًا من المحطة 7) بحساب Cloudflare حقيقي، بدون تركيب إضافة جديدة
+</p>
+
+<h3>السياق</h3>
+<p>من البنود المفتوحة منذ المحطة 7: Cloudflare Turnstile keys، Site Kit OAuth (GA4)، FluentCRM SMTP. عند بداية المحطة 9 اتعرض الثلاثة على المستخدم مع تنبيه فني: GA4/Site Kit قد يتعثر لأن الموقع محلي فقط (<code>shemostudio.local</code>) وGoogle محتاج يتحقق من الموقع عن بُعد. المستخدم اختار <strong>Cloudflare Turnstile</strong> أولًا.</p>
+
+<h3>1. تجهيز البيئة وفحص الكود</h3>
+<p>تم فحص كود Fluent Forms (<code>app/Modules/Turnstile/Turnstile.php</code> + <code>GlobalSettingsHelper.php</code> + <code>Services/FormBuilder/Components/Turnstile.php</code>) لتحديد أماكن التخزين والعرض الفعلية بدل التخمين: المفاتيح في option واحد <code>_fluentform_turnstile_details</code> (<code>siteKey</code>, <code>secretKey</code>, <code>invisible</code>, <code>appearance</code>, <code>theme</code>) + علم <code>_fluentform_turnstile_keys_status</code>. تم التأكد إن الاتنين فاضيين قبل البدء، وإن الموقع لسه معندوش فورم "Start a Project" حقيقي (بس الفورمين الافتراضيين "Contact Form Demo" و"Subscription Form") — يعني نطاق المحطة هو ربط المفاتيح على مستوى الإضافة، مش تفعيل الحماية على فورم فعلي بعد (ده بند مفتوح في <code>APPROVED-DECISIONS.md</code>).</p>
+
+<h3>2. إنشاء Widget حقيقي من Cloudflare</h3>
+<p>اتوجّه المستخدم لإنشاء Turnstile widget من <code>dash.cloudflare.com</code> (دومين <code>shemostudio.local</code>، وضع Managed) ورجع فعليًا بـSite Key وSecret Key حقيقيين من حسابه.</p>
+
+<h3>3. التحقق من صحة الـ Secret Key قبل التخزين</h3>
+<p>تم استدعاء فعلي لـ <code>https://challenges.cloudflare.com/turnstile/v0/siteverify</code> (نفس endpoint اللي بيستخدمه Fluent Forms داخليًا) بتوكن مزيف عمدًا مع الـSecret Key الحقيقي. الرد: <code>{"error-codes":["invalid-input-response"],"success":false}</code> — يعني Cloudflare قبل الـSecret Key كحساب/صيغة صحيحة ورفض بس التوكن المزيف، <strong>مش</strong> <code>invalid-input-secret</code> (اللي كان معناه إن المفتاح غلط). إثبات إن المفتاح حقيقي قبل أي تخزين دائم.</p>
+
+<h3>4. تخزين المفاتيح</h3>
+<p>عبر <code>wp eval-file</code> (run-hash <code>3PbB5bi_t</code> لسه شغّال)، تم تخزين <code>_fluentform_turnstile_details</code> و<code>_fluentform_turnstile_keys_status=true</code> — نفس الـoptions اللي بتستخدمها واجهة الإدارة نفسها. اتحقق سطر-سطر إن القيم المخزّنة مطابقة تمامًا للمُدخلة.</p>
+
+<h3>5. اختبار end-to-end حقيقي (غير مدمّر)</h3>
+<ol>
+<li>أُخذت نسخة احتياطية من <code>form_fields</code> (JSON) الخاص بفورم "Contact Form Demo" (ID 1).</li>
+<li>اتضاف عنصر <code>turnstile</code> مؤقتًا لنهاية قائمة الحقول.</li>
+<li>اتنفّذ <code>do_shortcode('[fluentform id="1"]')</code> فعليًا: احتوى الـHTML الناتج على <code>data-sitekey</code> بالقيمة الحقيقية الصحيحة، كلاس <code>cf-turnstile</code>، وتأكد إن سكريبت Cloudflare اتسجّل <code>enqueued</code> فعليًا.</li>
+<li>اتشال العنصر المؤقت فورًا، ورجع <code>form_fields</code> لنفس القيمة الأصلية بالظبط (مطابقة حرفية للـJSON قبل/بعد).</li>
+</ol>
+
+<h3>6. التحقق من عدم وجود Regression</h3>
+<ul>
+<li><code>/</code> و<code>/work/</code> و<code>/wp-login.php</code> و<code>/shop/</code> — كلهم <strong>200 OK</strong>.</li>
+<li>لسه <strong>14 إضافة نشطة</strong> (مفيش تركيب إضافة جديدة).</li>
+<li>مفيش <code>debug.log</code> جديد ومفيش أي خطأ PHP.</li>
+</ul>
+
+<h3>7. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>مفيش فورم حقيقي بيستخدم Turnstile فعليًا على الموقع المنشور — القدرة التقنية جاهزة بالكامل، لكن ربط العنصر بفورم "Start a Project" الفعلي مؤجّل لمحطة تصميم الفورم.</li>
+<li>الفورمين الافتراضيين فضلوا زي ما كانوا بالظبط، من غير أي تعديل دائم.</li>
+<li>GA4 (Site Kit) وFluentCRM SMTP لسه برّة نطاق هذه المحطة — القيد الفني بتاع GA4 (استضافة محلية، Google محتاج تحقق عن بُعد) لسه قائم.</li>
+<li>الفجوة الفنية بتاعة sitemaps 404 (المحطة 5) لسه مفتوحة.</li>
+</ul>
+
+<div class="gate">
+<strong>8. بوابة المراجعة:</strong> المحطة 9 خلصت: Cloudflare Turnstile بقى مُهيّأ بالكامل بمفاتيح حقيقية — Site Key وSecret Key من حساب المستخدم الفعلي، اتتحقق صحتهم عبر نداء API حي لـCloudflare قبل أي تخزين، اتخزّنوا في نفس options الإضافة، واتعمل اختبار عرض (rendering) حقيقي أثبت إن الويدجت هيظهر صح لأي زائر. الاختبار اتعمل بشكل غير مدمّر (فورم تجريبي مؤقت رجع لحالته الأصلية بالظبط). الـSecret Key اتحفظ في <code>wp_options</code> فقط، مش متتبّع بـGit ولا مكتوب في أي ملف. <code>APPROVED-DECISIONS.md</code> قرار 13 اتحدّث بالحالة الجديدة. تحقق كامل من عدم وجود regression على أي إعداد من المحطات 0–8.
+البنود المتبقية (GA4/Site Kit OAuth، FluentCRM SMTP) لسه مفتوحة لمحطات لاحقة حسب اختيار المستخدم. في انتظار توجيه المستخدم للانتقال إلى <strong>المحطة 10</strong>.
+</div>
+
+</div>
+
 </body>
 </html>
