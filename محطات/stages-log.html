@@ -1446,5 +1446,100 @@ Demo / Concept Project - Not commissioned by a client</code></pre>
 </div>
 </div>
 
+<hr>
+
+<div class="stage">
+<h2>المحطة 19 — Packages + Request a Quote + Process/Testimonials/FAQ + SureCart</h2>
+<p class="meta"><strong>التاريخ:</strong> 2026-07-01<br>
+<strong>الحالة:</strong> ✅ مكتملة<br>
+<strong>النوع:</strong> بناء صفحات محتوى ثنائية اللغة + نماذج Fluent Forms Free + ربط SureCart اختبار فقط</p>
+
+<h3>السياق</h3>
+<p>بدأت المحطة بعد قراءة <code>APPROVED-DECISIONS.md</code> خصوصًا القرارات 7، 8، 20، 21، 24، 25، و<code>محطات/roadmap.md</code>، وآخر محطات 16-18، و<code>design/content/tone-of-voice.md</code>، و<code>git log --oneline -15</code>. تم تشغيل ذاكرة Codex المشتركة أولًا، ثم فحص الواقع الحالي.</p>
+<ul>
+<li>عدد الإضافات النشطة = 15.</li>
+<li>SureCart نشط ويملك <code>sc_form</code>, <code>sc_cart</code>, <code>sc_product</code>.</li>
+<li>SureCart يحتوي checkout form منشور واحد ID <code>10</code> ولا توجد منتجات <code>sc_product</code> محلية.</li>
+<li>Fluent Forms Free نشط وجداول النماذج موجودة.</li>
+</ul>
+
+<h3>1. التنفيذ</h3>
+<p>تمت إضافة سكربتين قابلين لإعادة التشغيل: <code>tools/stage19-build-packages-quote.php</code> و<code>tools/stage19-verify.php</code>.</p>
+<table>
+<tr><th>الصفحة</th><th>عربي</th><th>English</th></tr>
+<tr><td>Packages</td><td><code>/packages/</code></td><td><code>/en/packages-en/</code></td></tr>
+<tr><td>Request a Quote</td><td><code>/request-a-quote/</code></td><td><code>/en/request-a-quote-en/</code></td></tr>
+<tr><td>Process</td><td><code>/process/</code></td><td><code>/en/process-en/</code></td></tr>
+<tr><td>Testimonials</td><td><code>/testimonials/</code></td><td><code>/en/testimonials-en/</code></td></tr>
+<tr><td>FAQ</td><td><code>/faq/</code></td><td><code>/en/faq-en/</code></td></tr>
+</table>
+<p>كل زوج صفحات تم ربطه عبر Polylang، مع Rank Math meta وGeneratePress full-width/title meta. أُضيف CSS داعم محدود داخل <code>themes/shemo-child/style.css</code>.</p>
+
+<h3>2. الباقات والأسعار</h3>
+<p>تمت كتابة الباقات كنصوص اقتراحية قابلة للتعديل وليست قرارًا تجاريًا نهائيًا.</p>
+<table>
+<tr><th>الباقة</th><th>السعر المقترح</th></tr>
+<tr><td>Sketch Sprint</td><td><code>150-250 USD</code></td></tr>
+<tr><td>Content Kit</td><td><code>350-650 USD</code></td></tr>
+<tr><td>Launch Visual System</td><td><code>900-1,500 USD</code></td></tr>
+</table>
+<p>لم يتم تعديل <code>APPROVED-DECISIONS.md</code> لأن الأسعار/العربون/سير البيع النهائي لم تحصل على موافقة صريحة.</p>
+
+<h3>3. Fluent Forms Free</h3>
+<table>
+<tr><th>النموذج</th><th>ID</th><th>اللغة</th><th>عدد الحقول</th></tr>
+<tr><td>Shemo Request a Quote - AR</td><td>3</td><td>عربي</td><td>7</td></tr>
+<tr><td>Shemo Request a Quote - EN</td><td>4</td><td>English</td><td>7</td></tr>
+</table>
+<p>النموذجان single-page عمدًا لحدود النسخة المجانية: بدون <code>save &amp; resume</code>، بدون PDF تلقائي، وبدون multi-step. أثناء التشغيل الأول ظهر اختلاف schema في <code>wp_fluentform_form_meta</code> لعدم وجود أعمدة timestamps، فتم إصلاح السكربت ثم أعيد تشغيله بنجاح.</p>
+<table>
+<tr><th>النموذج</th><th>قبل</th><th>بعد</th><th>النتيجة</th></tr>
+<tr><td>عربي ID 3</td><td>0</td><td>1</td><td>JSON <code>success=true</code>, submission ID <code>1</code>, status <code>unread</code></td></tr>
+<tr><td>English ID 4</td><td>0</td><td>1</td><td>JSON <code>success=true</code>, submission ID <code>2</code>, status <code>unread</code></td></tr>
+</table>
+
+<h3>4. SureCart</h3>
+<p>تم الربط الآمن كاختبار فقط لأن SureCart لا يحتوي منتجات محلية ولا توجد مفاتيح إنتاج أو شراء. أزرار <code>Test SureCart</code> تربط إلى <code>/checkout/?mode=test&amp;shemo_package=...&amp;deposit=50</code>. تحقق HTML أظهر وجود <code>sc-checkout</code> و<code>mode="test"</code>. نص العربون 50% موضح كاقتراح فقط لا كسياسة معتمدة.</p>
+
+<h3>5. Testimonials</h3>
+<p>تم الالتزام بعدم اختراع شهادات. الصفحة تعرض حالة شفافة: عربيًا <code>لا توجد شهادات منشورة بعد</code>، وإنجليزيًا <code>No published testimonials yet</code>. لا توجد أسماء عملاء، ولا اقتباسات، ولا نتائج أو أرقام مزعومة.</p>
+
+<h3>6. تحقق WordPress / Polylang / DB</h3>
+<p>نجح <code>tools/stage19-verify.php</code>:</p>
+<table>
+<tr><th>الصفحة</th><th>عربي</th><th>English</th><th>الربط</th></tr>
+<tr><td>packages</td><td>47</td><td>48</td><td><code>ar_to_en=48</code>, <code>en_to_ar=47</code></td></tr>
+<tr><td>request-a-quote</td><td>49</td><td>50</td><td><code>ar_to_en=50</code>, <code>en_to_ar=49</code></td></tr>
+<tr><td>process</td><td>51</td><td>52</td><td><code>ar_to_en=52</code>, <code>en_to_ar=51</code></td></tr>
+<tr><td>testimonials</td><td>53</td><td>54</td><td><code>ar_to_en=54</code>, <code>en_to_ar=53</code></td></tr>
+<tr><td>faq</td><td>55</td><td>56</td><td><code>ar_to_en=56</code>, <code>en_to_ar=55</code></td></tr>
+</table>
+<p>التحقق أكد أيضًا أن النموذجين منشوران، صفحة Packages تحتوي تنبيه عدم نهائية الأسعار وروابط SureCart test، صفحة Request a Quote تحتوي shortcode Fluent Forms، صفحة Testimonials تحتوي النص الشفاف، وعدد الإضافات النشطة = 15.</p>
+
+<h3>7. تحقق HTTP</h3>
+<p>كل URLs الجديدة رجعت <code>HTTP/1.1 200 OK</code> بدون <code>Location</code> redirect، بما فيها checkout test:</p>
+<ul>
+<li><code>/packages/</code> و<code>/en/packages-en/</code></li>
+<li><code>/request-a-quote/</code> و<code>/en/request-a-quote-en/</code></li>
+<li><code>/process/</code> و<code>/en/process-en/</code></li>
+<li><code>/testimonials/</code> و<code>/en/testimonials-en/</code></li>
+<li><code>/faq/</code> و<code>/en/faq-en/</code></li>
+<li><code>/checkout/?mode=test&amp;shemo_package=content-kit&amp;deposit=50</code></li>
+</ul>
+
+<h3>8. حدود المحطة</h3>
+<ul>
+<li>لم يتم اعتماد أسعار نهائية أو سياسة عربون أو نموذج بيع كامل.</li>
+<li>لم يتم شراء أي شيء أو إدخال مفاتيح إنتاج.</li>
+<li>لم يتم تركيب إضافة جديدة.</li>
+<li>لم يتم إنشاء شهادات أو أسماء عملاء أو نتائج وهمية.</li>
+<li>صفحة Contact وStart a Project والسياسات لا تزال للمحطة 20.</li>
+</ul>
+
+<div class="gate">
+<strong>9. بوابة الإغلاق:</strong> المحطة 19 اكتملت: تم بناء Packages وRequest a Quote وProcess وTestimonials وFAQ بالعربية والإنجليزية، وربط الترجمات عبر Polylang، وإنشاء نماذج Fluent Forms Free واختبار إرسالها فعليًا، وربط الباقات بتدفق SureCart test-only بدون مفاتيح إنتاج أو شراء. كل URLs الجديدة ترجع 200 بدون redirect غير متوقع، والقراءة الرجعية من قاعدة البيانات تؤكد الصفحات والنماذج والروابط، مع الحفاظ على عدد الإضافات النشطة 15 وعدم إضافة قرارات تجارية جديدة.
+</div>
+</div>
+
 </body>
 </html>

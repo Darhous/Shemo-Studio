@@ -1718,3 +1718,144 @@ themes/shemo-child/style.css
 ### بوابة الإغلاق
 
 المحطة 18 اكتملت: أرشيف Work أصبح مبنيًا على CPT `project` الفعلي وقابلًا للفلترة عبر تصنيفات `shemo-core`، وقالب Case Study المفرد يعرض بنية واضحة مستوحاة من الـ16 جزءًا المطلوبة، وتم إنشاء 3 مشاريع Demo/Concept على الأقل بالعربي والإنجليزي وربط ترجماتها في Polylang. كل مشروع موسوم حرفيًا حسب القرار 25 قرب العنوان وفي metadata، بدون ادعاءات عميل أو نتائج غير حقيقية، وبدون إضافة أي أداة مدفوعة أو إضافة جديدة.
+
+---
+
+## المحطة 19 — Packages + Request a Quote + Process/Testimonials/FAQ + SureCart
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** بناء صفحات محتوى ثنائية اللغة + نماذج Fluent Forms Free + ربط SureCart اختبار فقط
+
+### السياق
+
+بدأت المحطة بعد قراءة الملفات المطلوبة: `APPROVED-DECISIONS.md` خصوصًا القرارات 7، 8، 20، 21، 24، 25، و`محطات/roadmap.md`، وآخر محطات 16-18 من `محطات/stages-log.md`، و`design/content/tone-of-voice.md`، و`git log --oneline -15`. تم تشغيل ذاكرة Codex المشتركة أولًا، ثم فحص الواقع الحالي:
+
+- الفرع `main` كان على commit المحطة 18.
+- يوجد ملف غير متتبع سابق `MASTER-PLAN.md` ولم يتم لمسه.
+- عدد الإضافات النشطة = 15.
+- SureCart نشط ويملك post types: `sc_form`, `sc_cart`, `sc_product`.
+- SureCart يحتوي checkout form منشور واحد ID `10` باسم `Checkout`، ولا توجد منتجات `sc_product` محلية.
+- Fluent Forms Free نشط، وجداول النماذج موجودة.
+
+### 1. التنفيذ
+
+تمت إضافة سكربتين قابلين لإعادة التشغيل:
+
+- `tools/stage19-build-packages-quote.php`
+- `tools/stage19-verify.php`
+
+تم بناء 10 صفحات منشورة داخل WordPress:
+
+| الصفحة | عربي | English |
+|---|---|---|
+| Packages | `/packages/` | `/en/packages-en/` |
+| Request a Quote | `/request-a-quote/` | `/en/request-a-quote-en/` |
+| Process | `/process/` | `/en/process-en/` |
+| Testimonials | `/testimonials/` | `/en/testimonials-en/` |
+| FAQ | `/faq/` | `/en/faq-en/` |
+
+كل زوج صفحات تم ربطه عبر Polylang، مع العربي افتراضيًا والإنجليزي تحت `/en/`. تم تحديث Rank Math title/description لكل صفحة، وتفعيل GeneratePress full-width/title meta كما في المحطات السابقة.
+
+تمت إضافة CSS داعم محدود داخل `themes/shemo-child/style.css` لشبكة الباقات، بطاقات الأسعار، نموذج Fluent Forms، timeline العملية، وFAQ.
+
+### 2. الباقات والأسعار
+
+تمت كتابة الباقات كنصوص **اقتراحية قابلة للتعديل وليست قرارًا تجاريًا نهائيًا**:
+
+| الباقة | السعر المقترح |
+|---|---|
+| Sketch Sprint | `150-250 USD` |
+| Content Kit | `350-650 USD` |
+| Launch Visual System | `900-1,500 USD` |
+
+تم توضيح ذلك صراحة في صفحة Packages بالعربي والإنجليزي. لم يتم تعديل `APPROVED-DECISIONS.md` لأن الأسعار/العربون/سير البيع النهائي لم تحصل على موافقة صريحة.
+
+### 3. Fluent Forms Free
+
+تم إنشاء نموذجين داخل Fluent Forms Free:
+
+| النموذج | ID | اللغة | عدد الحقول |
+|---|---:|---|---:|
+| Shemo Request a Quote - AR | 3 | عربي | 7 |
+| Shemo Request a Quote - EN | 4 | English | 7 |
+
+النموذج intentionally single-page لحدود النسخة المجانية: بدون `save & resume`، بدون PDF تلقائي، وبدون multi-step. الحقول: الاسم، الإيميل، نوع المشروع، الباقة الأقرب، الميزانية التقريبية، الموعد المتوقع، وصف مختصر.
+
+أثناء التشغيل الأول ظهر اختلاف schema فعلي: جدول `wp_fluentform_form_meta` لا يحتوي أعمدة `created_at`/`updated_at`. تم إصلاح السكربت ليستخدم الأعمدة الموجودة فقط، ثم أعيد تشغيل البناء بنجاح بدون أخطاء.
+
+تم اختبار الإرسال فعليًا عبر `admin-ajax.php?action=fluentform_submit`:
+
+| النموذج | قبل | بعد | النتيجة |
+|---|---:|---:|---|
+| عربي ID 3 | 0 | 1 | JSON `success=true`, submission ID `1`, status `unread` |
+| English ID 4 | 0 | 1 | JSON `success=true`, submission ID `2`, status `unread` |
+
+### 4. SureCart
+
+حسب القرار 8، SureCart Free/Launch هو الأداة المعتمدة، لكن تفاصيل البيع والأسعار غير معتمدة. في الواقع الحالي لا توجد منتجات SureCart محلية، ولا توجد مفاتيح إنتاج أو شراء.
+
+لذلك تم الربط الآمن كاختبار فقط:
+
+- أزرار `Test SureCart` داخل صفحة Packages تربط إلى `/checkout/?mode=test&shemo_package=...&deposit=50`.
+- `curl -I` على checkout test رجع `HTTP/1.1 200 OK` بدون redirect.
+- HTML checkout يحتوي `sc-checkout` و`mode="test"`.
+- لا توجد عملية شراء أو مفاتيح إنتاج أو قرار عربون نهائي. نص العربون 50% موضح كاقتراح فقط لا كسياسة معتمدة.
+
+### 5. Testimonials
+
+تم الالتزام الصريح بعدم اختراع شهادات. صفحة Testimonials تعرض حالة شفافة:
+
+- عربي: `لا توجد شهادات منشورة بعد`.
+- English: `No published testimonials yet`.
+
+لا توجد أسماء عملاء، ولا اقتباسات، ولا نتائج أو أرقام مزعومة.
+
+### 6. تحقق WordPress / Polylang / DB
+
+نجح `tools/stage19-verify.php`:
+
+| الصفحة | عربي | English | الربط |
+|---|---:|---:|---|
+| packages | 47 | 48 | `ar_to_en=48`, `en_to_ar=47` |
+| request-a-quote | 49 | 50 | `ar_to_en=50`, `en_to_ar=49` |
+| process | 51 | 52 | `ar_to_en=52`, `en_to_ar=51` |
+| testimonials | 53 | 54 | `ar_to_en=54`, `en_to_ar=53` |
+| faq | 55 | 56 | `ar_to_en=56`, `en_to_ar=55` |
+
+التحقق أكد أيضًا:
+
+- النموذجان منشوران وعدد حقولهما 7.
+- صفحة Packages تحتوي تنبيه عدم نهائية الأسعار وروابط SureCart test.
+- صفحة Request a Quote تحتوي shortcode `Fluent Forms`.
+- صفحة Testimonials تحتوي النص الشفاف بعدم وجود شهادات منشورة.
+- عدد الإضافات النشطة = 15.
+- SureCart checkout form count = 1.
+
+### 7. تحقق HTTP
+
+كل URLs الجديدة رجعت `HTTP/1.1 200 OK` بدون `Location` redirect:
+
+- `/packages/`
+- `/en/packages-en/`
+- `/request-a-quote/`
+- `/en/request-a-quote-en/`
+- `/process/`
+- `/en/process-en/`
+- `/testimonials/`
+- `/en/testimonials-en/`
+- `/faq/`
+- `/en/faq-en/`
+- `/checkout/?mode=test&shemo_package=content-kit&deposit=50`
+
+### 8. حدود المحطة
+
+- لم يتم اعتماد أسعار نهائية أو سياسة عربون أو نموذج بيع كامل.
+- لم يتم شراء أي شيء أو إدخال مفاتيح إنتاج.
+- لم يتم تركيب إضافة جديدة.
+- لم يتم إنشاء شهادات أو أسماء عملاء أو نتائج وهمية.
+- صفحة Contact وStart a Project والسياسات لا تزال للمحطة 20.
+
+### 9. بوابة الإغلاق
+
+المحطة 19 اكتملت: تم بناء Packages وRequest a Quote وProcess وTestimonials وFAQ بالعربية والإنجليزية، وربط الترجمات عبر Polylang، وإنشاء نماذج Fluent Forms Free واختبار إرسالها فعليًا، وربط الباقات بتدفق SureCart test-only بدون مفاتيح إنتاج أو شراء. كل URLs الجديدة ترجع 200 بدون redirect غير متوقع، والقراءة الرجعية من قاعدة البيانات تؤكد الصفحات والنماذج والروابط، مع الحفاظ على عدد الإضافات النشطة 15 وعدم إضافة قرارات تجارية جديدة.

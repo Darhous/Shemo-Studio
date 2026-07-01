@@ -983,3 +983,144 @@ select:focus,
 		grid-template-columns: 1fr;
 	}
 }
+
+.shemo-package-grid {
+	display: grid;
+	gap: clamp(1rem, 3vw, 1.5rem);
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shemo-package-card {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: clamp(1rem, 3vw, 1.35rem);
+}
+
+.shemo-package-card h3,
+.shemo-package-card p {
+	margin: 0;
+}
+
+.shemo-package-card .shemo-button-row {
+	margin-top: auto;
+}
+
+.shemo-package-card__fit {
+	color: var(--shemo-text-muted);
+}
+
+.shemo-price {
+	color: var(--shemo-accent);
+	font-family: var(--shemo-font-display);
+	font-size: clamp(1.5rem, 3vw, 2.2rem);
+	font-weight: 800;
+	line-height: 1.08;
+}
+
+.shemo-form-section {
+	display: grid;
+	gap: clamp(1.5rem, 4vw, 2.5rem);
+	grid-template-columns: minmax(0, 0.42fr) minmax(320px, 0.58fr);
+}
+
+.shemo-form-shell {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.shemo-form-shell .ff-el-group {
+	margin-bottom: 1rem;
+}
+
+.shemo-form-shell label {
+	color: var(--shemo-text);
+	font-weight: 800;
+}
+
+.shemo-form-shell input,
+.shemo-form-shell select,
+.shemo-form-shell textarea {
+	background: var(--shemo-bg) !important;
+	border: 1px solid var(--shemo-border) !important;
+	border-radius: var(--shemo-radius-control) !important;
+	color: var(--shemo-text) !important;
+	min-height: 46px;
+}
+
+.shemo-form-shell textarea {
+	min-height: 140px;
+}
+
+.shemo-form-shell .ff-btn-submit {
+	background: var(--shemo-accent) !important;
+	border-color: var(--shemo-accent) !important;
+	border-radius: var(--shemo-radius-control) !important;
+	color: var(--shemo-bg) !important;
+	font-weight: 800 !important;
+	min-height: 46px;
+	padding-inline: 1.15rem !important;
+}
+
+.shemo-timeline {
+	display: grid;
+	gap: 1rem;
+}
+
+.shemo-timeline article {
+	align-items: start;
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: 70px minmax(0, 1fr);
+	padding: 1rem;
+}
+
+.shemo-timeline span {
+	color: var(--shemo-accent);
+	font-family: var(--shemo-font-display);
+	font-size: 1.7rem;
+	font-weight: 800;
+	line-height: 1;
+}
+
+.shemo-timeline p {
+	margin: 0;
+}
+
+.shemo-faq-list {
+	display: grid;
+	gap: 0.9rem;
+}
+
+.shemo-faq-list details {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	padding: 1rem 1.1rem;
+}
+
+.shemo-faq-list summary {
+	color: var(--shemo-text);
+	cursor: pointer;
+	font-weight: 800;
+}
+
+.shemo-faq-list p {
+	color: var(--shemo-text-muted);
+	margin: 0.8rem 0 0;
+}
+
+@media (max-width: 900px) {
+	.shemo-package-grid,
+	.shemo-form-section {
+		grid-template-columns: 1fr;
+	}
+}
