@@ -1541,5 +1541,74 @@ Demo / Concept Project - Not commissioned by a client</code></pre>
 </div>
 </div>
 
+<hr>
+
+<div class="stage">
+<h2>المحطة 20 — Start a Project + Contact + Policies + الصفحات المساعدة</h2>
+<p class="meta"><strong>التاريخ:</strong> 2026-07-01<br>
+<strong>الحالة:</strong> ✅ مكتملة<br>
+<strong>النوع:</strong> صفحات ثنائية اللغة + نموذج Start a Project فعلي + Turnstile + سياسات مسودة للمراجعة</p>
+
+<h3>السياق</h3>
+<p>بدأت المحطة بعد تشغيل ذاكرة Codex المشتركة، ثم قراءة <code>APPROVED-DECISIONS.md</code> خصوصًا القرارات 7، 8، 13، 14، 20، 21، 24، 25، و<code>محطات/roadmap.md</code>، وآخر محطات 18-19، و<code>design/content/tone-of-voice.md</code>، و<code>git log --oneline -15</code>.</p>
+<ul>
+<li>عدد الإضافات النشطة = 15.</li>
+<li>Fluent Forms Free نشط بإصدار 6.2.5.</li>
+<li>Cloudflare Turnstile مهيأ داخل Fluent Forms.</li>
+<li>Privacy Policy القديمة ID <code>3</code> كانت <code>draft</code>.</li>
+<li>Complianz Privacy Statement (EU) ID <code>18</code> كانت منشورة.</li>
+</ul>
+
+<h3>1. التنفيذ</h3>
+<p>تمت إضافة سكربتين قابلين لإعادة التشغيل: <code>tools/stage20-build-start-contact-policies.php</code> و<code>tools/stage20-verify.php</code>. كما تمت إضافة <code>themes/shemo-child/404.php</code> و<code>themes/shemo-child/search.php</code>، وCSS داعم محدود داخل <code>themes/shemo-child/style.css</code>.</p>
+<table>
+<tr><th>الصفحة</th><th>عربي</th><th>English</th></tr>
+<tr><td>Start a Project</td><td><code>/start-a-project/</code></td><td><code>/en/start-a-project-en/</code></td></tr>
+<tr><td>Contact</td><td><code>/contact/</code></td><td><code>/en/contact-en/</code></td></tr>
+<tr><td>Thank You</td><td><code>/thank-you/</code></td><td><code>/en/thank-you-en/</code></td></tr>
+<tr><td>Search</td><td><code>/search/</code></td><td><code>/en/search-en/</code></td></tr>
+<tr><td>Terms</td><td><code>/terms/</code></td><td><code>/en/terms-en/</code></td></tr>
+<tr><td>Revision Policy</td><td><code>/revision-policy/</code></td><td><code>/en/revision-policy-en/</code></td></tr>
+<tr><td>Deposit Policy</td><td><code>/deposit-policy/</code></td><td><code>/en/deposit-policy-en/</code></td></tr>
+<tr><td>Refund Policy</td><td><code>/refund-policy/</code></td><td><code>/en/refund-policy-en/</code></td></tr>
+<tr><td>Delivery Policy</td><td><code>/delivery-policy/</code></td><td><code>/en/delivery-policy-en/</code></td></tr>
+</table>
+<p>تم ربط كل زوج عبر Polylang وتحديث روابط CTA الإنجليزية القديمة من <code>/en/start-a-project/</code> و<code>/en/contact/</code> إلى الصفحات المنشورة الفعلية.</p>
+
+<h3>2. Fluent Forms Free + Turnstile</h3>
+<table>
+<tr><th>النموذج</th><th>ID</th><th>اللغة</th><th>عدد الحقول</th></tr>
+<tr><td>Shemo Start a Project - AR</td><td>5</td><td>عربي</td><td>10</td></tr>
+<tr><td>Shemo Start a Project - EN</td><td>6</td><td>English</td><td>10</td></tr>
+</table>
+<p>النموذج single-page عمدًا لحدود النسخة المجانية: بدون multi-step Pro، بدون save &amp; resume، وبدون PDF generation. تمت إضافة عنصر Turnstile الرسمي <code>turnstile</code> واسم الحقل <code>cf-turnstile-response</code>.</p>
+<p>التحقق الحي المتاح على LocalWP أثبت أن HTML النموذجين يحتوي <code>cf-turnstile</code> و<code>data-sitekey</code> وسكربت <code>challenges.cloudflare.com/turnstile</code>. محاولات الإرسال الآلية بدون token حي رجعت <code>HTTP/1.1 422 Unprocessable Entity</code> برسالة <code>Turnstile verification failed, please try again.</code>، وعدد submissions بقي <code>0</code> للنموذجين.</p>
+<p>لم يتم ادعاء نجاح إرسال حقيقي لأن توليد token صالح يحتاج تفاعل متصفح حي مع Cloudflare widget، وليس متاحًا من اختبار CLI الآمن.</p>
+
+<h3>3. Contact والسياسات</h3>
+<p>تم بناء Contact كصفحة CTA ثنائية اللغة بدون نموذج إضافي مدفوع، توجه إلى Start a Project وRequest a Quote والبريد والسياسات.</p>
+<p>تم بناء Terms وRevision Policy وDeposit Policy وRefund Policy وDelivery Policy كنصوص <strong>مسودة قابلة للمراجعة</strong> وليست اعتمادًا قانونيًا أو ماليًا نهائيًا. لم يتم تعديل <code>APPROVED-DECISIONS.md</code>.</p>
+<p>حل تعارض الخصوصية تم بشكل آمن: صفحة Privacy Policy القديمة ID <code>3</code> بقيت <code>draft</code> بدون حذف أو نشر، وتم تحديث <code>wp_page_for_privacy_policy</code> إلى صفحة Complianz المنشورة ID <code>18</code>. صفحات السياسات تشير إلى Privacy Statement (EU) وCookie Policy (EU) المنشورتين من Complianz.</p>
+
+<h3>4. تحقق WordPress / HTTP</h3>
+<p>نجح <code>tools/stage20-verify.php</code>: كل الصفحات منشورة ومربوطة في الاتجاهين عبر Polylang، Rank Math descriptions موجودة، النموذجان يحتويان Turnstile، <code>privacy_policy_option=18</code>، <code>legacy_privacy_status=draft</code>، وعدد الإضافات النشطة = 15.</p>
+<p>كل URLs الجديدة رجعت <code>HTTP/1.1 200 OK</code> بدون <code>Location</code> redirect، بما في ذلك نتائج البحث <code>/?s=motion</code> و<code>/en/?s=motion</code>. قالب 404 على <code>/stage20-missing-page-check/</code> رجع <code>404</code> كما هو متوقع، بدون redirect.</p>
+
+<h3>5. فحوص الإغلاق</h3>
+<ul>
+<li><code>php -l</code> نجح على سكربتات المحطة وقوالب <code>404.php</code> و<code>search.php</code>.</li>
+<li><code>debug.log</code> غير موجود قبل/بعد الاختبارات.</li>
+<li>عدد الإضافات النشطة = 15.</li>
+<li>فحص الروابط القديمة رجع <code>/en/start-a-project/ count=0</code> و<code>/en/contact/ count=0</code>.</li>
+<li>فحص الأسرار رجع مطابقات نصية غير سرية مثل أسماء options وتوثيق قديم، بدون قيم مفاتيح أو tokens مكشوفة.</li>
+<li><code>git diff --check</code> نجح مع تحذير CRLF المعروف فقط.</li>
+<li><code>phpcs</code>/WPCS غير متاح في PATH.</li>
+</ul>
+
+<div class="gate">
+<strong>6. بوابة الإغلاق:</strong> المحطة 20 اكتملت: تم بناء Start a Project وContact وThank You وSearch و404 والسياسات المطلوبة بالعربية والإنجليزية، وربط الترجمات عبر Polylang، وإنشاء فورم Start a Project فعلي عبر Fluent Forms Free مع Turnstile مضاف فعليًا ومتحقق server-side، وحل تعارض Privacy Policy القديمة draft مقابل Complianz المنشورة بدون حذف أو نشر سياسة نهائية جديدة. كل URLs الجديدة ترجع 200 بدون redirect غير متوقع، مع الحفاظ على عدد الإضافات النشطة 15 وعدم إضافة قرارات مالية أو قانونية نهائية جديدة.
+</div>
+</div>
+
 </body>
 </html>

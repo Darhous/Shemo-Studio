@@ -975,8 +975,15 @@ select:focus,
 	.shemo-project-grid,
 	.shemo-project-grid--compact,
 	.shemo-case-meta,
-	.shemo-case-visuals {
+	.shemo-case-visuals,
+	.shemo-search-list {
 		grid-template-columns: 1fr;
+	}
+
+	.shemo-stage20 .shemo-search-form,
+	.shemo-search-results .search-form {
+		align-items: stretch;
+		flex-direction: column;
 	}
 
 	.shemo-case-meta dl div {
@@ -1011,6 +1018,68 @@ select:focus,
 
 .shemo-package-card__fit {
 	color: var(--shemo-text-muted);
+}
+
+.shemo-stage20 .shemo-notice-panel,
+.shemo-stage20 .shemo-policy-list,
+.shemo-stage20 .shemo-search-form,
+.shemo-search-results .search-form {
+	background: var(--shemo-surface);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius);
+	padding: clamp(1rem, 3vw, 1.35rem);
+}
+
+.shemo-stage20 .shemo-notice-panel p,
+.shemo-stage20 .shemo-notice-panel strong {
+	margin-block: 0 0.5rem;
+}
+
+.shemo-stage20 .shemo-policy-list {
+	display: grid;
+	gap: 0.85rem;
+	list-style: none;
+	margin: 0;
+	padding-inline-start: clamp(1rem, 3vw, 1.35rem);
+}
+
+.shemo-stage20 .shemo-policy-list li {
+	border-bottom: 1px solid var(--shemo-border);
+	padding-block: 0 0.85rem;
+}
+
+.shemo-stage20 .shemo-policy-list li:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+.shemo-stage20 .shemo-search-form,
+.shemo-search-results .search-form {
+	display: flex;
+	gap: 0.75rem;
+	margin-top: 1.25rem;
+}
+
+.shemo-stage20 .shemo-search-form input[type="search"],
+.shemo-search-results .search-form input[type="search"],
+.shemo-search-results .search-field {
+	background: var(--shemo-bg);
+	border: 1px solid var(--shemo-border);
+	border-radius: var(--shemo-radius-control);
+	color: var(--shemo-text);
+	flex: 1 1 auto;
+	min-height: 46px;
+	padding: 0.85rem 1rem;
+}
+
+.shemo-search-list {
+	display: grid;
+	gap: clamp(1rem, 3vw, 1.35rem);
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shemo-error-page .shemo-hero {
+	min-height: 62vh;
 }
 
 .shemo-price {
