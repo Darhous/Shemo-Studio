@@ -372,5 +372,75 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 
 </div>
 
+<div class="stage" id="stage-5">
+<h2>المحطة 5 — تثبيت الإضافات الأساسية المتبقية (Core Plugins Installation)</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تعديل فعلي على موقع LocalWP — تثبيت وتفعيل 7 إضافات third-party، بدون قرارات جديدة
+</p>
+
+<h3>السياق</h3>
+<p>كل الأدوات المطلوبة في هذه المحطة كانت معتمدة بالفعل من بوابة المحطة 2 (وبعضها مُعدَّل لاحقًا في المحطة 3/4 حسب مبدأ "تفضيل المجاني"): <strong>Safe SVG، Fluent Forms (مجاني)، SureCart (Launch مجاني)، Rank Math، Wordfence Free + 2FA، ShortPixel (مجاني)، Duplicator</strong>. لا قرار جديد كان مطلوبًا — المهمة تنفيذ وتفعيل وتحقق فقط.</p>
+
+<h3>1. تجهيز بيئة wp-cli</h3>
+<p>نفس الإعداد الموثّق من المحطات السابقة: <code>wp.bat</code> من مجلد Local الداخلي، مع <code>PHPRC</code>/<code>MYSQL_HOME</code> تشير لمجلد <code>run\3PbB5bi_t\conf\</code> (run-hash اتغيّر عن المحطات السابقة — اتكتشف من جديد)، و<code>PATH</code> مضاف له مسارات PHP 8.3.29 وMySQL 8.4.0 وwp-cli. تم التأكد بـ<code>wp core version</code> (رجّع 7.0) قبل أي تنفيذ.</p>
+
+<h3>2. تثبيت وتفعيل الإضافات السبعة</h3>
+<p>كل إضافة اتثبتت من <code>downloads.wordpress.org</code> مباشرة عبر <code>wp plugin install &lt;slug&gt; --activate</code>، واحدة بواحدة (مش دفعة واحدة) للتأكد من عدم وجود PHP Fatal Error بعد كل واحدة على حدة:</p>
+
+<table>
+<tr><th>الإضافة</th><th>Slug</th><th>النسخة</th><th>الحالة</th></tr>
+<tr><td>Safe SVG</td><td><code>safe-svg</code></td><td>2.4.0</td><td>✅ نشطة</td></tr>
+<tr><td>Fluent Forms (مجاني)</td><td><code>fluentform</code></td><td>6.2.5</td><td>✅ نشطة</td></tr>
+<tr><td>SureCart</td><td><code>surecart</code></td><td>4.4.1</td><td>✅ نشطة</td></tr>
+<tr><td>Rank Math SEO</td><td><code>seo-by-rank-math</code></td><td>1.0.273</td><td>✅ نشطة</td></tr>
+<tr><td>Wordfence Security (شامل Login Security/2FA)</td><td><code>wordfence</code></td><td>8.2.2</td><td>✅ نشطة</td></tr>
+<tr><td>ShortPixel Image Optimizer</td><td><code>shortpixel-image-optimiser</code></td><td>6.5.3</td><td>✅ نشطة</td></tr>
+<tr><td>Duplicator</td><td><code>duplicator</code></td><td>1.5.16.1</td><td>✅ نشطة</td></tr>
+</table>
+
+<p><strong>ملاحظة على قرار 2FA:</strong> ما كانش فيه حاجة لتثبيت إضافة منفصلة لـ2FA — Wordfence Security (النسخة الكاملة المجانية) بيشمل مكوّن Login Security (2FA + حماية تسجيل الدخول) داخليًا. اتأكد ده عمليًا بعد التفعيل: ظهور خيار <code>wordfence_ls_version</code> في قاعدة البيانات. تثبيت إضافة <code>wordfence-login-security</code> المنفصلة كان هيكون تكرار وتعارض محتمل — اتجنّب عمدًا.</p>
+
+<h3>3. التحقق من عدم وجود تعارض (end-to-end)</h3>
+<ul>
+<li><code>wp plugin list</code>: كل الـ10 إضافات (7 الجديدة + <code>generateblocks</code>/<code>meta-box</code>/<code>shemo-core</code> من المحطات السابقة) ظاهرة <code>active</code> بدون أي علامة خطأ</li>
+<li>الصفحة الرئيسية <code>/</code> → <strong>200 OK</strong>، العنوان وtagline زي ما هما من المحطة 1، <code>robots noindex</code> لسه موجود (مفيش تعارض من Rank Math)</li>
+<li>أرشيف <code>/work/</code> (من shemo-core، المحطة 4) → <strong>200 OK</strong> لسه شغّال</li>
+<li><code>/wp-admin/</code> → <strong>302</strong> تحويل طبيعي لتسجيل الدخول (مفيش حجب من Wordfence Firewall)</li>
+<li><code>/wp-login.php</code> → <strong>200 OK</strong> بعنوان صحيح</li>
+<li><code>/shop/</code> و<code>/checkout/</code> (صفحات أنشأتها SureCart تلقائيًا عند التفعيل) → <strong>200 OK</strong> لكل منهما</li>
+<li><code>wp rewrite flush</code> نجح بدون أخطاء بعد كل التفعيلات، ومفيش <code>debug.log</code> جديد أو أخطاء PHP</li>
+</ul>
+
+<h3>4. فجوة فنية موثقة (حدود بيئة LocalWP، مش تعارض إضافات)</h3>
+<p>خرائط الموقع (sitemaps) — سواء sitemap الأصلي لووردبريس (<code>/wp-sitemap.xml</code>) أو sitemap Rank Math (<code>/sitemap_index.xml</code>) — بترجع <strong>404</strong>. السبب: قاعدة <code>location ~* \.(?:jpg|jpeg|gif|png|ico|xml)$</code> في <code>nginx/site.conf</code> المُولَّد تلقائيًا من LocalWP بتعامل أي رابط بامتداد <code>.xml</code> كملف ثابت **قبل** ما يوصل لقاعدة تحويل الـ404 لووردبريس. هذا <strong>مش خطأ من Rank Math ولا تعارض بين الإضافات</strong> — نفس السلوك بيحصل مع sitemap الأصلي لووردبريس برضه (تم التأكد). الحل بيحتاج تعديل يدوي على ملف Nginx config نفسه — تعديل بنية خادم مش إضافات، فاتأجل عمدًا بدل ما يتلمس config مُولَّد تلقائيًا بدون موافقة صريحة.</p>
+<p>تم أيضًا وضع <code>rank_math_wizard_completed = yes</code> يدويًا (إجراء تنظيمي بس، مش قرار استراتيجي) لتفادي تكرار توجيه المستخدم لمعالج الإعداد التفاعلي.</p>
+
+<h3>5. خطوات تالية تحتاج تدخل المستخدم مباشرة</h3>
+<ul>
+<li><strong>SureCart:</strong> يحتاج ربط/إنشاء حساب فعلي (OAuth) لتفعيل باقة Launch المجانية فعليًا</li>
+<li><strong>ShortPixel:</strong> يحتاج API key مجاني عبر تسجيل بإيميل حقيقي على shortpixel.com</li>
+<li><strong>Rank Math:</strong> معالج الإعداد التفاعلي (ربط Google Search Console/Analytics) لسه محتاج إكمال يدوي</li>
+<li><strong>Wordfence:</strong> API key اختياري (premium feed) — الوظائف الأساسية شغّالة بدونه. تفعيل 2FA فعليًا لأي مستخدم بيحتاج مسح QR code شخصي</li>
+<li><strong>إيميل الأدمن (من المحطة 1):</strong> لسه <code>dev-email@wpengine.local</code> placeholder — لسه مفتوح</li>
+<li><strong>صفحة Privacy Policy:</strong> لسه <code>draft</code> (تم التأكد) — لسه يحتاج قرار: تُكتب دلوقتي أو تتأجل لمحطة محتوى/قانونية لاحقة؟</li>
+</ul>
+
+<h3>6. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>مفيش تخصيص أو إعداد تفصيلي لأي إضافة بعد التفعيل الأساسي (غير <code>rank_math_wizard_completed</code>)</li>
+<li>مفيش محتوى حقيقي اتضاف لأي صفحة (صفحات Shop/Checkout/Dashboard اتولدت تلقائيًا من SureCart نفسه)</li>
+<li>إضافات لسه برّه نطاق كل المحطات لحد الآن: Cloudflare Turnstile، Complianz، GA4/GTM، أدوات CRM/قوائم بريدية</li>
+<li>إيميل الأدمن placeholder وصفحة Privacy Policy draft — لسه مفتوحين بانتظار قرار/بيانات من المستخدم</li>
+</ul>
+
+<div class="gate">
+<strong>7. بوابة المراجعة:</strong> المحطة 5 خلصت: كل الإضافات السبع المعتمدة من بوابة المحطة 2 (القرارات 6–12) اتثبتت وتفعّلت بنجاح بدون أي قرار جديد مطلوب — كلها بأعلى نسخة مجانية متاحة. اتحقق من عدم وجود تعارض بين الإضافات العشرة عبر فحوصات HTTP حية — كلها بدون أخطاء PHP أو تعارض. فجوة فنية واحدة اتوثقت بدقة (sitemaps بترجع 404 بسبب قاعدة Nginx ثابتة في إعداد LocalWP، مش بسبب الإضافات) وأُجِّلت بدل ما تتحل بتعديل غير موافق عليه. الفجوتين القديمتين (إيميل الأدمن placeholder، صفحة Privacy Policy draft) اتراجعوا وتأكد إنهم لسه مفتوحين، محتاجين قرار/بيانات حقيقية من المستخدم.
+في انتظار موافقة المستخدم للانتقال إلى <strong>المحطة 6</strong>.
+</div>
+
+</div>
+
 </body>
 </html>
