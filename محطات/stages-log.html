@@ -842,5 +842,123 @@ sessions=1</code></pre>
 </div>
 </div>
 
+<div class="stage" id="stage-12">
+<h2>المحطة 12 — تشخيص LocalWP Router وport 80</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تشخيص read-only وتوثيق — بدون تغيير خدمات Windows/LocalWP وبدون تعديل URLs
+</p>
+
+<h3>السياق</h3>
+<p>المشكلة المفتوحة من المحطة 11 كانت إن <code>http://shemostudio.local/</code> بيرجع صفحة IIS على port 80 بدل WordPress، بينما موقع LocalWP الحقيقي موجود خلف Nginx الداخلي عند <code>127.0.0.1:10005</code> مع <code>Host: shemostudio.local</code>.</p>
+<p>نطاق المحطة كان تشخيص السبب فقط أولًا، مع قيود صريحة: عدم تغيير <code>WordPress Address</code> أو <code>Site Address</code>، عدم استخدام Tunnel، عدم إيقاف/تشغيل/تعطيل خدمات Windows أو IIS أو HTTP.sys، وعدم تعديل ملفات LocalWP/Nginx المولدة تلقائيًا بدون موافقة صريحة.</p>
+
+<h3>1. تثبيت حالة Git قبل التشخيص</h3>
+<ul>
+<li><code>git status --branch --short</code>: الفرع <code>main...origin/main</code>، والملف الوحيد غير المتتبع هو <code>MASTER-PLAN.md</code> كما هو مقصود.</li>
+<li><code>HEAD</code> و<code>origin/main</code>: <code>37dd9964aeab8c86e31f8942bf4725c7959c2f1d</code>.</li>
+<li>آخر commit مؤكد: <code>37dd996 Phase 11: add local Burst analytics baseline</code>.</li>
+</ul>
+
+<h3>2. hosts file</h3>
+<p>ملف <code>C:\Windows\System32\drivers\etc\hosts</code> يحتوي إدخالات LocalWP الصحيحة:</p>
+<pre><code>::1 shemostudio.local #Local Site
+127.0.0.1 shemostudio.local #Local Site
+::1 www.shemostudio.local #Local Site
+127.0.0.1 www.shemostudio.local #Local Site</code></pre>
+<p>يعني اسم الدومين المحلي مضبوط على loopback، والمشكلة لم تكن من غياب hosts entry.</p>
+
+<h3>3. LocalWP run hash وNginx الداخلي</h3>
+<p>الـrun hash الحالي هو <code>3PbB5bi_t</code>. ملف Nginx المولّد للموقع:</p>
+<pre><code>C:\Users\ahmed\AppData\Roaming\Local\run\3PbB5bi_t\conf\nginx\site.conf</code></pre>
+<p>يحتوي:</p>
+<pre><code>listen 127.0.0.1:10005;
+listen [::1]:10005;
+root "C:/Users/ahmed/Local Sites/Shemo-Studio-Clean-Start/app/public";</code></pre>
+<p>ده يثبت إن Nginx الخاص بالموقع لا يحاول الاستماع على 80 مباشرة، بل على <code>10005</code> فقط.</p>
+
+<h3>4. LocalWP router config</h3>
+<p>تم فحص router config المولّد read-only:</p>
+<pre><code>C:\Users\ahmed\AppData\Roaming\Local\run\router\nginx\conf\route.shemostudio.local.conf</code></pre>
+<p>ووجد أن <code>shemostudio.local</code> مضبوط ليعمل proxy إلى الموقع الداخلي:</p>
+<pre><code>server_name shemostudio.local *.shemostudio.local;
+
+location / {
+    proxy_pass http://127.0.0.1:10005;
+    include location-block.conf;
+}</code></pre>
+<p>كما أن router <code>nginx.conf</code> يستمع على <code>80</code> و<code>[::]:80</code>.</p>
+
+<h3>5. حالة port 80 أثناء التشخيص</h3>
+<p>في بداية التشخيص، <code>http://shemostudio.local/</code> رجع <code>200 OK</code> من <code>Microsoft-IIS/10.0</code> مع صفحة <code>IIS Windows</code>. كان port 80 مملوكًا لـPID 4 (<code>System</code>)، و<code>netsh http show servicestate view=requestq</code> أظهر <code>DefaultAppPool</code> مع:</p>
+<pre><code>Services: WAS, W3SVC
+Registered URLs:
+    HTTP://*:80/</code></pre>
+<p>وكانت خدمات <code>HTTP</code> و<code>W3SVC</code> و<code>WAS</code> في حالة Running، ما يثبت أن IIS/HTTP.sys كان يسبق Local router على port 80 في بداية المحطة.</p>
+
+<h3>6. حالة port 10005 وعمليات LocalWP</h3>
+<table>
+<thead><tr><th>المنفذ</th><th>العملية</th><th>الدور</th></tr></thead>
+<tbody>
+<tr><td><code>10002</code></td><td><code>php-cgi.exe</code></td><td>PHP upstream</td></tr>
+<tr><td><code>10003</code></td><td><code>php-cgi.exe</code></td><td>PHP upstream</td></tr>
+<tr><td><code>10004</code></td><td><code>mysqld.exe</code></td><td>MySQL</td></tr>
+<tr><td><code>10005</code></td><td><code>nginx.exe</code></td><td>Nginx الداخلي للموقع</td></tr>
+</tbody>
+</table>
+<p>اختبار static file على <code>127.0.0.1:10005</code> رجع <code>200 OK</code> من <code>nginx/1.26.1</code>.</p>
+
+<h3>7. HTTP responses مع وبدون Host header</h3>
+<table>
+<thead><tr><th>الطلب</th><th>النتيجة</th></tr></thead>
+<tbody>
+<tr><td><code>http://shemostudio.local/</code> في بداية التشخيص</td><td><code>200 OK</code> من <code>Microsoft-IIS/10.0</code>، صفحة IIS</td></tr>
+<tr><td><code>http://127.0.0.1:10005/</code> بدون Host header</td><td><code>301 Moved Permanently</code> إلى <code>http://127.0.0.1/</code> من WordPress</td></tr>
+<tr><td><code>http://127.0.0.1:10005/</code> مع <code>Host: shemostudio.local</code></td><td><code>200 OK</code> من <code>nginx/1.26.1</code>، صفحة WordPress</td></tr>
+<tr><td><code>http://shemostudio.local/</code> في نهاية التشخيص</td><td><code>200 OK</code> من <code>nginx/1.26.1</code>، صفحة WordPress</td></tr>
+</tbody>
+</table>
+<p>تم التحقق أيضًا من أن <code>home</code> و<code>siteurl</code> ما زالا <code>http://shemostudio.local</code>، باستخدام قراءة WP-CLI بدون تعديل أي option.</p>
+
+<h3>8. تغير الحالة بدون تدخل تغييري</h3>
+<p>أثناء التشخيص فقط، وبدون تشغيل/إيقاف أي خدمة من طرف Codex، تغيرت الحالة:</p>
+<ul>
+<li><code>W3SVC</code> أصبح <code>Stopped</code>.</li>
+<li>port 80 و443 أصبحا مملوكين لـ<code>nginx.exe</code> PID <code>4768</code> (Local router).</li>
+<li><code>http://shemostudio.local/</code> بدأ يرجع WordPress مباشرة.</li>
+<li><code>netsh http show servicestate</code> لم يعد يعرض <code>DefaultAppPool</code> أو <code>HTTP://*:80/</code> بعد توقف <code>W3SVC</code>.</li>
+</ul>
+<p>لوج Local router يحتوي محاولات فشل متكررة سابقة:</p>
+<pre><code>bind() to 0.0.0.0:80 failed (10013: An attempt was made to access a socket in a way forbidden by its access permissions)</code></pre>
+<p>ثم الحالة النهائية أثبتت أن Local router استطاع امتلاك port 80 بعد زوال التعارض. لم يتم تنفيذ أي أمر <code>Stop-Service</code> أو <code>Start-Service</code> أو تعديل Windows feature أو تعديل config.</p>
+
+<h3>9. البدائل المعروضة لو المشكلة رجعت</h3>
+<p>لم يتم تنفيذ أي بديل علاجي في هذه المحطة لأن الحالة النهائية أصبحت سليمة بدون تدخل. لو عادت المشكلة، فالبدائل الفنية هي:</p>
+<table>
+<thead><tr><th>البديل</th><th>الفائدة</th><th>التكلفة/المخاطر</th></tr></thead>
+<tbody>
+<tr><td>إيقاف/تعطيل مسبب IIS/HTTP.sys على port 80</td><td>يعيد LocalWP router لامتلاك <code>shemostudio.local</code> طبيعيًا</td><td>يحتاج موافقة صريحة؛ قد يؤثر على أي مشروع/خدمة محلية تعتمد على IIS؛ لا يتم تنفيذه بدون خطة واضحة</td></tr>
+<tr><td>استخدام LocalWP internal route مؤقتًا</td><td>مفيد للاختبارات الآلية بدون لمس خدمات Windows</td><td>ليس تجربة استخدام طبيعية في المتصفح؛ قد يكسر الروابط لو استُخدم بدون Host صحيح؛ حل تطوير مؤقت فقط</td></tr>
+<tr><td>تعديل إعداد LocalWP/Router لو متاح من واجهة LocalWP</td><td>يحافظ على إدارة LocalWP الرسمية بدل لمس ملفات مولدة</td><td>يعتمد على وجود إعداد واضح؛ أي تعديل مباشر في ملفات router المولدة مؤجل لموافقة صريحة</td></tr>
+<tr><td>ترك المشكلة موثقة وتأجيلها للاستضافة الحقيقية</td><td>أقل مخاطرة ولا يغير جهاز التطوير</td><td>المشكلة قد ترجع في جلسات LocalWP لاحقة وتحتاج نفس التشخيص</td></tr>
+</tbody>
+</table>
+
+<h3>10. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>لم يتم تغيير <code>WordPress Address</code> أو <code>Site Address</code>.</li>
+<li>لم يتم استخدام Tunnel.</li>
+<li>لم يتم إيقاف أو تشغيل أو تعطيل أي خدمة Windows أو IIS أو HTTP.sys.</li>
+<li>لم يتم تعديل ملفات LocalWP/Nginx المولدة تلقائيًا.</li>
+<li>لم يتم تعديل <code>APPROVED-DECISIONS.md</code> لأن مفيش قرار جديد صريح.</li>
+<li>لم يتم الانتقال للمحطة 13.</li>
+</ul>
+
+<div class="gate">
+<strong>11. بوابة المراجعة:</strong> المحطة 12 خلصت كتشخيص read-only: السبب المؤكد كان تعارض امتلاك port 80 بين IIS/HTTP.sys وLocalWP router. في بداية الفحص كان IIS يرد على <code>shemostudio.local</code>، وفي نهاية الفحص أصبح Local router <code>nginx.exe</code> هو المالك لـ80/443 وبدأ <code>http://shemostudio.local/</code> يرجع WordPress 200 بشكل طبيعي. لم يحدث أي تغيير يدوي في الخدمات أو URLs أو configs. في انتظار جلسة جديدة للمحطة 13 فقط، بدون تنفيذ أي محطة إضافية هنا.
+</div>
+</div>
+
 </body>
 </html>
