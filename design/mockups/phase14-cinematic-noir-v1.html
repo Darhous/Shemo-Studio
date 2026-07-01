@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shemo Studio — Cinematic Noir Mockup</title>
   <link rel="icon" href="phase14-favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Fraunces:opsz,wght@9..144,600..900&family=Inter:wght@400;600;700;800&family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0E0F12;
@@ -17,6 +20,10 @@
       --focus: #FF5A2C;
       --shadow: rgba(0, 0, 0, .34);
       --max: 1180px;
+      --font-body: Inter, "Segoe UI", Arial, sans-serif;
+      --font-display: "Fraunces", Georgia, serif;
+      --font-arabic-display: "Aref Ruqaa", "Noto Kufi Arabic", serif;
+      --font-arabic-body: "Noto Kufi Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
     }
 
     * {
@@ -35,7 +42,7 @@
         linear-gradient(180deg, rgba(245, 242, 236, .025) 1px, transparent 1px) 0 0 / 72px 72px,
         var(--bg);
       color: var(--text);
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      font-family: var(--font-body);
       line-height: 1.55;
     }
 
@@ -93,9 +100,9 @@
 
     .brand-name {
       margin: 0;
-      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-      font-size: 1.55rem;
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 1.42rem;
+      font-weight: 800;
       line-height: 1;
     }
 
@@ -204,10 +211,11 @@
     .hero-title {
       max-width: 830px;
       margin: 0;
-      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-      font-size: 6.4rem;
-      line-height: .9;
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 5.85rem;
+      line-height: .92;
+      font-weight: 850;
+      font-variation-settings: "opsz" 96;
     }
 
     .hero-title span {
@@ -243,7 +251,7 @@
       max-width: 510px;
       margin-top: 20px;
       color: var(--text-muted);
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      font-family: var(--font-arabic-body);
     }
 
     .storyboard {
@@ -305,9 +313,10 @@
 
     .frame-title {
       margin: 32px 0 12px;
-      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-      font-size: 1.72rem;
-      line-height: 1.05;
+      font-family: var(--font-display);
+      font-size: 1.58rem;
+      line-height: 1.08;
+      font-weight: 800;
     }
 
     .sketch-line {
@@ -343,9 +352,10 @@
 
     .section-title {
       margin: 0;
-      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-family: var(--font-display);
       font-size: 3.4rem;
-      line-height: .98;
+      line-height: 1.02;
+      font-weight: 820;
     }
 
     .section-copy {
@@ -401,6 +411,85 @@
 
     .service-band {
       background: var(--surface);
+    }
+
+    .rtl-preview {
+      background:
+        linear-gradient(270deg, rgba(255, 90, 44, .1), transparent 42%),
+        var(--bg);
+    }
+
+    .rtl-preview .section-title,
+    .rtl-preview .eyebrow,
+    .rtl-preview .button {
+      font-family: var(--font-arabic-body);
+    }
+
+    .rtl-preview .section-title {
+      font-family: var(--font-arabic-display);
+      line-height: 1.18;
+    }
+
+    .rtl-hero {
+      direction: rtl;
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(340px, .58fr);
+      gap: 42px;
+      align-items: center;
+      padding: 30px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .rtl-hero h2 {
+      margin: 0;
+      font-family: var(--font-arabic-display);
+      font-size: 4.2rem;
+      line-height: 1.18;
+      font-weight: 700;
+    }
+
+    .rtl-hero p {
+      max-width: 670px;
+      margin: 18px 0 0;
+      color: var(--text-muted);
+      font-family: var(--font-arabic-body);
+      font-size: 1rem;
+    }
+
+    .rtl-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .rtl-frames {
+      display: grid;
+      gap: 14px;
+    }
+
+    .rtl-frame {
+      min-height: 118px;
+      padding: 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .rtl-frame b {
+      display: block;
+      color: var(--accent);
+      font-family: var(--font-body);
+      font-size: .78rem;
+      margin-bottom: 16px;
+    }
+
+    .rtl-frame span {
+      font-family: var(--font-arabic-display);
+      font-size: 1.55rem;
+      line-height: 1.25;
     }
 
     .services {
@@ -557,9 +646,10 @@
 
     .cta-strip h2 {
       margin: 0;
-      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-family: var(--font-display);
       font-size: 3rem;
       line-height: 1;
+      font-weight: 820;
     }
 
     .cta-strip p {
@@ -585,12 +675,13 @@
       .hero-inner,
       .section-head,
       .system-grid,
+      .rtl-hero,
       .cta-strip {
         grid-template-columns: 1fr;
       }
 
       .hero-title {
-        font-size: 4.6rem;
+        font-size: 4.35rem;
       }
 
       .storyboard {
@@ -661,7 +752,7 @@
       }
 
       .hero-title {
-        font-size: 3.15rem;
+        font-size: 2.88rem;
       }
 
       .hero-title span {
@@ -680,6 +771,14 @@
       .section-title,
       .cta-strip h2 {
         font-size: 2.3rem;
+      }
+
+      .rtl-hero {
+        padding: 20px;
+      }
+
+      .rtl-hero h2 {
+        font-size: 2.55rem;
       }
 
       .mark-row,
@@ -709,9 +808,10 @@
         <a class="brand" href="#top" aria-label="Shemo Studio home">
           <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
             <rect width="64" height="64" rx="14" fill="#0E0F12"/>
-            <path d="M14 18 C21 11, 34 11, 38 19 C42 28, 30 31, 22 35 C12 40, 12 48, 22 52 C30 55, 42 53, 47 44" fill="none" stroke="#F5F2EC" stroke-width="4.6" stroke-linecap="round"/>
-            <path d="M50 19 C44 13, 32 13, 28 20 C25 27, 35 31, 43 35 C52 39, 53 47, 44 52 C36 56, 25 53, 20 45" fill="none" stroke="#F5F2EC" stroke-width="3" stroke-linecap="round" opacity=".72"/>
-            <path d="M13 13 L51 13 M13 53 L51 53" fill="none" stroke="#FF5A2C" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="9" y="9" width="46" height="46" rx="6" fill="#1C1E22" stroke="#33363C"/>
+            <path d="M26 16 C19 13, 14 16, 14 22 C14 29, 26 27, 26 34 C27 42, 15 39, 14 47 C14 53, 21 56, 28 51" fill="none" stroke="#F5F2EC" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M45 16 C38 13, 33 16, 33 22 C33 29, 45 27, 45 34 C46 42, 34 39, 33 47 C33 53, 40 56, 47 51" fill="none" stroke="#F5F2EC" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 10 H50 M14 54 H50" fill="none" stroke="#FF5A2C" stroke-width="2" stroke-linecap="round"/>
           </svg>
           <span>
             <span class="brand-name">Shemo Studio</span>
@@ -858,6 +958,44 @@
         </div>
       </section>
 
+      <section class="section rtl-preview" id="rtl-preview" lang="ar" dir="rtl">
+        <div class="section-inner">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">RTL-first preview</p>
+              <h2 class="section-title">اختبار اتجاه العربية قبل الاعتماد.</h2>
+            </div>
+            <p class="section-copy">هذا القسم ليس ترجمة نهائية، لكنه يختبر العنوان العربي الكبير، اتجاه الواجهة، وحركة القراءة من اليمين إلى اليسار.</p>
+          </div>
+
+          <div class="rtl-hero">
+            <div>
+              <p class="eyebrow">استوديو بصري سينمائي</p>
+              <h2>من الاسكتش إلى الشاشة</h2>
+              <p>نموذج مصغّر للنسخة العربية الافتراضية: عنوان بعرض عربي من Google Fonts، نص أساسي واضح، وأزرار تبدأ من يمين الشاشة بما يناسب قرار RTL-first.</p>
+              <div class="rtl-actions">
+                <a class="button button-primary" href="#start">ابدأ مشروعك</a>
+                <a class="button button-secondary" href="#work">شاهد الأعمال</a>
+              </div>
+            </div>
+            <div class="rtl-frames" aria-label="Arabic storyboard preview">
+              <div class="rtl-frame">
+                <b>01</b>
+                <span>فكرة مرسومة</span>
+              </div>
+              <div class="rtl-frame">
+                <b>02</b>
+                <span>إيقاع بصري</span>
+              </div>
+              <div class="rtl-frame">
+                <b>03</b>
+                <span>نتيجة جاهزة للشاشة</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="brand">
         <div class="section-inner">
           <div class="section-head">
@@ -875,27 +1013,30 @@
                 <div class="mark-option">
                   <svg viewBox="0 0 100 100" aria-hidden="true">
                     <rect width="100" height="100" rx="14" fill="#0E0F12" stroke="#33363C"/>
-                    <path d="M20 28 C33 15, 55 16, 63 30 C72 48, 50 53, 35 60 C18 68, 18 82, 36 88 C50 93, 70 89, 78 73" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round"/>
-                    <path d="M80 30 C68 18, 49 17, 41 31 C33 48, 55 54, 70 61 C88 69, 88 82, 72 89 C56 96, 37 89, 29 76" fill="none" stroke="#F5F2EC" stroke-width="4.5" stroke-linecap="round" opacity=".7"/>
-                    <path d="M18 18 H82 M18 84 H82" stroke="#FF5A2C" stroke-width="4" stroke-linecap="round"/>
+                    <rect x="15" y="15" width="70" height="70" rx="8" fill="#1C1E22" stroke="#33363C"/>
+                    <path d="M39 25 C28 20, 20 25, 20 36 C19 49, 39 46, 40 58 C41 72, 21 68, 20 82 C19 92, 33 96, 44 88" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M69 25 C58 20, 50 25, 50 36 C49 49, 69 46, 70 58 C71 72, 51 68, 50 82 C49 92, 63 96, 74 88" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M21 16 H79 M21 84 H79" stroke="#FF5A2C" stroke-width="3.5" stroke-linecap="round"/>
                   </svg>
-                  <p>Primary SS frame</p>
+                  <p>Primary split SS frame</p>
                 </div>
                 <div class="mark-option">
                   <svg viewBox="0 0 100 100" aria-hidden="true">
-                    <circle cx="50" cy="50" r="42" fill="#0E0F12" stroke="#33363C"/>
-                    <path d="M23 34 C37 19, 59 22, 64 36 C70 53, 45 54, 34 64 C22 75, 35 87, 55 82 C66 79, 73 71, 77 62" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round"/>
-                    <path d="M20 20 L82 82" stroke="#FF5A2C" stroke-width="3" stroke-linecap="round"/>
+                    <rect width="100" height="100" rx="10" fill="#0E0F12" stroke="#33363C"/>
+                    <path d="M37 22 C25 22, 18 28, 19 39 C20 51, 39 48, 39 59 C39 73, 20 69, 19 82 C18 92, 31 96, 44 88" fill="none" stroke="#F5F2EC" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M73 22 C61 22, 54 28, 55 39 C56 51, 75 48, 75 59 C75 73, 56 69, 55 82 C54 92, 67 96, 80 88" fill="none" stroke="#F5F2EC" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 50 H84" stroke="#FF5A2C" stroke-width="3" stroke-linecap="round"/>
                   </svg>
-                  <p>Alt A diagonal cue</p>
+                  <p>Alt A horizontal cut</p>
                 </div>
                 <div class="mark-option">
                   <svg viewBox="0 0 100 100" aria-hidden="true">
-                    <rect x="14" y="14" width="72" height="72" rx="4" fill="#0E0F12" stroke="#33363C"/>
-                    <path d="M28 30 C42 18, 61 22, 63 36 C65 48, 46 49, 36 58 C25 68, 35 82, 55 78 C65 76, 72 68, 76 59" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round"/>
-                    <path d="M24 71 H78" stroke="#FF5A2C" stroke-width="4" stroke-linecap="round"/>
+                    <rect x="10" y="10" width="80" height="80" rx="4" fill="#0E0F12" stroke="#33363C"/>
+                    <path d="M38 24 C26 20, 20 27, 20 38 C20 50, 38 48, 39 59 C40 73, 22 69, 21 82" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M69 24 C57 20, 51 27, 51 38 C51 50, 69 48, 70 59 C71 73, 53 69, 52 82" fill="none" stroke="#F5F2EC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M23 18 H77 M23 88 H77" stroke="#FF5A2C" stroke-width="3.5" stroke-linecap="round"/>
                   </svg>
-                  <p>Alt B sharp frame</p>
+                  <p>Alt B sharp split</p>
                 </div>
               </div>
             </section>

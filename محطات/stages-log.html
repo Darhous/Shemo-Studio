@@ -1036,9 +1036,9 @@ design/mockups/phase14-ss-monogram.svg
 design/mockups/phase14-favicon.svg</code></pre>
 <table>
 <tr><th>البديل</th><th>الفكرة</th></tr>
-<tr><td>Primary SS frame</td><td>مونوجرام SS داخل frame سينمائي بخطوط sketch عاجية وخط Ember محدود</td></tr>
-<tr><td>Alt A diagonal cue</td><td>دائرة وخط قطري يوحي بالتحويل من sketch إلى screen</td></tr>
-<tr><td>Alt B sharp frame</td><td>إطار أكثر حدة وأقل دائرية</td></tr>
+<tr><td>Primary split SS frame</td><td>حرفان S منفصلان داخل frame سينمائي بخط Ember محدود</td></tr>
+<tr><td>Alt A horizontal cut</td><td>حرفان S منفصلان مع خط أفقي كإشارة cut، بدون أي دلالة منع/إلغاء</td></tr>
+<tr><td>Alt B sharp split</td><td>نسخة أكثر حدة بإطار مربع وحرفين منفصلين</td></tr>
 </table>
 <p>لم يتم اعتبار أي بديل “معتمد نهائيًا”؛ هذه بوابة مراجعة بصرية فقط.</p>
 
@@ -1081,6 +1081,16 @@ design/mockups/phase14-favicon.svg</code></pre>
 <div class="gate">
 <strong>6. بوابة المراجعة:</strong> بوابة مراجعة المحطة 14 جاهزة: الموكاب الحي، wordmark، monogram، favicon، وسكريبت التباين موجودين داخل الريبو. المطلوب الآن اعتماد المستخدم صراحةً لأحد اتجاهات العلامة/الموكاب أو طلب تعديلات. بعد الاعتماد فقط يتم تنفيذ الجزء الثالث: تحويل التوكينز المعتمدة إلى CSS custom properties داخل <code>themes/shemo-child</code> وتطبيقها كـglobal styles في GenerateBlocks ومكونات الأزرار/الكروت/حقول الفورم.
 </div>
+
+<h3>7. Round 2 — تعديلات بعد مراجعة المستخدم</h3>
+<p>بعد مراجعة المستخدم للموكاب في متصفح حقيقي، ظهرت 3 ملاحظات مانعة للاعتماد النهائي: خط Impact/Haettenschweiler، قراءة المونوجرام كـ<code>SS</code>، وتمثيل العربية/RTL.</p>
+<ol>
+<li><strong>الخط:</strong> تم استبدال Impact/Haettenschweiler بتحميل Google Fonts فعليًا داخل الموكاب: <code>Fraunces</code> للـdisplay الإنجليزي، <code>Inter</code> للنص، <code>Aref Ruqaa</code> للـdisplay العربي، و<code>Noto Kufi Arabic</code> للنص العربي.</li>
+<li><strong>المونوجرام:</strong> التصميم السابق لم يكن يقرأ كـ<code>SS</code> بوضوح، وAlt A كان يوحي بعلامة منع/إلغاء. تم إعادة تصميمه بالكامل كحرفين S منفصلين بصريًا داخل frame، وتحديث ملفات <code>phase14-cinematic-noir-v1.html</code> و<code>phase14-wordmark.svg</code> و<code>phase14-ss-monogram.svg</code> و<code>phase14-favicon.svg</code>.</li>
+<li><strong>RTL/العربي:</strong> أُضيف قسم <code>RTL-first preview</code> داخل الموكاب لاختبار اتجاه عربي حقيقي، مع <code>dir="rtl"</code> و<code>lang="ar"</code> وhero عربي مصغّر بعنوان <code>من الاسكتش إلى الشاشة</code>.</li>
+</ol>
+<p>تحققات Round 2: تحميل الخطوط رجع <code>true</code> في <code>document.fonts.check()</code> لـ<code>Fraunces</code> و<code>Inter</code> و<code>Aref Ruqaa</code> و<code>Noto Kufi Arabic</code>، لا يوجد horizontal overflow على عرض موبايل <code>390px</code>، اتجاه قسم RTL هو <code>rtl</code>، وتم اختبار الفافيكون/المونوجرام كـinline SVG عند <code>16px</code> و<code>32px</code> و<code>64px</code>. تم استبعاد <code>Aref Ruqaa Ink</code> بعد فحص بصري لأنه ظهر كـcolor/ink font أحمر ويكسر قيد Ember كـaccent محدود. اختبار التباين لم يتغير لأن الألوان لم تتغير.</p>
+<p>الحدود ما زالت كما هي: لم يتم تنفيذ Design System داخل <code>themes/shemo-child</code>، ولم يتم لمس GenerateBlocks أو WP-CLI في Round 2. الاعتماد النهائي ما زال مطلوبًا قبل الجزء الثالث.</p>
 </div>
 
 </body>

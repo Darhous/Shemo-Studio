@@ -1110,9 +1110,9 @@ design/mockups/phase14-favicon.svg
 
 | البديل | الفكرة |
 |---|---|
-| Primary SS frame | مونوجرام SS داخل frame سينمائي بخطوط sketch عاجية وخط Ember محدود |
-| Alt A diagonal cue | دائرة وخط قطري يوحي بالتحويل من sketch إلى screen |
-| Alt B sharp frame | إطار أكثر حدة وأقل دائرية |
+| Primary split SS frame | حرفان S منفصلان داخل frame سينمائي بخط Ember محدود |
+| Alt A horizontal cut | حرفان S منفصلان مع خط أفقي كإشارة cut، بدون أي دلالة منع/إلغاء |
+| Alt B sharp split | نسخة أكثر حدة بإطار مربع وحرفين منفصلين |
 
 لم يتم اعتبار أي بديل “معتمد نهائيًا”؛ هذه بوابة مراجعة بصرية فقط.
 
@@ -1156,3 +1156,30 @@ design/mockups/phase14-contrast-check.py
 
 ### 6. بوابة المراجعة
 بوابة مراجعة المحطة 14 جاهزة: الموكاب الحي، wordmark، monogram، favicon، وسكريبت التباين موجودين داخل الريبو. المطلوب الآن اعتماد المستخدم صراحةً لأحد اتجاهات العلامة/الموكاب أو طلب تعديلات. بعد الاعتماد فقط يتم تنفيذ الجزء الثالث: تحويل التوكينز المعتمدة إلى CSS custom properties داخل `themes/shemo-child` وتطبيقها كـglobal styles في GenerateBlocks ومكونات الأزرار/الكروت/حقول الفورم.
+
+### 7. Round 2 — تعديلات بعد مراجعة المستخدم
+
+بعد مراجعة المستخدم للموكاب في متصفح حقيقي، ظهرت 3 ملاحظات مانعة للاعتماد النهائي:
+
+1. **الخط:** Impact/Haettenschweiler كان يعطي إحساس لافتة تخفيضات، وغير ثابت بين الأجهزة لأنه system stack. تم استبداله بتحميل Google Fonts فعليًا داخل الموكاب:
+   - Display English: `Fraunces` (مجاني من Google Fonts) بدل Impact.
+   - Body: `Inter` كما كان.
+   - Arabic display preview: `Aref Ruqaa`.
+   - Arabic body: `Noto Kufi Arabic`.
+2. **المونوجرام:** التصميم السابق لم يكن يقرأ كـ`SS` بوضوح، وAlt A كان يوحي بعلامة منع/إلغاء. تم إعادة تصميم المونوجرام بالكامل كحرفين S منفصلين بصريًا داخل frame، وتحديث:
+   - `phase14-cinematic-noir-v1.html`
+   - `phase14-wordmark.svg`
+   - `phase14-ss-monogram.svg`
+   - `phase14-favicon.svg`
+3. **RTL/العربي:** أُضيف قسم `RTL-first preview` داخل الموكاب لاختبار اتجاه عربي حقيقي، وليس سطرًا ديكوريًا فقط. القسم يستخدم `dir="rtl"` و`lang="ar"`، ويعرض hero عربي مصغّر بعنوان `من الاسكتش إلى الشاشة`.
+
+تحققات Round 2:
+
+- تم تحميل الخطوط فعليًا في Chrome عبر Google Fonts؛ `document.fonts.check()` رجع `true` لـ`Fraunces` و`Inter` و`Aref Ruqaa` و`Noto Kufi Arabic`.
+- تم استبعاد `Aref Ruqaa Ink` بعد فحص بصري لأنه ظهر كـcolor/ink font أحمر ويكسر قيد Ember كـaccent محدود، واستُبدل بـ`Aref Ruqaa` العادي.
+- لا يوجد horizontal overflow على عرض موبايل `390px`.
+- اتجاه قسم RTL المقروء من CSS هو `rtl`.
+- تم اختبار الفافيكون/المونوجرام فعليًا كـinline SVG عند `16px` و`32px` و`64px`; النسخة الجديدة تقرأ كـ`SS` بوضوح أفضل من النسخة السابقة.
+- اختبار التباين لم يتغير لأن الألوان لم تتغير؛ نتائج `phase14-contrast-check.py` ما زالت مطابقة للأرقام السابقة.
+
+الحدود ما زالت كما هي: لم يتم تنفيذ Design System داخل `themes/shemo-child`، ولم يتم لمس GenerateBlocks أو WP-CLI في Round 2. الاعتماد النهائي ما زال مطلوبًا قبل الجزء الثالث.
