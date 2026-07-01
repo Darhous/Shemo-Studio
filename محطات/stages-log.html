@@ -674,5 +674,59 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 
 </div>
 
+<div class="stage" id="stage-10">
+<h2>المحطة 10 — ربط FluentCRM بـ SMTP حقيقي</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: قرار جديد (تركيب إضافة) + تعديل فعلي على موقع LocalWP — تركيب FluentSMTP وربطها بحساب Gmail SMTP حقيقي
+</p>
+
+<h3>السياق</h3>
+<p>من البندين المتبقيين منذ المحطة 9 (GA4/Site Kit OAuth، FluentCRM SMTP)، المستخدم بدأ بعرض FluentCRM SMTP كخيار أول لأنه عنده حساب SMTP جاهز فعليًا، بعكس GA4 اللي لسه محتاج حل لمشكلة الوصول العام (استضافة حقيقية أو نفق مثل ngrok) قبل أي محاولة.</p>
+
+<h3>1. اكتشاف فني قبل أي تنفيذ</h3>
+<p>فحص كود FluentCRM نفسه (<code>Mailer.php</code>, <code>SettingsController.php</code>) كشف إن FluentCRM <strong>مفيهوش إعدادات SMTP مدمجة جوّاه خالص</strong> — كل الإرسال بيمر عبر <code>wp_mail()</code> الأساسية، وكوده نفسه بيدوّر على <code>get_option('fluentmail-settings')</code> (إضافة FluentSMTP تحديدًا) عشان يعرض حالة الاتصال. فحص مجلد الإضافات أكّد إنها <strong>مش متركّبة خالص</strong>. هذا اكتشاف فتح <strong>قرار جديد غير موجود في القرارات 1-16</strong> — عُرض على المستخدم صراحةً قبل أي تنفيذ.</p>
+
+<h3>2. جمع بيانات الاتصال الحقيقية</h3>
+<p>المستخدم وفّر حساب Gmail حقيقي (إيميل + App Password مخصص من 16 حرف — يعني الحساب مفعّل عليه 2FA، الأسلوب الآمن الصحيح، مش كلمة مرور الحساب الرئيسية) وطلب توثيق أن هذا اتصال <strong>مؤقت لمرحلة التطوير/الاختبار فقط</strong>، وأن مزوّد الإنتاج النهائي هيتحدد عند تجهيز الاستضافة الحقيقية وإيميل الدومين.</p>
+
+<h3>3. تركيب FluentSMTP وفحص الـ Schema الفعلي</h3>
+<p>run-hash اتأكد إنه لسه <code>3PbB5bi_t</code>. اتركبت وتفعّلت <code>fluent-smtp</code> v2.2.95 عبر wp-cli (14 → 15 إضافة نشطة). اتفحص كود الإضافة نفسها (<code>Providers/Smtp/ValidatorTrait.php</code>, <code>Providers/config.php</code>, <code>Models/Settings.php</code>, <code>Functions/helpers.php</code>) بدل التخمين، ولوحظ: آلية تشفير مدمجة رسمية (AES-256-CTR) عبر <code>fluentMailGetSettings()</code>/<code>fluentMailSetSettings()</code>، والطريقة الرسمية لحفظ اتصال هي <code>\FluentMail\App\Models\Settings::store()</code> — نفس كود واجهة الإدارة نفسها، مش تعديل <code>wp_options</code> يدوي.</p>
+
+<h3>4. التنفيذ الفعلي</h3>
+<p>عبر <code>wp eval-file</code>، استُدعيت <code>Settings::store()</code> ببيانات حقيقية: <code>host=smtp.gmail.com</code>, <code>port=587</code>, <code>encryption=tls</code>, <code>username=darhous2023@gmail.com</code>, <code>sender_name=Shemo Studio</code>. تم التحقق سطر-سطر من القراءة الرجعية عبر <code>fluentMailGetSettings()</code> (تفك التشفير تلقائيًا): كل القيم مطابقة تمامًا، وطول الباسورد بعد فك التشفير 16 حرف مطابق حرفيًا للأصل.</p>
+
+<h3>5. اختبار end-to-end حقيقي (إرسال فعلي)</h3>
+<p>اتنفّذ <code>wp_mail()</code> فعليًا لإرسال إيميل اختبار حقيقي لـ <code>ahmeddarhous@gmail.com</code>. النتيجة: <strong><code>SENT=TRUE</code></strong> بدون أي خطأ على <code>wp_mail_failed</code> — معاملة SMTP فعلية نجحت (مصادقة صحيحة + تسليم)، مش بس "إعدادات اتخزّنت". تكرر الإرسال مرتين، نفس النتيجة الناجحة.</p>
+
+<h3>6. فجوة موثّقة (غير حرجة): جدول سجل FluentSMTP الداخلي</h3>
+<p>جدول <code>wp_fluentmail_logs</code> متعمَلش تلقائيًا عند التفعيل عبر wp-cli، وحتى استدعاء الـActivator يدويًا ماخلقوش. <strong>مش عائق وظيفي</strong> — الإرسال شغّال ومُتحقق منه فعليًا (الخطوة 5) — لكنه بند مفتوح: شاشة "Email Log" في واجهة FluentSMTP لن تعرض تاريخ حتى الجدول يتعمل (ممكن يحصل تلقائيًا أول زيارة admin لصفحة الإعدادات).</p>
+
+<h3>7. التحقق من عدم وجود Regression</h3>
+<ul>
+<li><code>/</code> (200)، <code>/work/</code> (200)، <code>/wp-login.php</code> (200)، <code>/shop/</code> (200)، <code>/wp-admin/admin.php?page=fluent-mail</code> (302 — طبيعي، إعادة توجيه لتسجيل الدخول).</li>
+<li><code>wp plugin list --status=active</code>: <strong>15 إضافة نشطة</strong> (14 + FluentSMTP).</li>
+<li>مفيش <code>debug.log</code> جديد.</li>
+</ul>
+
+<h3>8. التحقق من عدم تسريب السر</h3>
+<p><code>git grep</code> على الريبو المحلي كامل (الباسورد والإيميل) رجّع <strong>صفر نتائج</strong> — البيانات مش متتبّعة بـGit، متخزّنة فقط في <code>wp_options</code> (<code>fluentmail-settings</code>) مشفّرة.</p>
+
+<h3>9. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>الاتصال الحالي <strong>مؤقت لمرحلة LocalWP/التطوير فقط</strong> — موثّق في <code>APPROVED-DECISIONS.md</code> (قرار 17): مزوّد الإنتاج النهائي لسه قرار مفتوح.</li>
+<li>جدول سجل FluentSMTP الداخلي متعمَلش — بند مفتوح غير حرج.</li>
+<li>GA4 (Site Kit) لسه قيده الفني قائم (استضافة محلية، Google محتاج تحقق ملكية عن بُعد) — برّة نطاق هذه المحطة.</li>
+<li>الفجوة الفنية بتاعة sitemaps 404 (المحطة 5) لسه مفتوحة.</li>
+</ul>
+
+<div class="gate">
+<strong>10. بوابة المراجعة:</strong> المحطة 10 خلصت: FluentCRM بقى قادر فعليًا على إرسال بريد حقيقي عبر اتصال SMTP حقيقي — تم اكتشاف إن FluentCRM محتاج طبقة تسليم منفصلة (بدل افتراضها موجودة)، عُرض القرار الجديد على المستخدم قبل أي تركيب، اتركبت FluentSMTP (مجاني)، اتربطت بحساب Gmail حقيقي عبر الدالة الرسمية للإضافة بدل تعديل قاعدة بيانات يدوي، البيانات مشفّرة بآلية الإضافة نفسها، واتعمل اختبار إرسال فعلي نجح مرتين. <code>APPROVED-DECISIONS.md</code> اتحدّث بقرار جديد رقم 17 (موثّق كمؤقت للتطوير) وقرار 16 اتحدّث ليعكس إن الإرسال شغّال دلوقتي. تحقق كامل من عدم وجود regression وعدم تسريب أي سر.
+البند المتبقي الوحيد من فتحة المحطة 7 هو GA4/Site Kit OAuth، المحتاج حل مشكلة الوصول العام (استضافة حقيقية أو ngrok) قبل أي محاولة ربط — في انتظار توجيه المستخدم للانتقال إلى <strong>المحطة 11</strong>.
+</div>
+
+</div>
+
 </body>
 </html>
