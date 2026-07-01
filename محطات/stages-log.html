@@ -728,5 +728,119 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 
 </div>
 
+<div class="stage" id="stage-11">
+<h2>المحطة 11 — Local Analytics Baseline via Burst Statistics Free</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: قرار جديد + تعديل فعلي على موقع LocalWP — تركيب تحليلات محلية مجانية وتعطيل Site Kit مؤقتًا
+</p>
+
+<h3>السياق</h3>
+<p>نطاق المحطة الأصلي كان GA4 عبر Site Kit، لكن الموقع لسه LocalWP فقط (<code>shemostudio.local</code>) وGoogle Site Kit محتاج تحقق ملكية عن بُعد. المستخدم اعتمد بديلًا صريحًا لهذه المحطة: <strong>Local Analytics Baseline via Burst Statistics Free</strong>، بدون Tunnel، بدون تغيير <code>WordPress Address</code> أو <code>Site Address</code>، وبدون أي حساب/اشتراك خارجي.</p>
+
+<h3>1. اعتماد القرار الجديد</h3>
+<ul>
+<li><code>APPROVED-DECISIONS.md</code> اتحدّث بالقرار 18: Burst Statistics Free كخط أساس تحليلات محلي مؤقت، وكل بيانات LocalWP بيانات اختبار فقط.</li>
+<li>اتضاف القرار 19: <strong>Production GA4 + Search Console via Site Kit</strong> كبند إنتاج مستقل لاحق بعد الدومين والاستضافة الحقيقيين.</li>
+<li>القرار 15 اتحدّث ليعكس إن Site Kit مثبتة لكن <strong>مُعطّلة مؤقتًا</strong> من المحطة 11، ولم يتم OAuth أو إنشاء GA4 Property.</li>
+</ul>
+
+<h3>2. تركيب Burst Statistics من المصدر الرسمي فقط</h3>
+<p>تم تثبيت وتفعيل <code>burst-statistics</code> v3.5.1 عبر wp-cli من مستودع WordPress الرسمي:</p>
+<pre><code>Installing Burst Statistics – Simple WordPress Analytics (Google Analytics Alternative) (3.5.1)
+Downloading installation package from https://downloads.wordpress.org/plugin/burst-statistics.3.5.1.zip...
+Plugin installed successfully.
+Plugin 'burst-statistics' activated.</code></pre>
+<p>لم يتم إنشاء أي حساب خارجي، ولم يتم إدخال أي license أو اشتراك Pro.</p>
+
+<h3>3. ضبط Cookieless Tracking</h3>
+<p>فحص كود الإضافة أكد إن الإعداد الرسمي اسمه <code>enable_cookieless_tracking</code>، وإن الإضافة توفر أمر wp-cli رسمي:</p>
+<pre><code>wp burst save --enable_turbo_mode=true --enable_cookieless_tracking=true</code></pre>
+<p>تم استخدام الأمر الرسمي بدل تعديل <code>wp_options</code> يدويًا. القراءة الرجعية أكدت:</p>
+<pre><code>{"enable_cookieless_tracking":1,"enable_turbo_mode":1}</code></pre>
+
+<h3>4. التخزين المحلي داخل WordPress</h3>
+<p>Burst أنشأت جداول محلية داخل قاعدة بيانات WordPress، منها:</p>
+<ul>
+<li><code>wp_burst_statistics</code></li>
+<li><code>wp_burst_sessions</code></li>
+<li><code>wp_burst_goals</code></li>
+<li><code>wp_burst_goal_statistics</code></li>
+<li><code>wp_burst_known_uids</code></li>
+<li><code>wp_burst_devices</code> / <code>wp_burst_browsers</code> / <code>wp_burst_platforms</code></li>
+</ul>
+<p>القيم الأساسية اتخزنت في <code>wp_options</code> مثل <code>burst_options_settings</code> و<code>burst-current-version</code>.</p>
+
+<h3>5. إزالة أي تحميل Google Analytics / Tag Manager</h3>
+<p>بعد تركيب Burst اتضح إن Site Kit، رغم عدم ربطها بحساب Google، كانت تضيف <code>dns-prefetch</code> لـ <code>www.googletagmanager.com</code>. لذلك تم تعطيل <code>google-site-kit</code> مؤقتًا لتحقيق شرط عدم تحميل/تلميح GA/GTM على LocalWP.</p>
+<pre><code>Plugin 'google-site-kit' deactivated.</code></pre>
+<ul>
+<li><code>google-site-kit</code> = inactive، v1.182.0</li>
+<li><code>burst-statistics</code> = active، v3.5.1</li>
+<li><code>complianz-gdpr</code> = active، v7.5.0</li>
+<li><code>siteurl</code> و<code>home</code> فضلا كما هما: <code>http://shemostudio.local</code></li>
+</ul>
+<p>فحص HTML بعد التعطيل أظهر سكريبتات Burst وComplianz فقط ضمن نطاق التحليلات/الموافقة:</p>
+<pre><code>&lt;script id="burst-timeme-js" async src="http://shemostudio.local/wp-content/plugins/burst-statistics/assets/js/timeme/timeme.min.js?..."&gt;&lt;/script&gt;
+&lt;script id="burst-js" defer src="http://shemostudio.local/wp-content/uploads/burst/js/burst.min.js?..."&gt;&lt;/script&gt;
+&lt;script defer id="cmplz-cookiebanner-js" src="http://shemostudio.local/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.js?..."&gt;&lt;/script&gt;</code></pre>
+<p>لم يظهر أي تحميل لـ <code>googletagmanager.com</code> أو <code>google-analytics.com</code> بعد تعطيل Site Kit.</p>
+
+<h3>6. اختبار Frontend فعلي وتسجيل Page Views</h3>
+<p>أثناء التحقق اتضح إن <code>http://shemostudio.local/</code> على port 80 بيرجع صفحة IIS صغيرة بدل WordPress، لأن port 80 محجوز بواسطة Windows/IIS. موقع LocalWP الحقيقي شغال على Nginx الداخلي عند <code>127.0.0.1:10005</code>.</p>
+<p>بدون تغيير عناوين WordPress وبدون Tunnel، تم استخدام proxy محلي مؤقت داخل جلسة الاختبار فقط يمرر الطلبات إلى <code>127.0.0.1:10005</code> مع <code>Host: shemostudio.local</code>. اتقفل بعد الاختبار، ولم يعرّض الموقع للإنترنت.</p>
+<p>تم فتح <code>/</code> و<code>/work/</code> و<code>/shop/</code> من الواجهة. الشبكة أظهرت تحميل سكريبت Burst المحلي ثم POSTs محلية إلى:</p>
+<pre><code>/wp-json/burst/v1/track/</code></pre>
+<p>لم تظهر أي طلبات إلى Google Analytics أو Google Tag Manager أو <code>burst-statistics.com</code> أو أي خدمة تحليلات خارجية. ظهر طلب من حماية المتصفح المحلية Kaspersky أثناء Playwright، وليس صادرًا من WordPress أو Burst.</p>
+
+<h3>7. التحقق من قاعدة البيانات ولوحة WordPress</h3>
+<p>قبل الاختبار كانت جداول Burst فاضية:</p>
+<pre><code>stats=0
+sessions=0</code></pre>
+<p>بعد زيارات الواجهة:</p>
+<pre><code>stats=3
+sessions=1</code></pre>
+<table>
+<thead><tr><th>ID</th><th>page_url</th><th>page_type</th><th>session_id</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>/</code></td><td><code>front-page</code></td><td>1</td></tr>
+<tr><td>2</td><td><code>/work/</code></td><td><code>archive</code></td><td>1</td></tr>
+<tr><td>3</td><td><code>/shop/</code></td><td><code>page</code></td><td>1</td></tr>
+</tbody>
+</table>
+<p>رابط لوحة Burst داخل الإدارة موجود ومتوقع: <code>http://shemostudio.local/wp-admin/admin.php?page=burst</code>. لم يتم عمل تحقق بصري داخل لوحة الإدارة ببيانات دخول المستخدم؛ محاولة توليد auth cookie مؤقت عبر wp-cli فشلت داخل eval، فتم التوقف عنها بدل إنشاء مستخدم مؤقت أو طلب/تخزين credentials.</p>
+
+<h3>8. التحقق من عدم التعارض مع Complianz</h3>
+<p>Complianz بقيت نشطة، وسكريبت البانر ما زال موجودًا في HTML. كود تكامل Burst مع Complianz يترك Burst بدون حظر عند تفعيل Cookieless Tracking:</p>
+<pre><code>if ( (bool) burst_get_option( 'enable_cookieless_tracking' ) ) {
+    return;
+}</code></pre>
+<p>وبالفعل، Burst سجل pageviews رغم وجود Complianz، بدون انتظار موافقة كوكيز، لأن التتبع Cookieless.</p>
+
+<h3>9. ملاحظات تحقق وأخطاء غير مؤثرة</h3>
+<ul>
+<li>تحذيرات <code>php_imagick.dll</code> من LocalWP ظهرت أثناء wp-cli، وليست ناتجة عن Burst تحديدًا.</li>
+<li>طلب يدوي مبكر إلى <code>endpoint.php</code> بجسم JSON غير مطابق تسبب في PHP fatal داخل Burst؛ اختبار الواجهة الحقيقي استخدم REST tracking وسجل البيانات بنجاح.</li>
+<li>استعلام SQL أولي استخدم عمودًا غير موجود، ثم اتراجع واتقرأ الـschema الحقيقي.</li>
+<li>محاولة auth-cookie للوحة الإدارة فشلت داخل eval، ولم يتم إنشاء مستخدم مؤقت أو تخزين credentials.</li>
+</ul>
+
+<h3>10. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>لم يتم تغيير <code>WordPress Address</code> أو <code>Site Address</code>.</li>
+<li>لم يتم استخدام Tunnel أو تعريض LocalWP للإنترنت.</li>
+<li>لم يتم إنشاء GA4 Property أو تنفيذ OAuth أو ربط حساب Google.</li>
+<li>لم يتم حذف Site Kit؛ فقط تم تعطيله مؤقتًا حتى بند الإنتاج.</li>
+<li>بيانات Burst الحالية (3 pageviews + 1 session) بيانات اختبار LocalWP فقط، وليست بيانات إنتاج.</li>
+<li>مشكلة port 80/IIS مقابل LocalWP Nginx الداخلي موثقة ولم تُعالج في هذه المحطة.</li>
+<li>فجوة sitemap 404 وجدول سجل FluentSMTP الداخلي ما زالا مفتوحين.</li>
+</ul>
+
+<div class="gate">
+<strong>11. بوابة المراجعة:</strong> المحطة 11 خلصت بالنطاق الجديد المعتمد: Burst Statistics Free اتثبتت من مستودع WordPress الرسمي، اتفعلت، واتضبطت Cookieless + Turbo عبر أمر الإضافة الرسمي. Site Kit اتعطل مؤقتًا لإزالة أي تلميح/تحميل متعلق بـGoogle Analytics أو Tag Manager، مع تسجيل بند إنتاج مستقل لاحق لـGA4 + Search Console. تحقق فعليًا إن pageviews من الواجهة بتتسجل في جداول WordPress المحلية (<code>wp_burst_statistics</code>, <code>wp_burst_sessions</code>) وإن Complianz ما اتعارضش مع التتبع cookieless. لم يتم تغيير URLs، ولم يُستخدم Tunnel، ولم يتم إنشاء GA4 Property. في انتظار جلسة جديدة للمحطة 12 فقط، بدون تنفيذ أي محطة إضافية هنا.
+</div>
+</div>
+
 </body>
 </html>

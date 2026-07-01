@@ -662,3 +662,186 @@ FluentSMTP عنده جدول DB خاص (`wp_fluentmail_logs`) لعرض سجل ا
 
 ### 10. بوابة المراجعة
 المحطة 10 خلصت: FluentCRM بقى قادر فعليًا على إرسال بريد حقيقي عبر اتصال SMTP حقيقي (مش بس "مفعّل تقنيًا" زي ما كان من المحطة 7) — تم اكتشاف إن FluentCRM محتاج طبقة تسليم منفصلة (بدل افتراض إنها موجودة)، عُرض القرار الجديد على المستخدم قبل أي تركيب، اتركبت FluentSMTP (مجاني)، اتربطت بحساب Gmail حقيقي عبر الدالة الرسمية للإضافة (`Settings::store()`) بدل تعديل قاعدة بيانات يدوي، البيانات مشفّرة بآلية الإضافة نفسها، واتعمل اختبار إرسال فعلي حقيقي (مش نظري) نجح مرتين. `APPROVED-DECISIONS.md` اتحدّث بقرار جديد رقم 17 (موثّق كمؤقت للتطوير) وقرار 16 اتحدّث ليعكس إن الإرسال الفعلي شغّال دلوقتي. تحقق كامل من عدم وجود regression وعدم تسريب أي سر. **البند المتبقي الوحيد من فتحة المحطة 7 هو GA4/Site Kit OAuth، المحتاج حل مشكلة الوصول العام (استضافة حقيقية أو ngrok) قبل أي محاولة ربط — في انتظار توجيه المستخدم للانتقال إلى المحطة 11.**
+
+---
+
+## المحطة 11 — Local Analytics Baseline via Burst Statistics Free
+
+**التاريخ:** 2026-07-01
+**الحالة:** ✅ مكتملة
+**النوع:** قرار جديد + تعديل فعلي على موقع LocalWP — تركيب تحليلات محلية مجانية وتعطيل Site Kit مؤقتًا
+
+### السياق
+نطاق المحطة الأصلي كان GA4 عبر Site Kit، لكن القيد الفني اتأكد قبل التنفيذ: الموقع لسه LocalWP فقط (`shemostudio.local`) وGoogle Site Kit محتاج تحقق ملكية عن بُعد، وبالتالي مش مناسب نبدأ OAuth/GA4 Property دلوقتي. المستخدم اعتمد بديلًا صريحًا لهذه المحطة: **Local Analytics Baseline via Burst Statistics Free**، بدون Tunnel، بدون تغيير `WordPress Address` أو `Site Address`، وبدون أي حساب/اشتراك خارجي.
+
+### 1. اعتماد القرار الجديد
+اتضاف في `APPROVED-DECISIONS.md`:
+- **القرار 18:** Burst Statistics Free كخط أساس تحليلات محلي مؤقت على LocalWP، مع اعتبار كل بيانات LocalWP بيانات اختبار فقط.
+- **القرار 19:** بند إنتاج مستقل لاحق باسم **Production GA4 + Search Console via Site Kit**، لا يُنفذ إلا بعد وجود دومين واستضافة حقيقيين.
+
+تم تحديث القرار 15 كمان ليعكس الواقع الجديد: Site Kit ما زالت مثبتة لكن **مُعطّلة مؤقتًا** من المحطة 11، ولم يتم ربطها بحساب Google ولم يتم إنشاء GA4 Property.
+
+### 2. تركيب Burst Statistics من المصدر الرسمي فقط
+تم تثبيت وتفعيل إضافة `burst-statistics` v3.5.1 عبر wp-cli من مستودع WordPress الرسمي:
+
+```text
+Installing Burst Statistics – Simple WordPress Analytics (Google Analytics Alternative) (3.5.1)
+Downloading installation package from https://downloads.wordpress.org/plugin/burst-statistics.3.5.1.zip...
+Plugin installed successfully.
+Plugin 'burst-statistics' activated.
+```
+
+لم يتم إنشاء أي حساب خارجي، ولم يتم إدخال أي license أو اشتراك Pro.
+
+### 3. ضبط Cookieless Tracking
+بعد فحص كود الإضافة المثبت فعليًا، اتأكد إن الإعداد الرسمي موجود في `includes/Admin/App/config/fields.php` باسم:
+
+```text
+enable_cookieless_tracking
+```
+
+وإن الإضافة توفر أمر wp-cli رسمي:
+
+```text
+wp burst save --enable_turbo_mode=true --enable_cookieless_tracking=true
+```
+
+تم استخدام الأمر الرسمي بدل تعديل `wp_options` يدويًا. القراءة الرجعية من قاعدة البيانات أكدت:
+
+```json
+{"enable_cookieless_tracking":1,"enable_turbo_mode":1}
+```
+
+### 4. التخزين المحلي داخل WordPress
+Burst أنشأت جداول محلية داخل قاعدة بيانات WordPress، منها:
+
+- `wp_burst_statistics`
+- `wp_burst_sessions`
+- `wp_burst_goals`
+- `wp_burst_goal_statistics`
+- `wp_burst_known_uids`
+- `wp_burst_devices`
+- `wp_burst_browsers`
+- `wp_burst_platforms`
+- جداول مساعدة أخرى للأرشفة/البحث/التقارير
+
+القيم الأساسية اتخزنت في `wp_options` تحت خيارات مثل `burst_options_settings` و`burst-current-version`.
+
+### 5. إزالة أي تحميل Google Analytics / Tag Manager
+بعد تركيب Burst ظهر إن Site Kit، رغم إنه غير متصل بحساب Google، كان يضيف `dns-prefetch` لـ `www.googletagmanager.com` في الـHTML. ده مش GA4 فعلي، لكنه تلميح خارجي مرتبط بجوجل، ويتعارض مع شرط المحطة "عدم تحميل Google Analytics أو Google Tag Manager" و"عدم إرسال بيانات إلى خدمات خارجية".
+
+لذلك تم تعطيل `google-site-kit` مؤقتًا:
+
+```text
+Plugin 'google-site-kit' deactivated.
+```
+
+التحقق بعد التعطيل:
+
+- `google-site-kit` = inactive، v1.182.0
+- `burst-statistics` = active، v3.5.1
+- `complianz-gdpr` = active، v7.5.0
+- عدد الإضافات النشطة = 14
+- `siteurl` و`home` فضلا كما هما: `http://shemostudio.local`
+
+فحص HTML الفعلي بعد التعطيل أظهر سكريبتات Burst وComplianz فقط ضمن نطاق التحليلات/الموافقة:
+
+```html
+<script id="burst-timeme-js" async src="http://shemostudio.local/wp-content/plugins/burst-statistics/assets/js/timeme/timeme.min.js?..."></script>
+<script id="burst-js" defer src="http://shemostudio.local/wp-content/uploads/burst/js/burst.min.js?..."></script>
+<script defer id="cmplz-cookiebanner-js" src="http://shemostudio.local/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.js?..."></script>
+```
+
+لم يظهر أي تحميل لـ `googletagmanager.com` أو `google-analytics.com` بعد تعطيل Site Kit.
+
+### 6. اختبار Frontend فعلي وتسجيل Page Views
+أثناء التحقق، اتضح إن `http://shemostudio.local/` على port 80 بيرجع صفحة IIS صغيرة بدل WordPress، لأن port 80 محجوز حاليًا بواسطة Windows/IIS (`System` process). موقع LocalWP الحقيقي شغال على Nginx الداخلي عند:
+
+```text
+127.0.0.1:10005
+```
+
+بدون تغيير `WordPress Address` أو `Site Address` وبدون Tunnel، تم استخدام proxy محلي مؤقت داخل جلسة الاختبار فقط يمرر الطلبات إلى `127.0.0.1:10005` مع `Host: shemostudio.local`، ويعيد كتابة روابط الاختبار محليًا حتى يستطيع المتصفح تحميل الصفحة والسكريبتات. هذا proxy محلي فقط، اتقفل بعد الاختبار، ولم يعرّض الموقع للإنترنت.
+
+تم فتح 3 URLs من الواجهة بمتصفح headless:
+
+- `/`
+- `/work/`
+- `/shop/`
+
+طلبات الشبكة المرصودة تضمنت تحميل سكريبت Burst المحلي:
+
+```text
+/wp-content/plugins/burst-statistics/assets/js/timeme/timeme.min.js
+/wp-content/uploads/burst/js/burst.min.js
+```
+
+ثم POSTs محلية إلى:
+
+```text
+/wp-json/burst/v1/track/
+```
+
+لم تظهر أي طلبات إلى Google Analytics أو Google Tag Manager أو `burst-statistics.com` أو أي خدمة تحليلات خارجية. ظهر طلب واحد من حماية المتصفح المحلية Kaspersky (`gc.kis.v2.scr.kaspersky-labs.com`) أثناء Playwright، وهذا ليس صادرًا من WordPress أو Burst.
+
+### 7. التحقق من قاعدة البيانات ولوحة WordPress
+قبل الاختبار كانت جداول Burst فاضية:
+
+```text
+stats=0
+sessions=0
+```
+
+بعد زيارات الواجهة:
+
+```text
+stats=3
+sessions=1
+```
+
+الصفوف المسجلة محليًا:
+
+| ID | page_url | page_type | session_id |
+|---|---|---|---|
+| 1 | `/` | `front-page` | 1 |
+| 2 | `/work/` | `archive` | 1 |
+| 3 | `/shop/` | `page` | 1 |
+
+رابط لوحة Burst داخل الإدارة موجود ومتوقع:
+
+```text
+http://shemostudio.local/wp-admin/admin.php?page=burst
+```
+
+لم يتم عمل تحقق بصري داخل لوحة الإدارة ببيانات دخول المستخدم. اتعملت محاولة مؤقتة لتوليد auth cookie عبر wp-cli بدون معرفة/تخزين كلمة مرور، لكنها فشلت بخطأ PHP داخل eval، فتم التوقف عنها بدل إنشاء مستخدم مؤقت أو طلب/تخزين credentials. التحقق العملي اعتمد على نفس جداول Burst التي تقرأها لوحة الإضافة، وعلى وجود dashboard URL الرسمي.
+
+### 8. التحقق من عدم التعارض مع Complianz
+Complianz بقيت نشطة، وسكريبت البانر (`cmplz-cookiebanner-js`) ما زال موجودًا في HTML. فحص تكامل Burst مع Complianz في كود الإضافة أظهر أنه عند تفعيل Cookieless Tracking لا يتم حظر Burst عبر Complianz:
+
+```php
+if ( (bool) burst_get_option( 'enable_cookieless_tracking' ) ) {
+    return;
+}
+```
+
+وبالفعل، أثناء اختبار الواجهة، Burst سجل pageviews رغم وجود Complianz، بدون انتظار موافقة كوكيز، لأن التتبع Cookieless.
+
+### 9. ملاحظات تحقق وأخطاء غير مؤثرة
+- ظهرت تحذيرات PHP startup متكررة من LocalWP بخصوص `php_imagick.dll` غير موجود — موجودة أثناء wp-cli، وليست ناتجة عن Burst تحديدًا.
+- طلب يدوي مبكر إلى `endpoint.php` بجسم JSON غير مطابق لتوقع الإضافة تسبب في PHP fatal داخل Burst (`completed_goals` وصل string بدل array). ده كان اختبار يدوي malformed، وليس ناتجًا عن سكريبت الواجهة الفعلي؛ اختبار الواجهة الحقيقي استخدم REST tracking وسجل البيانات بنجاح.
+- استعلام SQL سريع أولي استخدم عمودًا غير موجود (`referrer` داخل `wp_burst_statistics`) وسجل خطأ، ثم اتراجع واتقرأ الـschema الحقيقي (`referrer` موجود في `wp_burst_sessions`).
+- محاولة auth-cookie عبر wp-cli للوحة الإدارة فشلت داخل eval وتم إيقافها، ولم يتم إنشاء مستخدم مؤقت أو تخزين أي credentials.
+
+### 10. حدود المحطة (ما لم يتم لمسه عمدًا)
+- لم يتم تغيير `WordPress Address` أو `Site Address`.
+- لم يتم استخدام Tunnel أو تعريض LocalWP للإنترنت.
+- لم يتم إنشاء GA4 Property.
+- لم يتم تنفيذ OAuth أو ربط حساب Google.
+- لم يتم حذف Site Kit؛ فقط تم تعطيله مؤقتًا حتى بند الإنتاج.
+- بيانات Burst الحالية (3 pageviews + 1 session) بيانات اختبار LocalWP فقط، وليست بيانات إنتاج.
+- مشكلة port 80/IIS مقابل LocalWP Nginx الداخلي موثقة هنا، ولم يتم علاجها لأنها خارج نطاق المحطة وتحتاج قرارًا منفصلًا لو هنغيّر خدمات Windows/Local router.
+- فجوة sitemap 404 من المحطة 5 ما زالت مفتوحة، ولم تُلمس.
+- جدول سجل FluentSMTP الداخلي من المحطة 10 ما زال مفتوحًا، ولم يُلمس.
+
+### 11. بوابة المراجعة
+المحطة 11 خلصت بالنطاق الجديد المعتمد: Burst Statistics Free اتثبتت من مستودع WordPress الرسمي، اتفعلت، واتضبطت Cookieless + Turbo عبر أمر الإضافة الرسمي. Site Kit اتعطل مؤقتًا لإزالة أي تلميح/تحميل متعلق بـGoogle Analytics أو Tag Manager، مع تسجيل بند إنتاج مستقل لاحق لـGA4 + Search Console. تحقق فعليًا إن pageviews من الواجهة بتتسجل في جداول WordPress المحلية (`wp_burst_statistics`, `wp_burst_sessions`) وإن Complianz ما اتعارضش مع التتبع cookieless. لم يتم تغيير URLs، ولم يُستخدم Tunnel، ولم يتم إنشاء GA4 Property. **في انتظار جلسة جديدة للمحطة 12 فقط، بدون تنفيذ أي محطة إضافية هنا.**
