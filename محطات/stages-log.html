@@ -634,7 +634,7 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 <p>من البنود المفتوحة منذ المحطة 7: Cloudflare Turnstile keys، Site Kit OAuth (GA4)، FluentCRM SMTP. عند بداية المحطة 9 اتعرض الثلاثة على المستخدم مع تنبيه فني: GA4/Site Kit قد يتعثر لأن الموقع محلي فقط (<code>shemostudio.local</code>) وGoogle محتاج يتحقق من الموقع عن بُعد. المستخدم اختار <strong>Cloudflare Turnstile</strong> أولًا.</p>
 
 <h3>1. تجهيز البيئة وفحص الكود</h3>
-<p>تم فحص كود Fluent Forms (<code>app/Modules/Turnstile/Turnstile.php</code> + <code>GlobalSettingsHelper.php</code> + <code>Services/FormBuilder/Components/Turnstile.php</code>) لتحديد أماكن التخزين والعرض الفعلية بدل التخمين: المفاتيح في option واحد <code>_fluentform_turnstile_details</code> (<code>siteKey</code>, <code>secretKey</code>, <code>invisible</code>, <code>appearance</code>, <code>theme</code>) + علم <code>_fluentform_turnstile_keys_status</code>. تم التأكد إن الاتنين فاضيين قبل البدء، وإن الموقع لسه معندوش فورم "Start a Project" حقيقي (بس الفورمين الافتراضيين "Contact Form Demo" و"Subscription Form") — يعني نطاق المحطة هو ربط المفاتيح على مستوى الإضافة، مش تفعيل الحماية على فورم فعلي بعد (ده بند مفتوح في <code>APPROVED-DECISIONS.md</code>).</p>
+<p>تم فحص كود Fluent Forms لتحديد أماكن التخزين والعرض الفعلية بدل التخمين: بيانات Turnstile محفوظة في option خاص بالإعدادات العامة، مع علم منفصل يتحكم في ظهور Turnstile كخيار متاح في منشئ الفورم. تم التأكد إن الاتنين فاضيين قبل البدء، وإن الموقع لسه معندوش فورم "Start a Project" حقيقي (بس الفورمين الافتراضيين "Contact Form Demo" و"Subscription Form") — يعني نطاق المحطة هو ربط المفاتيح على مستوى الإضافة، مش تفعيل الحماية على فورم فعلي بعد (ده بند مفتوح في <code>APPROVED-DECISIONS.md</code>).</p>
 
 <h3>2. إنشاء Widget حقيقي من Cloudflare</h3>
 <p>اتوجّه المستخدم لإنشاء Turnstile widget من <code>dash.cloudflare.com</code> (دومين <code>shemostudio.local</code>، وضع Managed) ورجع فعليًا بـSite Key وSecret Key حقيقيين من حسابه.</p>
@@ -690,13 +690,13 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 <p>فحص كود FluentCRM نفسه (<code>Mailer.php</code>, <code>SettingsController.php</code>) كشف إن FluentCRM <strong>مفيهوش إعدادات SMTP مدمجة جوّاه خالص</strong> — كل الإرسال بيمر عبر <code>wp_mail()</code> الأساسية، وكوده نفسه بيدوّر على <code>get_option('fluentmail-settings')</code> (إضافة FluentSMTP تحديدًا) عشان يعرض حالة الاتصال. فحص مجلد الإضافات أكّد إنها <strong>مش متركّبة خالص</strong>. هذا اكتشاف فتح <strong>قرار جديد غير موجود في القرارات 1-16</strong> — عُرض على المستخدم صراحةً قبل أي تنفيذ.</p>
 
 <h3>2. جمع بيانات الاتصال الحقيقية</h3>
-<p>المستخدم وفّر حساب Gmail حقيقي (إيميل + App Password مخصص من 16 حرف — يعني الحساب مفعّل عليه 2FA، الأسلوب الآمن الصحيح، مش كلمة مرور الحساب الرئيسية) وطلب توثيق أن هذا اتصال <strong>مؤقت لمرحلة التطوير/الاختبار فقط</strong>، وأن مزوّد الإنتاج النهائي هيتحدد عند تجهيز الاستضافة الحقيقية وإيميل الدومين.</p>
+<p>المستخدم وفّر حساب Gmail حقيقي مع طريقة مصادقة مخصصة للتطبيقات (وليس كلمة مرور الحساب الرئيسية) وطلب توثيق أن هذا اتصال <strong>مؤقت لمرحلة التطوير/الاختبار فقط</strong>، وأن مزوّد الإنتاج النهائي هيتحدد عند تجهيز الاستضافة الحقيقية وإيميل الدومين. لم تُسجّل أي قيمة سرية في ملفات المشروع.</p>
 
 <h3>3. تركيب FluentSMTP وفحص الـ Schema الفعلي</h3>
 <p>run-hash اتأكد إنه لسه <code>3PbB5bi_t</code>. اتركبت وتفعّلت <code>fluent-smtp</code> v2.2.95 عبر wp-cli (14 → 15 إضافة نشطة). اتفحص كود الإضافة نفسها (<code>Providers/Smtp/ValidatorTrait.php</code>, <code>Providers/config.php</code>, <code>Models/Settings.php</code>, <code>Functions/helpers.php</code>) بدل التخمين، ولوحظ: آلية تشفير مدمجة رسمية (AES-256-CTR) عبر <code>fluentMailGetSettings()</code>/<code>fluentMailSetSettings()</code>، والطريقة الرسمية لحفظ اتصال هي <code>\FluentMail\App\Models\Settings::store()</code> — نفس كود واجهة الإدارة نفسها، مش تعديل <code>wp_options</code> يدوي.</p>
 
 <h3>4. التنفيذ الفعلي</h3>
-<p>عبر <code>wp eval-file</code>، استُدعيت <code>Settings::store()</code> ببيانات حقيقية: <code>host=smtp.gmail.com</code>, <code>port=587</code>, <code>encryption=tls</code>, <code>username=darhous2023@gmail.com</code>, <code>sender_name=Shemo Studio</code>. تم التحقق سطر-سطر من القراءة الرجعية عبر <code>fluentMailGetSettings()</code> (تفك التشفير تلقائيًا): كل القيم مطابقة تمامًا، وطول الباسورد بعد فك التشفير 16 حرف مطابق حرفيًا للأصل.</p>
+<p>عبر <code>wp eval-file</code>، استُدعيت <code>Settings::store()</code> ببيانات اتصال حقيقية لكن غير موثقة في Git. تم التحقق بالقراءة الرجعية عبر <code>fluentMailGetSettings()</code> من نجاح حفظ إعدادات مزوّد التطوير ومن أن القيمة الحساسة تُفك وتُستخدم داخل WordPress فقط، بدون كتابة أي سر في ملفات المشروع.</p>
 
 <h3>5. اختبار end-to-end حقيقي (إرسال فعلي)</h3>
 <p>اتنفّذ <code>wp_mail()</code> فعليًا لإرسال إيميل اختبار حقيقي لـ <code>ahmeddarhous@gmail.com</code>. النتيجة: <strong><code>SENT=TRUE</code></strong> بدون أي خطأ على <code>wp_mail_failed</code> — معاملة SMTP فعلية نجحت (مصادقة صحيحة + تسليم)، مش بس "إعدادات اتخزّنت". تكرر الإرسال مرتين، نفس النتيجة الناجحة.</p>
@@ -1135,7 +1135,7 @@ design/mockups/phase14-favicon.svg</code></pre>
 <p class="meta">
   التاريخ: 2026-07-01 ·
   <span class="badge done">✅ مكتملة</span> ·
-  النوع: فحص توافق تقني + تنفيذ Polylang Free + توثيق قرار
+  النوع: فحص توافق تقني + تنفيذ Polylang Free + استراتيجية Case Studies ونبرة محتوى
 </p>
 
 <h3>السياق</h3>
@@ -1196,8 +1196,34 @@ design/mockups/phase14-favicon.svg</code></pre>
 <li>فجوة sitemap XML المحلية القديمة بسبب LocalWP/Nginx مع ملفات <code>.xml</code> لم يتم لمسها في هذه المحطة.</li>
 </ul>
 
+<h3>7. استراتيجية Case Studies ونبرة المحتوى</h3>
+<p>بعد إغلاق الجزء التقني مؤقتًا، نبّه المستخدم أن المحطة 15 لم تكتمل لأنها كانت تشمل بندًا ثانيًا من <code>محطات/roadmap.md</code>: استراتيجية Case Studies ونبرة المحتوى. تم أولًا عمل commit+push فوري لشغل Polylang الموجود: <code>542dcc4 Complete Phase 15 localization setup</code>.</p>
+<p>ثم عُرضت بوابة قرار صريحة على المستخدم بثلاثة اختيارات: Demo/Concept Projects موسومة بوضوح، Work "قريبًا" مؤقتًا، أو شغل شخصي حقيقي كعينات أولى. اختار المستخدم صراحةً: <strong>Demo/Concept Projects موسومة بوضوح</strong>.</p>
+<p>بناءً على ذلك تم تسجيل القرار رقم 25 في <code>APPROVED-DECISIONS.md</code>: يسمح ببناء عينات Demo/Concept أصلية وموسومة بوضوح في Work/Case Studies إلى حين توفر أعمال عملاء حقيقية، مع منع أي أسماء عملاء وهمية أو نتائج/شهادات غير حقيقية.</p>
+
+<h3>8. دليل النبرة الثنائي</h3>
+<p>تم إنشاء ملف مرجعي جديد: <code>design/content/tone-of-voice.md</code>. الملف يحدد نبرة Shemo Studio لمحطات بناء الصفحات 16-20: Hybrid studio + visible founder، العربية لغة الإطلاق الأساسية، ثقة هادئة بدون مبالغة، حضور المؤسس بدون تحويل الموقع لبراند شخصي بحت، وقواعد صريحة لوسم Demo/Concept Projects.</p>
+<table>
+<tr><th>اللغة</th><th>وسم Demo/Concept المطلوب</th></tr>
+<tr><td>عربي</td><td><code>مشروع تجريبي / Concept - غير منفّذ لعميل تجاري</code></td></tr>
+<tr><td>English</td><td><code>Demo / Concept Project - Not commissioned by a client</code></td></tr>
+</table>
+<p>ممنوع: أسماء عملاء وهمية، metrics وهمية، testimonials وهمية، أو before/after claims غير حقيقية.</p>
+
+<h3>9. تحقق الإغلاق النهائي</h3>
+<ul>
+<li>Polylang ما زال active، والافتراضي <code>ar</code>.</li>
+<li><code>/</code> يرجع 200 و<code>lang="ar"</code> و<code>dir="rtl"</code>.</li>
+<li><code>/en/</code> يرجع 200 و<code>lang="en-US"</code>.</li>
+<li><code>php -l</code> نجح على ملفات الثيم المعدلة.</li>
+<li><code>محطات/stages-log.html</code> اتعمل له HTML parse ناجح.</li>
+<li><code>git diff --check</code> نجح.</li>
+<li><code>git grep</code> لفحص أسرار شائعة لم يجد أسرارًا في الملفات المتتبعة.</li>
+<li><code>MASTER-PLAN.md</code> بقي untracked عمدًا ولم يدخل أي commit.</li>
+</ul>
+
 <div class="gate">
-<strong>7. بوابة الإغلاق:</strong> المحطة 15 اكتملت: Free مقابل Pro اتقفل لصالح Polylang Free، وتم تنفيذ الثنائية اللغوية تقنيًا بدون شراء، وتوثيق القرار رقم 24 في <code>APPROVED-DECISIONS.md</code>. الموقع الآن Arabic-first تقنيًا في <code>/</code> وEnglish في <code>/en/</code>، والمرحلة التالية هي بناء/ترجمة المحتوى الفعلي داخل محطات الصفحات اللاحقة.
+<strong>10. بوابة الإغلاق:</strong> المحطة 15 اكتملت الآن بجزأيها: (1) Polylang Free اتقفل واتنفذ تقنيًا بدون شراء، مع Arabic-first في <code>/</code> وEnglish في <code>/en/</code> وتوثيق القرار 24، و(2) استراتيجية Case Studies اتقفلت لصالح Demo/Concept Projects موسومة بوضوح، مع دليل نبرة ثنائي اللغة في <code>design/content/tone-of-voice.md</code> وتوثيق القرار 25. لا يتم الانتقال للمحطة 16 إلا بعد commit+push النهائي لهذه الإضافة.
 </div>
 </div>
 
