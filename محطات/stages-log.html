@@ -567,5 +567,59 @@ define( 'SCRIPT_DEBUG', true );</code></pre>
 
 </div>
 
+<div class="stage" id="stage-8">
+<h2>المحطة 8 — إعداد Complianz Consent Wizard (بانر موافقة الكوكيز فعليًا)</h2>
+<p class="meta">
+  التاريخ: 2026-07-01 ·
+  <span class="badge done">✅ مكتملة</span> ·
+  النوع: تعديل فعلي على موقع LocalWP — إكمال معالج Complianz عبر الدالة العامة الرسمية <code>cmplz_update_option()</code>، بدون أي مفاتيح/حسابات خارجية
+</p>
+
+<h3>السياق</h3>
+<p>المحطة 7 سابت معالج Complianz الأول (Consent Wizard) لاستكمال يدوي لاحق. المستخدم اختار "Complianz" كهدف المحطة 8 من بين الأربعة المتبقية — الثلاثة التانية (Site Kit OAuth، Turnstile keys، FluentCRM SMTP) محتاجة حسابات/مفاتيح خارجية حقيقية وأُجّلت لمحطات لاحقة.</p>
+
+<h3>1. لماذا مش عبر واجهة wp-admin أو تعديل DB مباشر</h3>
+<p>Complianz 7.5.0 مالوش أوامر wp-cli جاهزة، وبيخزّن إعداداته في option واحد (<code>cmplz_options</code>). بدل تعديل قاعدة البيانات مباشرة (خطر على أداة قانونية حساسة)، تم فحص كود الإضافة ولقينا دالة عامة مخصصة بالظبط لهذا الغرض: <code>cmplz_update_option( $name, $value )</code> — بتتحقق من صحة الحقل، بتنضّف القيمة، وبتُطلق نفس الـ hooks اللي بتتطلق لو حد ملى الفورم يدويًا. كمان <code>cmplz_admin_logged_in()</code> بتتحقق صراحة <code>defined('WP_CLI') && WP_CLI</code> كـbypass رسمي من مطوّري الإضافة نفسهم.</p>
+
+<h3>2. القرارات المطلوبة من المستخدم قبل التنفيذ</h3>
+<ul>
+<li><strong>النطاق الجغرافي/القانوني:</strong> "عالمي (GDPR+CCPA+أقوى حماية)". <strong>قيد فني اتوضّح:</strong> النسخة المجانية بتسمح بنظام قانوني افتراضي واحد بس لكل الزوار (لا يوجد استهداف ديناميكي حسب الدولة — Premium فقط). القرار الفني: <strong><code>eu</code> (GDPR)</strong> بوصفه أشد نظام (opt-in افتراضي)، بيغطي عمليًا متطلبات CCPA (opt-out) تلقائيًا.</li>
+<li><strong>فئات الكوكيز:</strong> "أساسي + إحصائيات + تسويق/إعلانات" — الثلاثة اتفعّلوا في البانر.</li>
+<li><strong>لغة البانر:</strong> "ثنائي (AR+EN)". <strong>فجوة فنية اتكشفت:</strong> الموقع مالوش Polylang/WPML مثبّت أصلاً (<code>get_locale()</code> = <code>en_US</code>) — تفعيل اللغة الثنائية قرار مفتوح من المحطة 2/6. البانر دلوقتي إنجليزي بس، وهيبقى ثنائي تلقائيًا لما محطة Polylang تحصل مستقبلاً.</li>
+</ul>
+<p>معلومات حقيقية لازمة للمستندات القانونية (مش مفاتيح خارجية): اسم المؤسسة <strong>"Shemo Studio"</strong>، العنوان <strong>"القاهرة، مصر"</strong> فقط (بدون شارع تفصيلي). وبخصوص صفحة Privacy Policy القديمة (ID 3، draft من المحطة 6): Complianz بيربط بصفحات <code>publish</code> بس تلقائيًا — تعارض مع قرار "تسيبها draft". المستخدم اختار: <strong>خلي Complianz يولّد صفحة جديدة منفصلة</strong>.</p>
+
+<h3>3. التنفيذ الفعلي</h3>
+<ul>
+<li>عبر <code>wp eval-file</code> مع <code>wp_set_current_user(1)</code> (مطلوبة لـ<code>cmplz_user_can_manage()</code> جوه سياق CLI)، تم ضبط 24 حقل عبر <code>cmplz_update_option()</code>: النطاق (<code>regions=eu</code>, <code>eu_consent_regions=yes</code>)، المستندات (<code>cookie-statement=generated</code>, <code>privacy-statement=generated</code>)، بيانات المؤسسة (اسم/عنوان/دولة/إيميل)، الإحصائيات (<code>compile_statistics=yes</code> — عام، لأن GA4 هيتوصل لاحقًا عبر Site Kit)، التسويق (<code>uses_ad_cookies=yes</code>)، احترام Do Not Track، و<code>enable_cookie_banner=yes</code> + <code>enable_cookie_blocker=yes</code>. تحقق 24/24 OK، و<code>cmplz_wizard_completed_once=true</code>.</li>
+<li>اكتشفنا إن إنهاء المعالج مبيولّدش صفحات المستندات تلقائيًا (زرار منفصل). استُخدمت الدالة العامة <code>COMPLIANZ::$documents_admin->create_page()</code> لإنشاء <strong>Cookie Policy (EU)</strong> (ID 17) و<strong>Privacy Statement (EU)</strong> (ID 18)، الاتنين <code>publish</code> بمحتوى حقيقي (اسم المؤسسة والعنوان ظاهرين، الإيميل معروض مشفّر ضد الـspam).</li>
+</ul>
+
+<h3>4. التحقق من عدم وجود Regression (end-to-end)</h3>
+<ul>
+<li><code>/</code> و<code>/work/</code> و<code>/wp-login.php</code> و<code>/shop/</code> — كلهم <strong>200 OK</strong> قبل وبعد.</li>
+<li>نفس 13 إضافة نشطة قبل وبعد، بدون أي خطأ جديد، ومفيش <code>debug.log</code> جديد.</li>
+<li>تاجلاين المحطة 1 وmeta robots noindex لسه ظاهرين — مفيش تأثير على محطات سابقة.</li>
+<li><strong>البانر فعليًا ظاهر</strong> على الصفحة الرئيسية و<code>/work/</code> — فحص HTML حي لقى كلاسات <code>cmplz-cookiebanner--optin</code> و<code>cmplz-desc-functional/statistics/marketing/preferences--optin</code> كلها موجودة فعليًا في وضع opt-in.</li>
+<li>صفحتي المستندات الجديدتين (<code>/cookie-policy-eu/</code>, <code>/privacy-statement-eu/</code>) بترجعوا 200 OK بمحتوى حقيقي.</li>
+</ul>
+
+<h3>5. حدود المحطة (ما لم يتم لمسه عمدًا)</h3>
+<ul>
+<li>البانر إنجليزي بس دلوقتي — اللغة الثنائية محتاجة Polylang أولاً (بند مفتوح من المحطة 2/6).</li>
+<li>GA4 (Site Kit) لسه مش متصل بحساب Google حقيقي — فئة Statistics موجودة structural بس، مفيش تتبّع فعلي.</li>
+<li>صفحة Privacy Policy القديمة (ID 3) فضلت زي ما هي (draft، مربوطة بـ<code>wp_page_for_privacy_policy</code>) — متلموستش خالص. دلوقتي فيه صفحتين "خصوصية": القديمة (مسودة، مش منشورة) والجديدة (منشورة وفعلية في البانر). <strong>قرار مستقبلي مفتوح:</strong> توحيد الاتنين ولا تسييبهم منفصلين.</li>
+<li>Cloudflare Turnstile keys، Site Kit OAuth، FluentCRM SMTP — لسه برّة نطاق هذه المحطة بالكامل.</li>
+<li><code>impressum</code> و<code>disclaimer</code> اتسابوا <code>none</code> (متسألش عنهم المستخدم).</li>
+<li>الفجوة الفنية بتاعة sitemaps 404 (المحطة 5) لسه مفتوحة.</li>
+</ul>
+
+<div class="gate">
+<strong>6. بوابة المراجعة:</strong> المحطة 8 خلصت: بانر موافقة كوكيز حقيقي شغّال فعليًا على الموقع بالكامل — النطاق القانوني (GDPR)، فئات الكوكيز الثلاثة، مستندين قانونيين حقيقيين بمعلومات مؤسسة حقيقية، كل ده بدون أي مفتاح/حساب خارجي عبر الدالة الرسمية من الإضافة نفسها بدل تعديل DB يدوي خطير. اتسأل المستخدم صراحة عن كل قرار محتاج حكم بشري (النطاق، الفئات، اللغة، اسم المؤسسة، العنوان، مصير صفحة الخصوصية القديمة) قبل أي تنفيذ. فجوة اللغة الثنائية اتوضحت بصراحة كقيد فني مش تم تجاهله. تعارض صفحة الخصوصية القديمة مع آلية اكتشاف Complianz اتحل بإنشاء مستند جديد منفصل، مع ترك قرار مصير الصفحة القديمة مفتوح للمستخدم. تحقق end-to-end كامل (قراءة القيم + فحص HTML حي للبانر + فحوصات HTTP).
+في انتظار توجيه المستخدم للانتقال إلى <strong>المحطة 9</strong>.
+</div>
+
+</div>
+
 </body>
 </html>
